@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntheverse - POD Submission</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✦ Syntheverse POD Submission ◇</h1>
+        <p class="subtitle">Submit your Proof-of-Discovery contribution</p>
+        
+        <form id="pod-form">
+            <div class="form-group">
+                <label for="title">Discovery Title *</label>
+                <input type="text" id="title" required placeholder="Enter the title of your discovery">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" required placeholder="Describe your discovery in detail"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" required>
+                    <option value="">Select a category</option>
+                    <option value="research">Research</option>
+                    <option value="technology">Technology</option>
+                    <option value="ai">AI/ML</option>
+                    <option value="blockchain">Blockchain</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="evidence">Evidence/Documentation</label>
+                <textarea id="evidence" placeholder="Provide links, references, or descriptions of supporting evidence"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="contributor">Contributor ID *</label>
+                <input type="text" id="contributor" required placeholder="Your contributor identifier">
+            </div>
+            
+            <button type="submit">Submit POD</button>
+        </form>
+        
+        <div id="status" class="status"></div>
+    </div>
+    
+    <script>
+        document.getElementById('pod-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                evidence: document.getElementById('evidence').value,
+                contributor: document.getElementById('contributor').value,
+            };
+            
+            // TODO: Submit to backend API
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status success';
+            statusDiv.style.display = 'block';
+            statusDiv.textContent = 'Submission received! (Backend integration pending)';
+        });
+    </script>
+</body>
+</html>
+

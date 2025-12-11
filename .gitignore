@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Data directories (exclude data files, but keep directory structure)
+data/pdfs/*.pdf
+data/parsed/*.json
+data/vectorized/embeddings/*.json
+data/vectorized/metadata/*.json
+*.pdf
+scrape_results.json
+
+# Keep directory structure
+!data/pdfs/.gitkeep
+!data/parsed/.gitkeep
+!data/vectorized/embeddings/.gitkeep
+!data/vectorized/metadata/.gitkeep
+!data/**/README.md
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# ChromaDB
+chroma_db/
+
+# Temporary files
+*.tmp
+*.temp
+

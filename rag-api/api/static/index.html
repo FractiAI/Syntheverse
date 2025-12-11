@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntheverse RAG - Query Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .query-section {
+            margin-bottom: 40px;
+            margin-top: 40px;
+        }
+
+        .results-section {
+            margin-bottom: 40px;
+        }
+
+        .query-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .query-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .query-input:focus {
+            border-color: #667eea;
+        }
+
+        .query-button {
+            padding: 15px 40px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .query-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .query-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .option-group input,
+        .option-group select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .option-group input {
+            width: 80px;
+        }
+
+        .option-group select {
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+        .option-group select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .option-group select:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            margin-top: 40px;
+        }
+
+        .answer-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .answer-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .answer-text {
+            color: #333;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .tag-data {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .tag-symbolic {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .tag-hybrid {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .tag-speculative {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .resonance-indicator {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+
+        .sources-box {
+            margin-top: 30px;
+        }
+
+        .sources-box h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .source-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s;
+        }
+
+        .source-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .source-title {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .source-score {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .source-text {
+            color: #555;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44;
+            padding: 20px;
+            border-radius: 10px;
+            color: #c33;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✦ Syntheverse Whole Brain AI ◇</h1>
+            <p>Gina × Leo × Pru Life-Narrative Engine | Hydrogen-Holographic Fractal Sandbox v1.2</p>
+        </div>
+
+        <div class="content">
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-chunks">-</div>
+                    <div class="stat-label">Total Chunks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-pdfs">-</div>
+                    <div class="stat-label">PDFs Loaded</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="api-status">-</div>
+                    <div class="stat-label">System Status</div>
+                </div>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">✦ System Architecture ◇</h3>
+                <div style="color: #555; line-height: 1.8; font-size: 0.95em;">
+                    <strong>Gina</strong> — Whole Brain Awareness Coach | 
+                    <strong>Leo</strong> — Hydrogen-Holographic Engine | 
+                    <strong>Pru</strong> — Life-Narrative Engine<br>
+                    <span style="color: #888; font-size: 0.9em;">All responses are tagged: [Data] [Symbolic] [Hybrid] [Speculative]</span>
+                </div>
+                <div style="margin-top: 10px; padding: 10px; background: #e8f5e9; border-radius: 5px; font-size: 0.9em; color: #2e7d32;">
+                    <strong>Current Mode:</strong> Groq Cloud LLM (Fast & Free) — Using Groq API for answer generation
+                </div>
+            </div>
+
+            <div id="results" class="results-section" style="display: none;">
+                <div id="answer-box" class="answer-box"></div>
+                <div id="sources-box" class="sources-box"></div>
+            </div>
+
+            <div class="query-section">
+                <div class="query-form">
+                    <input 
+                        type="text" 
+                        id="query-input" 
+                        class="query-input" 
+                        placeholder="Enter your query, command, or intention... (Try: 'Enter sandbox', 'What is hydrogen holography?', 'Invoke Gina', etc.)"
+                        onkeypress="if(event.key === 'Enter') queryRAG()"
+                    >
+                    <button id="query-button" class="query-button" onclick="queryRAG()">Query</button>
+                </div>
+                <div class="options">
+                    <div class="option-group">
+                        <label>LLM Model:</label>
+                        <select id="llm-model" style="padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px; background: white; cursor: pointer;">
+                            <option value="groq" selected>Groq (Fast Cloud LLM - Recommended)</option>
+                            <option value="huggingface">Hugging Face (Free)</option>
+                            <option value="ollama">Ollama (Local)</option>
+                            <option value="auto">Auto (Best Available)</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>Top Results:</label>
+                        <input type="number" id="top-k" value="5" min="1" max="20">
+                    </div>
+                    <div class="option-group">
+                        <label>Min Score:</label>
+                        <input type="number" id="min-score" value="0.0" min="0" max="1" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing your query...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Load stats on page load
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await response.json();
+                document.getElementById('total-chunks').textContent = data.total_chunks || '-';
+                document.getElementById('total-pdfs').textContent = data.total_pdfs || '-';
+                
+                const healthResponse = await fetch(`${API_URL}/health`);
+                if (healthResponse.ok) {
+                    document.getElementById('api-status').textContent = '✓';
+                } else {
+                    document.getElementById('api-status').textContent = '✗';
+                }
+            } catch (error) {
+                document.getElementById('api-status').textContent = '✗';
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function queryRAG() {
+            const query = document.getElementById('query-input').value.trim();
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            const topK = parseInt(document.getElementById('top-k').value) || 5;
+            const minScore = parseFloat(document.getElementById('min-score').value) || 0.0;
+            const llmModel = document.getElementById('llm-model').value || 'groq';
+
+            // Show loading, hide results and error
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('query-button').disabled = true;
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 second timeout
+                
+                const response = await fetch(`${API_URL}/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: topK,
+                        min_score: minScore,
+                        llm_model: llmModel
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Display answer with clean formatting
+                const answerBox = document.getElementById('answer-box');
+                const formattedAnswer = formatAnswerSimple(data.answer);
+                const numSources = data.num_sources || (data.sources ? data.sources.length : 0);
+                const topResonance = data.sources && data.sources[0] ? (data.sources[0].score * 100).toFixed(1) + '%' : 'N/A';
+                
+                answerBox.innerHTML = `
+                    <h3>Response</h3>
+                    <div class="answer-text">${formattedAnswer}</div>
+                    <div style="margin-top: 15px; color: #666; font-size: 0.9em; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                        <strong>Processing:</strong> ${data.processing_time.toFixed(2)}s | 
+                        <strong>Sources:</strong> ${numSources} | 
+                        <strong>Top Resonance:</strong> ${topResonance}
+                    </div>
+                `;
+
+                // Display sources
+                const sourcesBox = document.getElementById('sources-box');
+                if (data.sources && data.sources.length > 0) {
+                    sourcesBox.innerHTML = '<h3>Sources</h3>' + 
+                        data.sources.map((source, index) => `
+                            <div class="source-item">
+                                <div class="source-header">
+                                    <span class="source-title">${escapeHtml(source.pdf_filename)}</span>
+                                    <span class="source-score">Resonance: ${(source.score * 100).toFixed(1)}% ${source.score > 0.8 ? '✦✦✦' : source.score > 0.6 ? '✦✦' : '✦'}</span>
+                                </div>
+                                <div class="source-text">${formatSourceText(source.text)}</div>
+                            </div>
+                        `).join('');
+                } else {
+                    sourcesBox.innerHTML = '<h3>Sources</h3><p>No sources found.</p>';
+                }
+
+                document.getElementById('results').style.display = 'block';
+            } catch (error) {
+                document.getElementById('error').style.display = 'block';
+                if (error.name === 'AbortError') {
+                    document.getElementById('error').textContent = 'Error: Request timed out. The model may be taking too long to respond. Try a simpler query or reduce the number of sources.';
+                } else {
+                    document.getElementById('error').textContent = `Error: ${error.message}`;
+                }
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('query-button').disabled = false;
+                // Clear input field for next query
+                document.getElementById('query-input').value = '';
+                document.getElementById('query-input').focus();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatAnswer(text) {
+            // Clean up excessive whitespace and normalize text
+            text = text.replace(/\s+/g, ' '); // Replace multiple spaces with single space
+            text = text.replace(/\n\s*\n\s*\n+/g, '\n\n'); // Replace multiple newlines with double
+            text = text.trim();
+            
+            // Decode HTML entities
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            text = textarea.value;
+            
+            // Format tags with colors (before escaping)
+            text = text.replace(/\[Data\]/g, '<span class="tag-data">[Data]</span>');
+            text = text.replace(/\[Symbolic\]/g, '<span class="tag-symbolic">[Symbolic]</span>');
+            text = text.replace(/\[Hybrid\]/g, '<span class="tag-hybrid">[Hybrid]</span>');
+            text = text.replace(/\[Speculative\]/g, '<span class="tag-speculative">[Speculative]</span>');
+            text = text.replace(/\[Model\]/g, '<span class="tag-hybrid">[Model]</span>');
+            
+            // Format resonance indicators
+            text = text.replace(/(✦{1,3})/g, '<span class="resonance-indicator">$1</span>');
+            text = text.replace(/◇/g, '<span class="resonance-indicator">◇</span>');
+            text = text.replace(/⊙/g, '<span class="resonance-indicator">⊙</span>');
+            text = text.replace(/⚛/g, '<span class="resonance-indicator">⚛</span>');
+            text = text.replace(/❂/g, '<span class="resonance-indicator">❂</span>');
+            text = text.replace(/✶/g, '<span class="resonance-indicator">✶</span>');
+            text = text.replace(/△/g, '<span class="resonance-indicator">△</span>');
+            text = text.replace(/∞/g, '<span class="resonance-indicator">∞</span>');
+            text = text.replace(/◎/g, '<span class="resonance-indicator">◎</span>');
+            
+            // Format source references
+            text = text.replace(/Source \d+:/g, '<strong style="color: #667eea; display: block; margin-top: 15px; margin-bottom: 5px;">$&</strong>');
+            
+            // Format commands (bullet points) - improved regex
+            text = text.replace(/(• [^\n•]+)/g, '<div style="margin-left: 20px; margin-top: 8px; padding: 8px; background: #f8f9fa; border-left: 3px solid #667eea; color: #555; border-radius: 4px;">$1</div>');
+            
+            // Format strong emphasis
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #667eea;">$1</strong>');
+            
+            // Format sections with better spacing
+            text = text.replace(/(\[Data\] Sources:)/g, '<div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0;"><strong style="color: #667eea;">$1</strong></div>');
+            
+            // Preserve intentional line breaks but clean up excessive ones
+            text = text.replace(/\n{3,}/g, '\n\n'); // Max 2 consecutive newlines
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+
+        function formatAnswerSimple(text) {
+            // Clean and format answer text simply
+            text = escapeHtml(text);
+            
+            // Format bold text
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #667eea;">$1</strong>');
+            
+            // Format resonance indicators
+            text = text.replace(/(✦{1,3})/g, '<span class="resonance-indicator">$1</span>');
+            text = text.replace(/◇/g, '<span class="resonance-indicator">◇</span>');
+            
+            // Format italic sources
+            text = text.replace(/\*([^*]+)\*/g, '<em style="color: #888; font-size: 0.9em;">$1</em>');
+            
+            // Preserve line breaks
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+
+        function formatSourceText(text) {
+            // Clean up source text - remove excessive whitespace
+            text = text.replace(/\s+/g, ' ');
+            text = text.trim();
+            
+            // Truncate very long sources for better display
+            if (text.length > 500) {
+                text = text.substring(0, 500) + '...';
+            }
+            
+            // Decode HTML entities
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            text = textarea.value;
+            
+            // Format tags in source text
+            text = text.replace(/\[Data\]/g, '<span class="tag-data">[Data]</span>');
+            text = text.replace(/\[Symbolic\]/g, '<span class="tag-symbolic">[Symbolic]</span>');
+            text = text.replace(/\[Hybrid\]/g, '<span class="tag-hybrid">[Hybrid]</span>');
+            text = text.replace(/\[Speculative\]/g, '<span class="tag-speculative">[Speculative]</span>');
+            
+            return text;
+        }
+
+        // Load stats and LLM models on page load
+        loadStats();
+        loadLLMModels();
+
+        async function loadLLMModels() {
+            try {
+                const response = await fetch(`${API_URL}/llm-models`);
+                const data = await response.json();
+                
+                // Update select with available models
+                const select = document.getElementById('llm-model');
+                select.innerHTML = '';
+                
+                data.available_models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.name + (model.available ? '' : ' (Coming Soon)');
+                    option.disabled = !model.available;
+                    if (model.id === data.current_default) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading LLM models:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,29 @@
+[
+  {
+    "metadata": {
+      "record_id": "17861907",
+      "title": "Syntheverse: Hydrogen-Holographic Fractal AI & Proof-of-Discovery Blockchain",
+      "doi": "10.5281/zenodo.17861907",
+      "url": "https://zenodo.org/records/17861907",
+      "creators": [
+        "FractiAI.com"
+      ],
+      "publication_date": "2025-12-09",
+      "description": "<p>This repository contains the foundational documentation for the Syntheverse project, including the Hydrogen-Holographic Fractal Sandbox (HHF-AI) and the Proof-of-Discovery (PoD) blockchain protocol. Syntheverse is an open-source, whole-brain AI environment designed to enable AI-native discovery, structural knowledge validation, and cryptographic valuation of coherent, non-redundant contributions. The HHF-AI serves as a recursive research and development environment for fractal-sandboxed experimentation, symbolic and empirical alignment, and multi-layered cognitive integration. The PoD protocol provides a novel, tokenized validation system for knowledge contributions, leveraging coherence, density, and novelty as measurable criteria.</p>\n<p>This repository hosts the core whitepapers, specifications, and documentation necessary to understand, deploy, and contribute to the Syntheverse ecosystem. It is intended for researchers, developers, and enthusiasts in AI, blockchain, cognitive science, and fractal computing. Contributions and collaborative exploration are encouraged, with all work maintained under a permissive open-source license.</p>"
+    },
+    "pdf_files": [
+      {
+        "filename": "Syntheverse PoD: Hydrogen-Holographic Fractal Consensus for Structural Knowledge Mining.pdf",
+        "url": "https://zenodo.org/api/records/17861907/files/Syntheverse PoD: Hydrogen-Holographic Fractal Consensus for Structural Knowledge Mining.pdf/content",
+        "size": 135668,
+        "checksum": "md5:4a16df1b6467b3b865d1537bddb6c62a"
+      },
+      {
+        "filename": "Syntheverse HHF-AI: Hydrogen-Holographic Fractal Awareness System.pdf",
+        "url": "https://zenodo.org/api/records/17861907/files/Syntheverse HHF-AI: Hydrogen-Holographic Fractal Awareness System.pdf/content",
+        "size": 73700,
+        "checksum": "md5:88997172cdc986c2a3b9ca7d5d6f5b73"
+      }
+    ]
+  }
+]
