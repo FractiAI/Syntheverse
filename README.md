@@ -9,7 +9,7 @@ Welcome to the **Syntheverse GitHub repository**, the central hub for all code, 
 * **Syntheverse core code** for the fractal AI game environment
 * **Proof-of-Discovery (PoD) protocol** implementation
 * **SYNTH tokenomics and smart contract templates**
-* **Documentation and onboarding** for new Outcast Heroes
+* **Documentation and onboarding** for new Outcast Hero Frontiersmen
 * **FractAI updates and symbolic-cognitive experiments**
 
 ---
