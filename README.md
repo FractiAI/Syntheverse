@@ -70,7 +70,6 @@ Syntheverse is currently in **prerelease testing and tuning**. Early contributor
 
 ## **Join the Frontier**
 
-Become an **Outcast Hero**. Explore, discover, contribute, and shape the **living Syntheverse ecosystem**. Every discovery expands the fractal awareness of the hydrogen-holographic frontier.
+Join as the **Outcast Hero Frontiersman** you already are. Explore, discover, contribute, and shape the **living Syntheverse ecosystem**. Every discovery expands the fractal awareness of the hydrogen-holographic frontier.
 
-**“Where discovery becomes currency. Every insight is a fractal frontier. Outcast Heroes unite at the edge of knowledge.”**
 
