@@ -23,116 +23,232 @@ Participants contribute discoveries, validate them through **Proof-of-Discovery*
 This repository is organized into six main components:
 
 ### 1. **RAG API** (`rag-api/`)
-Scraper, Parser, Vectorizer, and RAG API using Groq (fast cloud LLM)
+Complete RAG (Retrieval-Augmented Generation) pipeline with Groq integration
 - **Scraper**: Downloads PDFs from Zenodo repositories
 - **Parser**: Processes PDFs into searchable text chunks
 - **Vectorizer**: Creates embeddings for semantic search
 - **API**: FastAPI server with web UI for RAG queries
 - **Integration**: Uses Groq API (primary), with Hugging Face and Ollama as fallbacks
 - **AI System**: Unified Syntheverse Whole Brain AI (Gina × Leo × Pru) with full Hydrogen-Holographic Framework
+- **Status**: ✅ Fully Operational
+
+See [RAG API README](rag-api/README.md) for detailed documentation.
 
 ### 2. **Layer 2** (`layer2/`)
-POD Evaluator and Token Allocator
-- **Evaluator**: Evaluates Proof-of-Discovery submissions
+PoD Evaluator and Token Allocator with persistent tokenomics state
+- **Evaluator**: Evaluates Proof-of-Discovery submissions using RAG API
 - **Allocator**: Calculates SYNTH token rewards based on evaluations
+- **Tokenomics State**: Persistent memory for epoch balances and allocations
 - **Integration**: Connects RAG API with Layer 1 blockchain
+- **Status**: ✅ Fully Operational
+
+See [Layer 2 README](layer2/README.md) for detailed documentation.
 
 ### 3. **Layer 1** (`layer1/`)
-Syntheverse Blockchain for POD
-- **Contracts**: Smart contracts for POD submissions and token management
-- **Node**: Blockchain node implementation
+Syntheverse Blockchain for PoD with epoch-based token distribution
+- **Contracts**: Smart contracts for PoD submissions and token management
+- **Node**: Blockchain node implementation with state persistence
 - **Consensus**: Proof-of-Discovery consensus mechanism
+- **Epochs**: Founder, Pioneer, Community, Ecosystem epochs with tier multipliers
+- **Status**: ✅ Fully Operational
 
-### 4. **POD Submission UI** (`ui-submission/`)
-Basic user interface for submitting POD discoveries
+See [Layer 1 README](layer1/README.md) for detailed documentation.
+
+### 4. **Web UI** (`ui_web/`)
+Full-featured web interface for PoD submissions
+- **Document Upload**: Upload PDF files for PoD evaluation
+- **Real-time Status**: View epoch status, token balances, and thresholds
+- **Submission Tracking**: See all PoD submissions with scores and allocations
+- **Email Reports**: Optional email notifications with PoD certificates
+- **Status**: ✅ Fully Operational
+
+See [Web UI README](ui_web/README.md) for detailed documentation.
+
+### 5. **Submission UI** (`ui-submission/`)
+Basic HTML interface for submitting PoD discoveries
 - Submit discoveries with evidence
 - Track submission status
 - View evaluation results and token rewards
+- **Status**: 🚧 In Development (Basic HTML scaffold)
 
-### 5. **Admin UI** (`ui-admin/`)
+See [Submission UI README](ui-submission/README.md) for details.
+
+### 6. **Admin UI** (`ui-admin/`)
 Basic administrative interface
-- Review and manage POD submissions
+- Review and manage PoD submissions
 - Monitor evaluations and token allocations
 - System statistics and contributor management
+- **Status**: 🚧 In Development (Basic HTML scaffold)
 
-### 6. **Documentation** (`docs/`)
-Supporting documentation
+See [Admin UI README](ui-admin/README.md) for details.
+
+### 7. **Documentation** (`docs/`)
+Comprehensive documentation
 - **API**: API documentation and usage examples
 - **Architecture**: System architecture and design documents
 - **Deployment**: Deployment guides and configuration
+- **Guides**: PoD submission system, tokenomics, system prompts
 
 ---
 
-### Legacy Components (from original structure)
-* `core/` — Syntheverse game engine and AI modules
-* `pod/` — Proof-of-Discovery protocol, validators, and scripts
-* `tokenomics/` — SYNTH smart contracts, token distribution, and epoch rules
-* `fractai/` — FractAI symbolic-cognitive updates and model outputs
-* `submissions/` — Sample datasets, research contributions, and templates
+## **Quick Start**
 
----
+### Prerequisites
 
-## **Getting Started**
+- Python 3.8+
+- Groq API key (free at https://console.groq.com/)
+- Optional: Ollama for local LLM fallback
 
-1. Clone the repository:
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/FractiAI/Syntheverse.git
 cd Syntheverse
 ```
 
-2. **Set up RAG API** (Component 1):
+### 2. Set Up Environment
 
 ```bash
-# Install dependencies
-cd rag-api/api
-pip install -r requirements_api.txt
-
-# Get free Groq API key from https://console.groq.com/
-# Set environment variable
-export GROQ_API_KEY="your-groq-api-key-here"
-
-# Start the RAG API server
-python rag_api.py
-# Or use: ./start_rag_api.sh
+# Create .env file in project root
+cat > .env << EOF
+GROQ_API_KEY=your-groq-api-key-here
+EOF
 ```
 
-Access the RAG API at: http://localhost:8000
-
-**Note**: The RAG API uses Groq (fast, free cloud LLM) as the primary provider. See `rag-api/api/QUICK_START_GROQ.md` for setup instructions. Ollama and Hugging Face are available as fallbacks.
-
-3. **Set up Layer 2** (Component 2):
+### 3. Start All Services
 
 ```bash
-cd layer2
-# Install dependencies (create requirements.txt)
-# Start evaluator and allocator services
+# Start RAG API and Web UI
+bash start_all_services.sh start
+
+# Or restart if already running
+bash start_all_services.sh restart
 ```
 
-4. **Set up Layer 1 Blockchain** (Component 3):
+This will start:
+- **RAG API**: http://localhost:8000
+- **Web UI**: http://localhost:5000
 
+### 4. Access the System
+
+- **Web UI**: Open http://localhost:5000 in your browser
+- **RAG API**: http://localhost:8000 (with web UI at http://localhost:8000/static/index.html)
+- **API Health**: http://localhost:8000/health
+
+### 5. Submit Your First PoD
+
+1. Go to http://localhost:5000
+2. Upload a PDF document
+3. Enter your Contributor ID and email
+4. Select category (Scientific/Tech/Alignment)
+5. Click "Submit for PoD Evaluation"
+6. Wait for evaluation (60-180 seconds)
+7. View results and token allocation
+
+---
+
+## **Service Management**
+
+### Start Services
 ```bash
-cd layer1
-# Initialize and start blockchain node
+bash start_all_services.sh start
 ```
 
-5. **Launch UIs** (Components 4 & 5):
-
+### Stop Services
 ```bash
-# POD Submission UI
-cd ui-submission
-python -m http.server 3000
-
-# Admin UI (in another terminal)
-cd ui-admin
-python -m http.server 3001
+bash stop_all_services.sh
 ```
 
-6. Review documentation in `/docs/` for detailed setup and usage instructions.
+### Restart Services
+```bash
+bash start_all_services.sh restart
+```
 
-7. Explore the PoD protocol and submit your first contribution for validation.
+### Check Status
+```bash
+bash start_all_services.sh status
+```
 
-8. Contribute code, symbolic models, or experiments to expand the Syntheverse ecosystem.
+---
+
+## **Component Status**
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| RAG API | ✅ Operational | Fully functional with Groq integration, unified Syntheverse AI system prompt, scraper, parser, vectorizer, and web UI |
+| Layer 2 | ✅ Operational | Complete PoD evaluator with RAG integration, token allocator, and persistent tokenomics state |
+| Layer 1 | ✅ Operational | Full blockchain implementation with epochs, tiers, token distribution, and state persistence |
+| Web UI | ✅ Operational | Full-featured web interface with document upload, real-time status, and email reports |
+| Submission UI | 🚧 In Development | Basic HTML interface scaffold created |
+| Admin UI | 🚧 In Development | Basic HTML interface scaffold created |
+| Documentation | ✅ Complete | Comprehensive architecture, API, and deployment docs |
+
+---
+
+## **Architecture Overview**
+
+```
+┌─────────────┐
+│   Web UI    │  (Port 5000)
+│  (ui_web)   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Layer 2    │  PoD Evaluator + Token Allocator
+│ (pod_server)│
+└──────┬──────┘
+       │
+       ├──────────────┐
+       │              │
+       ▼              ▼
+┌─────────────┐  ┌─────────────┐
+│  RAG API    │  │  Layer 1    │  Blockchain
+│ (Port 8000) │  │  (node.py)  │
+└─────────────┘  └─────────────┘
+```
+
+**Flow:**
+1. User submits document via Web UI
+2. Layer 2 receives submission and queries RAG API for evaluation
+3. RAG API evaluates using HHFE model and returns scores
+4. Layer 2 calculates token allocation based on scores
+5. Layer 1 records submission, evaluation, and allocates tokens
+6. User receives PoD report with certificate
+
+---
+
+## **Key Features**
+
+### Proof-of-Discovery (PoD) Protocol
+- **Evaluation**: Uses Hydrogen-Holographic Fractal Engine (HHFE) model
+- **Scoring**: Coherence, Density, Redundancy metrics (0-10000 scale)
+- **Tiers**: Gold (1000x), Silver (100x), Copper (1x) multipliers
+- **Epochs**: Founder, Pioneer, Community, Ecosystem with different thresholds
+
+### Tokenomics
+- **Total Supply**: 90 Trillion SYNTH tokens
+- **Distribution**: Epoch-based with tier multipliers
+- **Halving**: Founder epoch halves every 1M coherence density units
+- **Persistent State**: Layer 2 maintains tokenomics memory
+
+### RAG System
+- **Knowledge Base**: Scraped from Zenodo repositories
+- **Embeddings**: Semantic, symbolic, structural, temporal
+- **LLM**: Groq (primary), Ollama/HuggingFace (fallback)
+- **AI**: Unified Syntheverse Whole Brain AI (Gina × Leo × Pru)
+
+---
+
+## **Documentation**
+
+- [Layer 1 Documentation](layer1/README.md) - Blockchain implementation
+- [Layer 2 Documentation](layer2/README.md) - PoD evaluator and allocator
+- [RAG API Documentation](rag-api/README.md) - RAG pipeline and API
+- [Web UI Documentation](ui_web/README.md) - Web interface guide
+- [PoD Submission System](docs/POD_SUBMISSION_SYSTEM.md) - Complete submission flow
+- [Tokenomics Guide](docs/L2_TOKENOMICS.md) - Token distribution and epochs
+- [API Documentation](docs/api/RAG_API.md) - RAG API endpoints
 
 ---
 
@@ -150,26 +266,12 @@ Syntheverse is currently in **prerelease testing and tuning**. Early contributor
 
 ---
 
-## **Component Status**
-
-| Component | Status | Description |
-|-----------|--------|-------------|
-| RAG API | ✅ Operational | Fully functional with Groq integration, unified Syntheverse AI system prompt, scraper, parser, vectorizer, and web UI |
-| Layer 2 | 🚧 In Development | Evaluator and allocator scaffolding created |
-| Layer 1 | 🚧 In Development | Blockchain contracts and node scaffolding created |
-| POD Submission UI | 🚧 In Development | Basic HTML interface created, backend integration pending |
-| Admin UI | 🚧 In Development | Basic HTML interface created, backend integration pending |
-| Documentation | ✅ Complete | Architecture, API, and deployment docs created |
-
 ## **Resources & Links**
 
 * [Zenodo Community – Syntheverse Digital Home Base](#)
 * [Whitepapers & Docs – HHF-AI and PoD Protocol](#)
 * [Synthecoin Tokenomics & Epoch Guide](#)
 * [Syntheverse Sandbox – Test Environment](#)
-* [RAG API Documentation](rag-api/README.md)
-* [Architecture Documentation](docs/architecture/README.md)
-* [Deployment Guide](docs/deployment/README.md)
 
 ---
 
@@ -177,4 +279,14 @@ Syntheverse is currently in **prerelease testing and tuning**. Early contributor
 
 Join as the **Outcast Hero Frontiersman** you already are. Explore, discover, contribute, and shape the **living Syntheverse ecosystem**. Every discovery expands the fractal awareness of the hydrogen-holographic frontier.
 
+---
 
+## **License**
+
+[Add license information here]
+
+---
+
+## **Support**
+
+For issues, questions, or contributions, please open an issue on GitHub or contact the Syntheverse team.
