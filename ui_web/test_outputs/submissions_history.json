@@ -1,0 +1,110 @@
+[
+  {
+    "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+    "title": "Syntheverse Pod  Hydrogen-Holographic Fractal Consensus For Structural Knowledge Mining",
+    "pdf_path": "uploads/Syntheverse_PoD__Hydrogen-Holographic_Fractal_Consensus_for_Structural_Knowledge_Mining.pdf",
+    "contributor": "pru01",
+    "category": "scientific",
+    "timestamp": "2025-12-11T17:56:30.154403",
+    "evaluation": {
+      "coherence": 10000.0,
+      "density": 10000.0,
+      "redundancy": 0.0,
+      "novelty": 1.0,
+      "epoch_weight": 1.0,
+      "pod_score": 10000.0,
+      "tier": "gold",
+      "epoch": "expansion",
+      "tier_justification": "introduces validated scientific structure, models, equations, or empirically grounded frameworks.",
+      "redundancy_analysis": "non-redundant information",
+      "epoch_justification": "emphasis on scalability and trustlessness aligns with the Expansion epoch",
+      "retroactive_mining": null,
+      "reasoning": "",
+      "status": "approved",
+      "rejection_reason": null
+    },
+    "pod_score": 1.0,
+    "allocation": {
+      "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "recipient": "pru01",
+      "pod_score": 1.0,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 4500000000000.0,
+      "timestamp": "2025-12-11T17:56:30.147251"
+    },
+    "status": "approved"
+  },
+  {
+    "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+    "title": "Syntheverse  A Peer-To-Peer Holographic Coherence System The Fundamental Evolution From Proof-Of-Work To Proof-Of-Discovery ",
+    "pdf_path": "uploads/Syntheverse__A_Peer-to-Peer_Holographic_Coherence_System_The_Fundamental_Evolution_from_Proof-of-Work_to_Proof-of-Discovery_.pdf",
+    "contributor": "pru01",
+    "category": "scientific",
+    "timestamp": "2025-12-11T17:57:01.662630",
+    "evaluation": {
+      "coherence": 8500.0,
+      "density": 9200.0,
+      "redundancy": 0.6,
+      "novelty": 0.4,
+      "epoch_weight": 1.0,
+      "pod_score": 646400.0,
+      "tier": "gold",
+      "epoch": "founder",
+      "tier_justification": "introduces a fundamentally new concept",
+      "redundancy_analysis": "similar to existing work in some aspects, but introduces new ideas",
+      "epoch_justification": "density score is 9200",
+      "retroactive_mining": null,
+      "reasoning": "",
+      "status": "approved",
+      "rejection_reason": null
+    },
+    "pod_score": 0.3128000000000001,
+    "allocation": {
+      "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "recipient": "pru01",
+      "pod_score": 0.3128000000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 1266840000000.0002,
+      "timestamp": "2025-12-11T17:57:01.652800"
+    },
+    "status": "approved"
+  },
+  {
+    "submission_hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+    "title": "Syntheverse Hhf-Ai  Hydrogen-Holographic Fractal Awareness System",
+    "pdf_path": "uploads/Syntheverse_HHF-AI__Hydrogen-Holographic_Fractal_Awareness_System.pdf",
+    "contributor": "pru01",
+    "category": "scientific",
+    "timestamp": "2025-12-11T17:58:24.965280",
+    "evaluation": {
+      "coherence": 9200.0,
+      "density": 9800.0,
+      "redundancy": 0.2,
+      "novelty": 0.8,
+      "epoch_weight": 1.0,
+      "pod_score": 1785.6,
+      "tier": "gold",
+      "epoch": "founder",
+      "tier_justification": "novel physics-aligned model of intelligence",
+      "redundancy_analysis": "low redundancy, unique perspective",
+      "epoch_justification": "high density, novelty, and contribution",
+      "retroactive_mining": null,
+      "reasoning": "",
+      "status": "approved",
+      "rejection_reason": null
+    },
+    "pod_score": 0.7212800000000001,
+    "allocation": {
+      "submission_hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+      "recipient": "pru01",
+      "pod_score": 0.7212800000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 2829809364480.0005,
+      "timestamp": "2025-12-11T17:58:24.960600"
+    },
+    "status": "approved"
+  }
+]

@@ -36,11 +36,13 @@ See [RAG API README](rag-api/README.md) for detailed documentation.
 
 ### 2. **Layer 2** (`layer2/`)
 PoD Evaluator and Token Allocator with persistent tokenomics state
-- **Evaluator**: Evaluates Proof-of-Discovery submissions using RAG API
+- **Evaluator**: Evaluates Proof-of-Discovery submissions using direct Grok API calls with Syntheverse L2 system prompt
 - **Allocator**: Calculates SYNTH token rewards based on evaluations
 - **Tokenomics State**: Persistent memory for epoch balances and allocations
-- **Integration**: Connects RAG API with Layer 1 blockchain
+- **Integration**: Direct LLM integration (no RAG dependency) - calls Grok API with combined Syntheverse Whole Brain AI + L2 PoD Reviewer prompt
 - **Status**: ✅ Fully Operational
+
+**Note**: After evaluation, we determined that RAG (retrieval-augmented generation) did not provide sufficient value for PoD evaluations. The L2 Syntheverse PoD Reviewer now calls the LLM (Grok API) directly with the comprehensive Syntheverse L2 system prompt, which includes the full Syntheverse Whole Brain AI framework (Gina × Leo × Pru) combined with specific PoD evaluation instructions.
 
 See [Layer 2 README](layer2/README.md) for detailed documentation.
 
@@ -115,25 +117,31 @@ GROQ_API_KEY=your-groq-api-key-here
 EOF
 ```
 
-### 3. Start All Services
+### 3. Start Syntheverse
 
 ```bash
-# Start RAG API and Web UI
-bash start_all_services.sh start
+# Start Syntheverse (PoD Submission UI with L1/L2)
+./Syntheverse.sh start
 
 # Or restart if already running
-bash start_all_services.sh restart
+./Syntheverse.sh restart
+
+# Check status
+./Syntheverse.sh status
+
+# Stop
+./Syntheverse.sh stop
 ```
 
 This will start:
-- **RAG API**: http://localhost:8000
-- **Web UI**: http://localhost:5000
+- **PoD Submission UI**: http://localhost:5000 (includes L1 blockchain + L2 PoD Reviewer with direct Grok API integration)
+
+**Note**: L2 PoD Reviewer uses direct Grok API calls (no RAG API dependency required)
 
 ### 4. Access the System
 
 - **Web UI**: Open http://localhost:5000 in your browser
-- **RAG API**: http://localhost:8000 (with web UI at http://localhost:8000/static/index.html)
-- **API Health**: http://localhost:8000/health
+- **L2 Evaluations**: Use direct Grok API integration (configured via GROQ_API_KEY)
 
 ### 5. Submit Your First PoD
 
@@ -151,22 +159,22 @@ This will start:
 
 ### Start Services
 ```bash
-bash start_all_services.sh start
+./Syntheverse.sh start
 ```
 
 ### Stop Services
 ```bash
-bash stop_all_services.sh
+./Syntheverse.sh stop
 ```
 
 ### Restart Services
 ```bash
-bash start_all_services.sh restart
+./Syntheverse.sh restart
 ```
 
 ### Check Status
 ```bash
-bash start_all_services.sh status
+./Syntheverse.sh status
 ```
 
 ---
@@ -176,7 +184,7 @@ bash start_all_services.sh status
 | Component | Status | Description |
 |-----------|--------|-------------|
 | RAG API | ✅ Operational | Fully functional with Groq integration, unified Syntheverse AI system prompt, scraper, parser, vectorizer, and web UI |
-| Layer 2 | ✅ Operational | Complete PoD evaluator with RAG integration, token allocator, and persistent tokenomics state |
+| Layer 2 | ✅ Operational | Complete PoD evaluator with direct Grok API integration (no RAG dependency), token allocator, and persistent tokenomics state |
 | Layer 1 | ✅ Operational | Full blockchain implementation with epochs, tiers, token distribution, and state persistence |
 | Web UI | ✅ Operational | Full-featured web interface with document upload, real-time status, and email reports |
 | Submission UI | 🚧 In Development | Basic HTML interface scaffold created |
@@ -194,27 +202,33 @@ bash start_all_services.sh status
 └──────┬──────┘
        │
        ▼
-┌─────────────┐
-│  Layer 2    │  PoD Evaluator + Token Allocator
-│ (pod_server)│
+┌─────────────┐      ┌──────────────┐
+│  Layer 2    │─────▶│  Grok API    │  Direct LLM calls
+│ (pod_server)│      │  (LLM)       │  with Syntheverse L2
+│             │      └──────────────┘  system prompt
+│ PoD Evaluator│
+│ + Allocator │
 └──────┬──────┘
        │
-       ├──────────────┐
-       │              │
-       ▼              ▼
-┌─────────────┐  ┌─────────────┐
-│  RAG API    │  │  Layer 1    │  Blockchain
-│ (Port 8000) │  │  (node.py)  │
-└─────────────┘  └─────────────┘
+       ▼
+┌─────────────┐
+│  Layer 1    │  Blockchain
+│  (node.py)  │
+└─────────────┘
+
+Note: RAG API (Port 8000) exists separately for other use cases
+      but is NOT used for L2 PoD evaluations
 ```
 
 **Flow:**
 1. User submits document via Web UI
-2. Layer 2 receives submission and queries RAG API for evaluation
-3. RAG API evaluates using HHFE model and returns scores
-4. Layer 2 calculates token allocation based on scores
+2. Layer 2 receives submission and calls Grok API directly with Syntheverse L2 system prompt
+3. Grok API evaluates using HHFE model (via system prompt) and returns scores in markdown + JSON
+4. Layer 2 parses response and calculates token allocation based on scores
 5. Layer 1 records submission, evaluation, and allocates tokens
 6. User receives PoD report with certificate
+
+**Architecture Note:** Layer 2 PoD Reviewer calls Grok API directly (not via RAG API). The comprehensive Syntheverse L2 system prompt includes all necessary context for evaluation, making RAG retrieval unnecessary for this use case.
 
 ---
 
@@ -232,11 +246,12 @@ bash start_all_services.sh status
 - **Halving**: Founder epoch halves every 1M coherence density units
 - **Persistent State**: Layer 2 maintains tokenomics memory
 
-### RAG System
+### RAG System (Separate Service)
 - **Knowledge Base**: Scraped from Zenodo repositories
 - **Embeddings**: Semantic, symbolic, structural, temporal
 - **LLM**: Groq (primary), Ollama/HuggingFace (fallback)
 - **AI**: Unified Syntheverse Whole Brain AI (Gina × Leo × Pru)
+- **Note**: RAG API exists as a separate service but is **not used by Layer 2 PoD Reviewer**. L2 makes direct LLM calls with the comprehensive system prompt instead.
 
 ---
 

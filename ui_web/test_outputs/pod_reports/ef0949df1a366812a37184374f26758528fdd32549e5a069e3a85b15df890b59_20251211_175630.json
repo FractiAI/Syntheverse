@@ -1,0 +1,80 @@
+{
+  "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+  "title": "Syntheverse Pod  Hydrogen-Holographic Fractal Consensus For Structural Knowledge Mining",
+  "timestamp": "2025-12-11T17:56:30.146625",
+  "evaluation": {
+    "coherence": 10000.0,
+    "density": 10000.0,
+    "redundancy": 0.0,
+    "novelty": 1.0,
+    "epoch_weight": 1.0,
+    "pod_score": 10000.0,
+    "tier": "gold",
+    "epoch": "expansion",
+    "tier_justification": "introduces validated scientific structure, models, equations, or empirically grounded frameworks.",
+    "redundancy_analysis": "non-redundant information",
+    "epoch_justification": "emphasis on scalability and trustlessness aligns with the Expansion epoch",
+    "retroactive_mining": null,
+    "reasoning": "",
+    "status": "approved",
+    "rejection_reason": null
+  },
+  "pod_score": 10000.0,
+  "qualified_epoch": "founder",
+  "tier": "gold",
+  "allocation": {
+    "success": true,
+    "available": true,
+    "epoch": "founder",
+    "tier": "gold",
+    "pod_score": 10000.0,
+    "base_reward": 41621760000000.0,
+    "tier_multiplier": 1000.0,
+    "reward": 41621760000000.0,
+    "epoch_balance_before": 41621760000000.0,
+    "epoch_balance_after": 0.0
+  },
+  "markdown_report": "",
+  "duplicate_check": {
+    "is_first_registered": true,
+    "content_hash": "b1ebe3576083a8707c02b5619a0652c46377f0d42a32652ffbbcd76944154528"
+  },
+  "hhfe_metrics": {
+    "coherence_phi": 10000.0,
+    "density_rho": 10000.0,
+    "redundancy_r": 0.0,
+    "epoch_weight_w": 1.0,
+    "pod_score_s": 10000.0,
+    "formula": "S = (\u03a6/10000) \u00d7 (\u03c1/10000) \u00d7 (1-R) \u00d7 W \u00d7 10000"
+  },
+  "tier_classification": {
+    "tier": "gold",
+    "justification": "introduces validated scientific structure, models, equations, or empirically grounded frameworks.",
+    "multiplier": 1000.0
+  },
+  "epoch_analysis": {
+    "qualified_epoch": "founder",
+    "justification": "emphasis on scalability and trustlessness aligns with the Expansion epoch",
+    "threshold_met": true
+  },
+  "redundancy_analysis": {
+    "redundancy_score": 0.0,
+    "analysis": "non-redundant information",
+    "similar_documents": []
+  },
+  "retroactive_mining": null,
+  "tokenomics_state": {
+    "epoch_balances": {
+      "founder": 41621760000000.0,
+      "pioneer": 8541000000000.0,
+      "community": 18000000000000.0,
+      "ecosystem": 18000000000000.0
+    },
+    "total_coherence_density": 17700.0,
+    "founder_halving_count": 0
+  },
+  "evaluation_context": {
+    "evaluation_method": "direct_grok_api",
+    "model": "llama-3.1-8b-instant"
+  }
+}

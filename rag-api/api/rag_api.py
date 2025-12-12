@@ -24,6 +24,7 @@ class QueryRequest(BaseModel):
     top_k: int = 5
     min_score: float = 0.0
     llm_model: str = "groq"  # Default to Groq
+    system_prompt: Optional[str] = None  # Optional custom system prompt
 
 
 class QueryResponse(BaseModel):
@@ -443,7 +444,7 @@ Awaiting operator input."""
         results.sort(key=lambda x: x['score'], reverse=True)
         return results[:top_k]
     
-    def _generate_with_ollama(self, query: str, context: str) -> str:
+    def _generate_with_ollama(self, query: str, context: str, system_prompt: Optional[str] = None) -> str:
         """
         Generate answer using Ollama LLM.
         
@@ -454,7 +455,9 @@ Awaiting operator input."""
         Returns:
             Generated answer
         """
-        prompt = f"""{self.SYSTEM_PROMPT}
+        system_prompt_to_use = system_prompt if system_prompt else self.SYSTEM_PROMPT
+        
+        prompt = f"""{system_prompt_to_use}
 
 Based on the following context from the Syntheverse knowledge base, answer the user's question.
 
@@ -472,11 +475,15 @@ Answer:"""
             max_prompt_length = 3000  # Characters (reduced from 4000)
             if len(prompt) > max_prompt_length:
                 # Truncate context if needed, keep system prompt and query
-                system_and_query = f"{self.SYSTEM_PROMPT}\n\nUser Question: {query}\n\nAnswer:"
+                system_and_query = f"{system_prompt_to_use}\n\nUser Question: {query}\n\nAnswer:"
                 available_for_context = max_prompt_length - len(system_and_query) - 200
                 if available_for_context > 0 and len(context) > available_for_context:
                     context = context[:available_for_context] + "\n\n[Context truncated...]"
-                prompt = f"{self.SYSTEM_PROMPT}\n\nContext:\n{context}\n\nUser Question: {query}\n\nProvide a concise answer:\n\nAnswer:"
+                prompt = f"{system_prompt_to_use}\n\nContext:\n{context}\n\nUser Question: {query}\n\nProvide a concise answer:\n\nAnswer:"
+            
+            # Check if this is an evaluation query (has system prompt with "PoD Reviewer")
+            is_evaluation = system_prompt and "PoD Reviewer" in system_prompt
+            num_predict = 2000 if is_evaluation else 300  # More tokens for evaluation queries
             
             response = requests.post(
                 f"{self.ollama_url}/api/generate",
@@ -487,7 +494,7 @@ Answer:"""
                     "options": {
                         "temperature": 0.7,
                         "top_p": 0.9,
-                        "num_predict": 300,  # Limit response length for faster generation
+                        "num_predict": num_predict,
                     }
                 },
                 timeout=120  # 120 second timeout for longer prompts
@@ -503,7 +510,7 @@ Answer:"""
         except Exception as e:
             raise Exception(f"Error calling Ollama: {e}")
     
-    def _generate_with_groq(self, query: str, context: str) -> str:
+    def _generate_with_groq(self, query: str, context: str, system_prompt: Optional[str] = None) -> str:
         """
         Generate answer using Groq API (fast cloud LLM).
         
@@ -520,8 +527,10 @@ Answer:"""
             if len(context) > max_context_length:
                 context = context[:max_context_length] + "\n\n[Context truncated...]"
             
+            system_prompt_to_use = system_prompt if system_prompt else self.SYSTEM_PROMPT
+            
             messages = [
-                {"role": "system", "content": self.SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt_to_use},
                 {"role": "user", "content": f"""Context from Syntheverse knowledge base:
 {context}
 
@@ -530,11 +539,15 @@ User Question: {query}
 Answer (synthesize from context using Gina × Leo × Pru framework):"""}
             ]
             
+            # Check if this is an evaluation query (has system prompt with "PoD Reviewer")
+            is_evaluation = system_prompt_to_use and "PoD Reviewer" in system_prompt_to_use
+            max_tokens = 2000 if is_evaluation else 500  # More tokens for evaluation queries
+            
             response = self.groq_client.chat.completions.create(
                 model="llama-3.1-8b-instant",  # Fast model
                 messages=messages,
                 temperature=0.7,
-                max_tokens=500,
+                max_tokens=max_tokens,
                 timeout=30
             )
             
@@ -542,7 +555,7 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""}
         except Exception as e:
             raise Exception(f"Error calling Groq API: {e}")
     
-    def _generate_with_huggingface(self, query: str, context: str) -> str:
+    def _generate_with_huggingface(self, query: str, context: str, system_prompt: Optional[str] = None) -> str:
         """
         Generate answer using Hugging Face Inference API.
         
@@ -559,7 +572,9 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""}
             if len(context) > max_context_length:
                 context = context[:max_context_length] + "\n\n[Context truncated...]"
             
-            prompt = f"""{self.SYSTEM_PROMPT}
+            system_prompt_to_use = system_prompt if system_prompt else self.SYSTEM_PROMPT
+            
+            prompt = f"""{system_prompt_to_use}
 
 Context from Syntheverse knowledge base:
 {context}
@@ -598,7 +613,7 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""
         except Exception as e:
             raise Exception(f"Error calling Hugging Face API: {e}")
     
-    def generate_answer(self, query: str, relevant_chunks: List[Dict], llm_model: str = None) -> str:
+    def generate_answer(self, query: str, relevant_chunks: List[Dict], llm_model: str = None, system_prompt: Optional[str] = None) -> str:
         """
         Generate synthesized answer from relevant chunks using specified LLM.
         
@@ -630,25 +645,25 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""
         if llm_model is None:
             llm_model = self.default_llm
         
-        # Generate with selected LLM
+        # Generate with selected LLM (pass system_prompt)
         if llm_model == "groq" and self.groq_available:
-            return self._generate_with_groq(query, context)
+            return self._generate_with_groq(query, context, system_prompt)
         elif llm_model == "huggingface" and self.huggingface_available:
-            return self._generate_with_huggingface(query, context)
+            return self._generate_with_huggingface(query, context, system_prompt)
         elif llm_model == "ollama" and self.ollama_available:
-            return self._generate_with_ollama(query, context)
+            return self._generate_with_ollama(query, context, system_prompt)
         else:
             # Fallback: try available providers in order
             if self.groq_available:
-                return self._generate_with_groq(query, context)
+                return self._generate_with_groq(query, context, system_prompt)
             elif self.huggingface_available:
-                return self._generate_with_huggingface(query, context)
+                return self._generate_with_huggingface(query, context, system_prompt)
             elif self.ollama_available:
-                return self._generate_with_ollama(query, context)
+                return self._generate_with_ollama(query, context, system_prompt)
             else:
                 raise RuntimeError("No LLM provider available")
     
-    def query(self, query: str, top_k: int = 5, min_score: float = 0.0, llm_model: str = None) -> Dict:
+    def query(self, query: str, top_k: int = 5, min_score: float = 0.0, llm_model: str = None, system_prompt: Optional[str] = None) -> Dict:
         """
         Complete RAG query: search + generate answer with Ollama.
         
@@ -668,7 +683,7 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""
         # Generate answer with selected LLM
         if llm_model is None:
             llm_model = self.default_llm
-        answer = self.generate_answer(query, relevant_chunks, llm_model=llm_model)
+        answer = self.generate_answer(query, relevant_chunks, llm_model=llm_model, system_prompt=system_prompt)
         
         processing_time = time.time() - start_time
         
@@ -870,7 +885,8 @@ async def query(request: QueryRequest):
             query=request.query,
             top_k=request.top_k,
             min_score=request.min_score,
-            llm_model=llm_model
+            llm_model=llm_model,
+            system_prompt=getattr(request, 'system_prompt', None)
         )
         
         # Add LLM model info to response

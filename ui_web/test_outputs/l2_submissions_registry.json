@@ -1,0 +1,31 @@
+{
+  "submissions": {
+    "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59": {
+      "title": "Syntheverse Pod  Hydrogen-Holographic Fractal Consensus For Structural Knowledge Mining",
+      "content_hash": "b1ebe3576083a8707c02b5619a0652c46377f0d42a32652ffbbcd76944154528",
+      "timestamp": "2025-12-11T17:56:30.146197",
+      "category": "scientific",
+      "status": "approved"
+    },
+    "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e": {
+      "title": "Syntheverse  A Peer-To-Peer Holographic Coherence System The Fundamental Evolution From Proof-Of-Work To Proof-Of-Discovery ",
+      "content_hash": "1e8e1519363dfaea593efe9ec89555ee54a63bae02f000e5f4abaf8faa836b14",
+      "timestamp": "2025-12-11T17:57:01.650802",
+      "category": "scientific",
+      "status": "approved"
+    },
+    "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0": {
+      "title": "Syntheverse Hhf-Ai  Hydrogen-Holographic Fractal Awareness System",
+      "content_hash": "77cdcca0a82c73c883f292129d5873002cac36a0f7384cd418477d3249278be7",
+      "timestamp": "2025-12-11T17:58:24.958596",
+      "category": "scientific",
+      "status": "approved"
+    }
+  },
+  "content_hashes": {
+    "b1ebe3576083a8707c02b5619a0652c46377f0d42a32652ffbbcd76944154528": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+    "1e8e1519363dfaea593efe9ec89555ee54a63bae02f000e5f4abaf8faa836b14": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+    "77cdcca0a82c73c883f292129d5873002cac36a0f7384cd418477d3249278be7": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0"
+  },
+  "last_updated": "2025-12-11T17:58:24.958601"
+}

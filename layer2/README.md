@@ -1,18 +1,18 @@
 # Layer 2 - PoD Evaluator and Token Allocator
 
-Layer 2 components for evaluating Proof-of-Discovery (PoD) submissions and allocating SYNTH tokens. This layer integrates the RAG API for evaluation and connects to Layer 1 blockchain for token distribution.
+Layer 2 components for evaluating Proof-of-Discovery (PoD) submissions and allocating SYNTH tokens. This layer uses direct Grok API calls for evaluation and connects to Layer 1 blockchain for token distribution.
 
 ## Status
 
-✅ **Fully Operational** - Complete PoD evaluation system with RAG integration, token allocation, and persistent tokenomics state.
+✅ **Fully Operational** - Complete PoD evaluation system with direct Grok API integration, token allocation, and persistent tokenomics state.
 
 ## Components
 
 ### 1. PoD Server (`pod_server.py`)
 Main server that orchestrates the evaluation and allocation process:
 - **Submission Handling**: Receives PoD submissions with PDFs or text content
-- **RAG Integration**: Queries RAG API for HHFE-based evaluation
-- **Evaluation Parsing**: Extracts scores from RAG API responses (markdown + JSON)
+- **Grok API Integration**: Direct Grok API calls for HHFE-based evaluation
+- **Evaluation Parsing**: Extracts scores from Grok API responses (markdown + JSON)
 - **Token Allocation**: Calculates SYNTH token rewards using tokenomics state
 - **Report Generation**: Creates comprehensive PoD evaluation reports
 - **Duplicate Prevention**: Tracks submissions to prevent duplicate rewards
@@ -28,7 +28,7 @@ Persistent state manager for token distribution:
 ### 3. Evaluator (`evaluator/pod_evaluator.py`)
 PoD evaluation logic (scaffold for future enhancements):
 - Evaluates submissions against Syntheverse criteria
-- Integrates with RAG API for knowledge verification
+- Uses direct Grok API calls for evaluation
 - Generates evaluation reports
 
 ### 4. Allocator (`allocator/token_allocator.py`)
@@ -66,8 +66,9 @@ Token allocation calculations:
 from layer2.pod_server import PODServer
 
 # Initialize server
+# Note: Requires GROQ_API_KEY environment variable to be set
 server = PODServer(
-    rag_api_url="http://localhost:8000",
+    groq_api_key=None,  # Uses GROQ_API_KEY env var if None
     output_dir="test_outputs/pod_reports",
     tokenomics_state_file="test_outputs/l2_tokenomics_state.json"
 )
@@ -107,13 +108,32 @@ print(f"Active Epoch: {epoch_info['current_epoch']}")
 print(f"Epoch Progression: {epoch_info['epoch_progression']}")
 ```
 
+## Architecture Decision: Direct LLM Integration
+
+**Why We Moved Away from RAG (Retrieval-Augmented Generation)**
+
+After initial implementation with RAG API integration, we determined that retrieval-augmented generation did not provide sufficient value for PoD evaluations. The evaluation process requires the LLM to assess artifacts using the comprehensive Syntheverse framework, and the RAG approach of retrieving similar documents from the knowledge base was not adding meaningful context for evaluation decisions.
+
+**Current Approach:**
+- **Direct Grok API calls** from L2 PoD Reviewer
+- **Comprehensive system prompt** that combines:
+  - Full Syntheverse Whole Brain AI framework (Gina × Leo × Pru)
+  - Complete Hydrogen-Holographic Fractal Engine (HHFE) rules
+  - Specific L2 PoD Reviewer evaluation instructions
+  - All necessary constants, formulas, and evaluation criteria
+- **Simplified architecture** - no RAG pipeline dependency for evaluations
+- **Faster evaluations** - direct API calls without intermediate retrieval steps
+- **More reliable** - consistent prompt ensures deterministic evaluation criteria
+
+The system prompt contains all the necessary context for evaluation, making external knowledge retrieval unnecessary. The LLM evaluates artifacts based on the embedded HHFE framework and PoD evaluation criteria directly.
+
 ## Integration
 
-### With RAG API
-- Queries RAG API for HHFE-based evaluation
-- Uses specialized PoD evaluation system prompt
+### With Grok API
+- Direct Grok API calls for HHFE-based evaluation
+- Uses comprehensive Syntheverse L2 system prompt (Whole Brain AI + PoD Reviewer)
 - Parses markdown + JSON response format
-- Handles evaluation errors gracefully
+- Handles evaluation errors gracefully with fallback extraction
 
 ### With Layer 1
 - Sends evaluation results to Layer 1 blockchain
@@ -150,8 +170,8 @@ Saved to `test_outputs/pod_reports/`:
 ## Evaluation Flow
 
 1. **Submission Received**: PDF or text content submitted
-2. **RAG Query**: Query RAG API for similar documents (novelty check)
-3. **Evaluation Request**: Send artifact to RAG API with PoD evaluation prompt
+2. **Redundancy Check**: Check for duplicate submissions via content hash
+3. **Evaluation Request**: Send artifact to Grok API with PoD evaluation prompt
 4. **Response Parsing**: Extract JSON from markdown + JSON response
 5. **Score Calculation**: Calculate PoD score from metrics
 6. **Epoch Qualification**: Determine qualified epoch from density
@@ -162,7 +182,7 @@ Saved to `test_outputs/pod_reports/`:
 
 ## Error Handling
 
-- **RAG API Errors**: Graceful fallback with error messages
+- **Grok API Errors**: Clear error messages with troubleshooting guidance
 - **Parsing Errors**: Detailed error messages with response preview
 - **Allocation Errors**: Clear error messages for tier/epoch mismatches
 - **Duplicate Detection**: Prevents duplicate submissions
@@ -170,7 +190,7 @@ Saved to `test_outputs/pod_reports/`:
 ## Dependencies
 
 See `requirements.txt` for full list. Key dependencies:
-- `requests` - HTTP client for RAG API
+- `openai` - Grok API client (via OpenAI-compatible interface)
 - `PyPDF2` / `pdfplumber` - PDF processing
 - Standard library: `json`, `pathlib`, `datetime`
 
@@ -183,7 +203,7 @@ python test_full_submission_flow.py
 # Test submission
 python test_submission.py
 
-# Test RAG API integration
+# Test Grok API integration
 python test_rag_pod_query.py
 ```
 

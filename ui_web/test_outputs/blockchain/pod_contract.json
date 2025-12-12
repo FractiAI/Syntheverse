@@ -1,0 +1,119 @@
+{
+  "submissions": {
+    "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59": {
+      "hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "data": {
+        "title": "Syntheverse Pod  Hydrogen-Holographic Fractal Consensus For Structural Knowledge Mining",
+        "description": "PDF submission: Syntheverse_PoD__Hydrogen-Holographic_Fractal_Consensus_for_Structural_Knowledge_Mining.pdf",
+        "category": "scientific",
+        "contributor": "pru01",
+        "evidence": "uploads/Syntheverse_PoD__Hydrogen-Holographic_Fractal_Consensus_for_Structural_Knowledge_Mining.pdf"
+      },
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:56:27.789692",
+      "status": "approved",
+      "block_number": null,
+      "epoch": "founder",
+      "pod_score": 1.0,
+      "evaluation": {
+        "coherence": 10000.0,
+        "density": 10000.0,
+        "novelty": 1.0,
+        "status": "approved"
+      }
+    },
+    "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e": {
+      "hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "data": {
+        "title": "Syntheverse  A Peer-To-Peer Holographic Coherence System The Fundamental Evolution From Proof-Of-Work To Proof-Of-Discovery ",
+        "description": "PDF submission: Syntheverse__A_Peer-to-Peer_Holographic_Coherence_System_The_Fundamental_Evolution_from_Proof-of-Work_to_Proof-of-Discovery_.pdf",
+        "category": "scientific",
+        "contributor": "pru01",
+        "evidence": "uploads/Syntheverse__A_Peer-to-Peer_Holographic_Coherence_System_The_Fundamental_Evolution_from_Proof-of-Work_to_Proof-of-Discovery_.pdf"
+      },
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:56:59.710780",
+      "status": "approved",
+      "block_number": null,
+      "epoch": "founder",
+      "pod_score": 0.3128000000000001,
+      "evaluation": {
+        "coherence": 8500.0,
+        "density": 9200.0,
+        "novelty": 0.4,
+        "status": "approved"
+      }
+    },
+    "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0": {
+      "hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+      "data": {
+        "title": "Syntheverse Hhf-Ai  Hydrogen-Holographic Fractal Awareness System",
+        "description": "PDF submission: Syntheverse_HHF-AI__Hydrogen-Holographic_Fractal_Awareness_System.pdf",
+        "category": "scientific",
+        "contributor": "pru01",
+        "evidence": "uploads/Syntheverse_HHF-AI__Hydrogen-Holographic_Fractal_Awareness_System.pdf"
+      },
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:58:23.692568",
+      "status": "approved",
+      "block_number": null,
+      "epoch": "founder",
+      "pod_score": 0.7212800000000001,
+      "evaluation": {
+        "coherence": 9200.0,
+        "density": 9800.0,
+        "novelty": 0.8,
+        "status": "approved"
+      }
+    }
+  },
+  "rewards": {
+    "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59": {
+      "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "contributor": "pru01",
+      "tokens": 4500000000000.0,
+      "pod_score": 1.0,
+      "epoch": "founder",
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:56:30.147251"
+    },
+    "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e": {
+      "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "contributor": "pru01",
+      "tokens": 1266840000000.0002,
+      "pod_score": 0.3128000000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:57:01.652800"
+    },
+    "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0": {
+      "submission_hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+      "contributor": "pru01",
+      "tokens": 2829809364480.0005,
+      "pod_score": 0.7212800000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "timestamp": "2025-12-11T17:58:24.960600"
+    }
+  },
+  "contributors": {
+    "pru01": {
+      "balance": 8596649364480.0,
+      "submissions": [
+        "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+        "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+        "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0"
+      ],
+      "tier_breakdown": {
+        "gold": 8596649364480.0,
+        "silver": 0.0,
+        "copper": 0.0
+      }
+    }
+  },
+  "tier_assignments": {
+    "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59": "gold",
+    "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e": "gold",
+    "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0": "gold"
+  }
+}

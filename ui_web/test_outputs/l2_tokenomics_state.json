@@ -1,0 +1,113 @@
+{
+  "epoch_balances": {
+    "founder": 36403350635520.0,
+    "pioneer": 9000000000000.0,
+    "community": 18000000000000.0,
+    "ecosystem": 18000000000000.0
+  },
+  "total_coherence_density": 27700.0,
+  "founder_halving_count": 0,
+  "current_epoch": "founder",
+  "epoch_progression": {
+    "founder": false,
+    "pioneer": false,
+    "community": false,
+    "ecosystem": false
+  },
+  "allocation_history": [
+    {
+      "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "contributor": "pru01",
+      "timestamp": "2025-12-11T17:31:08.773120",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "community",
+        "tier": "copper",
+        "pod_score": 6375.0,
+        "base_reward": 11475000000000.0,
+        "tier_multiplier": 1.0,
+        "reward": 11475000000000.0,
+        "epoch_balance_before": 18000000000000.0,
+        "epoch_balance_after": 6525000000000.0
+      },
+      "coherence": 8500.0
+    },
+    {
+      "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "contributor": "pru01",
+      "timestamp": "2025-12-11T17:32:43.921640",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "pioneer",
+        "tier": "gold",
+        "pod_score": 1356.48,
+        "base_reward": 1158569568000.0,
+        "tier_multiplier": 1000.0,
+        "reward": 8541000000000.0,
+        "epoch_balance_before": 8541000000000.0,
+        "epoch_balance_after": 0.0
+      },
+      "coherence": 9200.0
+    },
+    {
+      "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "contributor": "pru01",
+      "timestamp": "2025-12-11T17:56:30.149325",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 10000.0,
+        "base_reward": 41621760000000.0,
+        "tier_multiplier": 1000.0,
+        "reward": 41621760000000.0,
+        "epoch_balance_before": 41621760000000.0,
+        "epoch_balance_after": 0.0
+      },
+      "coherence": 10000.0
+    },
+    {
+      "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "contributor": "pru01",
+      "timestamp": "2025-12-11T17:57:01.654595",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 646400.0,
+        "base_reward": 2617920000000000.0,
+        "tier_multiplier": 1000.0,
+        "reward": 40500000000000.0,
+        "epoch_balance_before": 40500000000000.0,
+        "epoch_balance_after": 0.0
+      },
+      "coherence": 8500.0
+    },
+    {
+      "submission_hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+      "contributor": "pru01",
+      "timestamp": "2025-12-11T17:58:24.962625",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 1785.6,
+        "base_reward": 7005473049600.0,
+        "tier_multiplier": 1000.0,
+        "reward": 39233160000000.0,
+        "epoch_balance_before": 39233160000000.0,
+        "epoch_balance_after": 0.0
+      },
+      "coherence": 9200.0
+    }
+  ],
+  "contributor_balances": {
+    "pru01": 141370920000000.0
+  },
+  "last_updated": "2025-12-11T17:58:24.963140"
+}

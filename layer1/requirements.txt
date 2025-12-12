@@ -1,0 +1,9 @@
+# Syntheverse Layer 1 Blockchain Requirements
+# No external dependencies required - pure Python implementation
+
+# Optional: For enhanced JSON handling
+# ujson>=5.0.0
+
+# Optional: For data persistence
+# pymongo>=4.0.0  # If using MongoDB
+# redis>=4.0.0    # If using Redis

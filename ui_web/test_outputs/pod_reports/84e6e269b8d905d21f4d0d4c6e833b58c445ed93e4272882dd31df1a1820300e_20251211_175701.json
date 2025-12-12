@@ -1,0 +1,80 @@
+{
+  "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+  "title": "Syntheverse  A Peer-To-Peer Holographic Coherence System The Fundamental Evolution From Proof-Of-Work To Proof-Of-Discovery ",
+  "timestamp": "2025-12-11T17:57:01.651693",
+  "evaluation": {
+    "coherence": 8500.0,
+    "density": 9200.0,
+    "redundancy": 0.6,
+    "novelty": 0.4,
+    "epoch_weight": 1.0,
+    "pod_score": 646400.0,
+    "tier": "gold",
+    "epoch": "founder",
+    "tier_justification": "introduces a fundamentally new concept",
+    "redundancy_analysis": "similar to existing work in some aspects, but introduces new ideas",
+    "epoch_justification": "density score is 9200",
+    "retroactive_mining": null,
+    "reasoning": "",
+    "status": "approved",
+    "rejection_reason": null
+  },
+  "pod_score": 646400.0,
+  "qualified_epoch": "founder",
+  "tier": "gold",
+  "allocation": {
+    "success": true,
+    "available": true,
+    "epoch": "founder",
+    "tier": "gold",
+    "pod_score": 646400.0,
+    "base_reward": 2617920000000000.0,
+    "tier_multiplier": 1000.0,
+    "reward": 40500000000000.0,
+    "epoch_balance_before": 40500000000000.0,
+    "epoch_balance_after": 0.0
+  },
+  "markdown_report": "",
+  "duplicate_check": {
+    "is_first_registered": true,
+    "content_hash": "1e8e1519363dfaea593efe9ec89555ee54a63bae02f000e5f4abaf8faa836b14"
+  },
+  "hhfe_metrics": {
+    "coherence_phi": 8500.0,
+    "density_rho": 9200.0,
+    "redundancy_r": 0.6,
+    "epoch_weight_w": 1.0,
+    "pod_score_s": 646400.0,
+    "formula": "S = (\u03a6/10000) \u00d7 (\u03c1/10000) \u00d7 (1-R) \u00d7 W \u00d7 10000"
+  },
+  "tier_classification": {
+    "tier": "gold",
+    "justification": "introduces a fundamentally new concept",
+    "multiplier": 1000.0
+  },
+  "epoch_analysis": {
+    "qualified_epoch": "founder",
+    "justification": "density score is 9200",
+    "threshold_met": true
+  },
+  "redundancy_analysis": {
+    "redundancy_score": 0.6,
+    "analysis": "similar to existing work in some aspects, but introduces new ideas",
+    "similar_documents": []
+  },
+  "retroactive_mining": null,
+  "tokenomics_state": {
+    "epoch_balances": {
+      "founder": 40500000000000.0,
+      "pioneer": 9000000000000.0,
+      "community": 18000000000000.0,
+      "ecosystem": 18000000000000.0
+    },
+    "total_coherence_density": 10000.0,
+    "founder_halving_count": 0
+  },
+  "evaluation_context": {
+    "evaluation_method": "direct_grok_api",
+    "model": "llama-3.1-8b-instant"
+  }
+}

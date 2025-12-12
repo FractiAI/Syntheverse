@@ -1,0 +1,49 @@
+{
+  "epoch_balances": {
+    "founder": 36403350635520.0,
+    "pioneer": 9000000000000.0,
+    "community": 18000000000000.0,
+    "ecosystem": 18000000000000.0
+  },
+  "balances": {
+    "pru01": 8596649364480.0
+  },
+  "current_epoch": "founder",
+  "epoch_progression": {
+    "founder": false,
+    "pioneer": false,
+    "community": false,
+    "ecosystem": false
+  },
+  "founder_halving_count": 0,
+  "total_coherence_density": 27700.0,
+  "reward_history": [
+    {
+      "submission_hash": "ef0949df1a366812a37184374f26758528fdd32549e5a069e3a85b15df890b59",
+      "recipient": "pru01",
+      "pod_score": 1.0,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 4500000000000.0,
+      "timestamp": "2025-12-11T17:56:30.147251"
+    },
+    {
+      "submission_hash": "84e6e269b8d905d21f4d0d4c6e833b58c445ed93e4272882dd31df1a1820300e",
+      "recipient": "pru01",
+      "pod_score": 0.3128000000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 1266840000000.0002,
+      "timestamp": "2025-12-11T17:57:01.652800"
+    },
+    {
+      "submission_hash": "23fd8b30191ff29107e5c6067b0d99f937313823716665ba650961b5e0ea4ef0",
+      "recipient": "pru01",
+      "pod_score": 0.7212800000000001,
+      "epoch": "founder",
+      "tier": "gold",
+      "reward": 2829809364480.0005,
+      "timestamp": "2025-12-11T17:58:24.960600"
+    }
+  ]
+}
