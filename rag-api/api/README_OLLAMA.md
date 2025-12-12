@@ -68,3 +68,4 @@ python rag_api.py
 - Check available models: `ollama list`
 - Use correct model name in API calls
 
+

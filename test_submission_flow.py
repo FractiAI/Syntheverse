@@ -373,3 +373,4 @@ if __name__ == "__main__":
         print("❌ Test failed - check errors above")
     print("=" * 70)
     sys.exit(0 if success else 1)
+

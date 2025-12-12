@@ -27,3 +27,4 @@ These directories are automatically created and populated when running:
 - The RAG API reads from `vectorized/embeddings/` for queries
 - You can specify custom paths in the script arguments
 
+

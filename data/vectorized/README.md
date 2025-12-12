@@ -37,3 +37,4 @@ Each JSON file contains an array of vectorized chunks with:
 - Already vectorized files are automatically skipped
 - Embeddings use local HuggingFace models (no API calls)
 
+

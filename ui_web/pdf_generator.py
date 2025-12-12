@@ -405,3 +405,4 @@ if __name__ == "__main__":
     # Generate certificate
     cert_path = generator.generate_certificate_pdf(test_submission, test_allocation)
     print(f"Certificate generated: {cert_path}")
+

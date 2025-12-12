@@ -74,3 +74,4 @@ def test_rag_response_time():
 if __name__ == "__main__":
     success = test_rag_response_time()
     sys.exit(0 if success else 1)
+

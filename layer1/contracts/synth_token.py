@@ -403,3 +403,4 @@ class SYNTHToken:
         contract.total_coherence_density = data["total_coherence_density"]
         contract.reward_history = data["reward_history"]
         return contract
+

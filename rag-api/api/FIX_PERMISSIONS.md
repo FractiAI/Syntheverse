@@ -47,3 +47,4 @@ If the symlink still doesn't work, you can use the direct path:
 /Applications/Ollama.app/Contents/Resources/ollama serve
 ```
 
+

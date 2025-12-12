@@ -23,3 +23,4 @@ Each PDF generates one JSON file with:
 - Already parsed files are automatically skipped
 - Files are named after the source PDF (e.g., `document.pdf` → `document.json`)
 
+

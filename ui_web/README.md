@@ -15,17 +15,9 @@ This installs:
 - Werkzeug (utilities)
 - python-dotenv (for .env file support)
 
-### 2. Configure Email (Optional)
+### 2. Start the Web Server
 
-To enable email reports:
-
-```bash
-cd ui_web
-cp .env.example .env
-# Edit .env with your email settings
-```
-
-See `EMAIL_SETUP.md` for detailed email configuration.
+No additional configuration needed. All results are displayed in the web UI.
 
 ### 3. Start the Web Server
 
@@ -34,7 +26,7 @@ cd ui_web
 python app.py
 ```
 
-### 4. Open in Browser
+### 3. Open in Browser
 
 Navigate to: **http://localhost:5000**
 
@@ -62,7 +54,6 @@ Navigate to: **http://localhost:5000**
 1. **Submit a Document**:
    - Click "Select PDF file" and choose your document
    - Enter your Contributor ID
-   - Enter your Email Address (PoD report will be emailed to you)
    - Select category (Scientific/Tech/Alignment)
    - Click "Submit for PoD Evaluation"
 
@@ -112,14 +103,12 @@ ui_web/
 └── README.md                   # This file
 ```
 
-## Email Reports
+## Viewing Results
 
-When you submit a document, if email is configured:
-- PoD report is automatically sent to your email
-- Report includes evaluation scores and token allocation
-- JSON report file is attached to the email
-
-See `EMAIL_SETUP.md` for email configuration.
+All PoD evaluation results, reports, and certificates are displayed directly in the web UI:
+- Navigate to the **"📄 Results"** tab after submitting
+- View detailed evaluation reports, scores, and certificates
+- Download PDF reports directly from the UI
 
 ## Notes
 
@@ -127,4 +116,4 @@ See `EMAIL_SETUP.md` for email configuration.
 - All outputs go to `test_outputs/` (same as CLI)
 - The web UI uses the same backend as the CLI tool
 - Make sure RAG API is running for best evaluation results
-- Email is optional - system works without it
+- All results are displayed in the web UI - no email configuration needed

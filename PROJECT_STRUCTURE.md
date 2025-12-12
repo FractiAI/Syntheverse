@@ -109,3 +109,4 @@ All other components are new scaffolding created for this repository structure.
 4. Allocation → `layer1/contracts` → Records on blockchain
 5. Admin monitors → `ui-admin` → Views all system activity
 
+

@@ -46,3 +46,4 @@ If Groq still shows as unavailable:
 2. Verify the key is valid at https://console.groq.com/
 3. Check RAG API logs: `tail -f /tmp/syntheverse_rag_api.log`
 4. Restart services after setting the key
+

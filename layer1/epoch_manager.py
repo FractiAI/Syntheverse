@@ -150,3 +150,4 @@ class EpochManager:
     def get_transition_history(self) -> list:
         """Get history of epoch transitions."""
         return self.epoch_history.copy()
+

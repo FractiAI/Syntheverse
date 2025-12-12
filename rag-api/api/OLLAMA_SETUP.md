@@ -93,3 +93,4 @@ Once the API is working:
 2. Run `python3 test_ollama.py` to verify
 3. Start the RAG API: `python rag_api.py`
 
+

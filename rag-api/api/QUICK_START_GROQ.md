@@ -63,3 +63,4 @@ The UI will automatically use Groq for fast responses!
 - The API prefers Groq if available
 - Check `/health` endpoint to see which providers are available
 
+

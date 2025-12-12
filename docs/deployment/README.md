@@ -76,3 +76,4 @@ Create `.env` files for each component with necessary configuration:
 - Layer 2: Evaluation criteria, tokenomics parameters
 - Layer 1: Network configuration, consensus parameters
 
+

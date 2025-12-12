@@ -63,7 +63,7 @@ Full-featured web interface for PoD submissions
 - **Interactive Submissions**: Expandable submission list with detailed PoD metrics, PDF viewing, and certificate registration
 - **PDF Viewing**: Direct access to submitted PDF documents
 - **Certificate Registration**: Blockchain registration with wallet integration, payment info, and gas balance tracking
-- **Email Reports**: Optional email notifications with PoD certificates
+- **In-UI Results**: All evaluation results displayed directly in the web interface
 - **Status**: ✅ Fully Operational
 
 See [Web UI README](ui_web/README.md) for detailed documentation.
@@ -149,7 +149,7 @@ This will start:
 
 1. Go to http://localhost:5000
 2. Upload a PDF document
-3. Enter your Contributor ID and email
+3. Enter your Contributor ID
 4. Select category (Scientific/Tech/Alignment)
 5. Click "Submit for PoD Evaluation"
 6. Wait for evaluation (60-180 seconds)
@@ -188,7 +188,7 @@ This will start:
 | RAG API | ✅ Operational | Fully functional with Groq integration, unified Syntheverse AI system prompt, scraper, parser, vectorizer, and web UI |
 | Layer 2 | ✅ Operational | Complete PoD evaluator with direct Grok API integration (no RAG dependency), token allocator, and persistent tokenomics state |
 | Layer 1 | ✅ Operational | Full blockchain implementation with epochs, tiers, token distribution, and state persistence |
-| Web UI | ✅ Operational | Full-featured web interface with document upload, expandable submissions, PDF viewing, certificate registration with wallet integration, real-time status, and email reports |
+| Web UI | ✅ Operational | Full-featured web interface with document upload, expandable submissions, PDF viewing, certificate registration with wallet integration, real-time status, and in-UI results display |
 | Submission UI | 🚧 In Development | Basic HTML interface scaffold created |
 | Admin UI | 🚧 In Development | Basic HTML interface scaffold created |
 | Documentation | ✅ Complete | Comprehensive architecture, API, and deployment docs |

@@ -315,3 +315,4 @@ class Blockchain:
             Transaction.from_dict(tx_data) for tx_data in data.get("pending_transactions", [])
         ]
         return blockchain
+

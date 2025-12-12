@@ -263,3 +263,4 @@ Evaluation uses the RAG API with a specialized prompt based on the PoD protocol 
 - Epoch status updates automatically
 - Token allocation depends on PoD score, epoch, and tier
 - System validates tier availability in epochs before allocation
+

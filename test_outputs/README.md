@@ -40,3 +40,4 @@ Complete list of all submissions with:
 - Evaluation results
 - Allocation details
 - Status (approved/rejected)
+

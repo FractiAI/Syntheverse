@@ -20,3 +20,4 @@ rm -f /tmp/syntheverse_pod_ui.pid
 
 sleep 1
 echo "Syntheverse stopped."
+

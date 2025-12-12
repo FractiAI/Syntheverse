@@ -362,3 +362,4 @@ class TokenomicsState:
             self.state["current_epoch"] = l1_state["current_epoch"]
         
         self.save_state()
+

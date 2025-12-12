@@ -110,3 +110,4 @@ if __name__ == "__main__":
     allocation = allocator.calculate_reward(sample_evaluation, epoch=1)
     print(json.dumps(allocation, indent=2))
 
+

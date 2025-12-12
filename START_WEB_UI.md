@@ -65,3 +65,4 @@ cd rag-api/api && python rag_api.py
 3. Enter your contributor ID
 4. Select category and submit
 5. View the results in the Status and Submissions tabs!
+

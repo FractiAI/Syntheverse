@@ -229,3 +229,4 @@ The state file contains:
 - Epoch progression (which epochs are unlocked)
 
 All data persists across server restarts and is automatically updated.
+

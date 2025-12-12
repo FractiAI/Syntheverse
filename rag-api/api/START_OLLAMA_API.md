@@ -58,3 +58,4 @@ If `ollama serve` doesn't work:
 3. Try restarting Ollama.app
 4. Check system logs for errors
 
+

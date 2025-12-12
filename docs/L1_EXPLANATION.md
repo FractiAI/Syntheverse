@@ -108,3 +108,4 @@ Layer 1 is the **Syntheverse Blockchain** - the foundational blockchain layer th
 - **Gold** (Scientific): 1000x multiplier, all epochs
 - **Silver** (Tech): 100x multiplier, Community/Ecosystem only
 - **Copper** (Alignment): 1x multiplier, Pioneer/Community/Ecosystem
+

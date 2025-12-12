@@ -35,3 +35,4 @@ echo ""
 # Start Ollama server (foreground so we can see output)
 ollama serve
 
+

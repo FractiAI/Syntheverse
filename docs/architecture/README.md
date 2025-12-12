@@ -96,3 +96,4 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Di
 - Layer 1 blockchain provides distributed consensus
 - UIs can be deployed as static sites with API backends
 
+
