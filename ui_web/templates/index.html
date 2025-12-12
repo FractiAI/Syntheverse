@@ -173,6 +173,7 @@
             padding: 15px;
             border-bottom: 1px solid #e0e0e0;
             transition: background 0.2s;
+            cursor: pointer;
         }
         
         .submission-item:hover {
@@ -183,15 +184,120 @@
             border-bottom: none;
         }
         
+        .submission-item.expanded {
+            background: #f9f9f9;
+        }
+        
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         .submission-title {
             font-weight: 600;
             color: #333;
             margin-bottom: 5px;
+            flex: 1;
         }
         
         .submission-meta {
             font-size: 0.9em;
             color: #666;
+        }
+        
+        .submission-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .submission-item.expanded .submission-details {
+            display: block;
+        }
+        
+        .expand-icon {
+            margin-left: 10px;
+            transition: transform 0.3s;
+            font-size: 1.2em;
+        }
+        
+        .submission-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .detail-section {
+            margin-bottom: 15px;
+        }
+        
+        .detail-section h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .detail-item {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .detail-item strong {
+            display: block;
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item span {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-pdf {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-pdf:hover {
+            background: #d32f2f;
+            transform: translateY(-1px);
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
         }
         
         .badge {
@@ -732,24 +838,102 @@
                     
                     let html = '<div class="submissions-list">';
                     
-                    submissions.forEach(sub => {
+                    submissions.forEach((sub, index) => {
                         const status = sub.status || 'pending';
                         const allocation = sub.allocation;
+                        const evaluation = sub.evaluation || {};
+                        const submissionHash = sub.submission_hash || '';
                         
-                        html += `<div class="submission-item">
-                            <div class="submission-title">
-                                ${sub.title || 'Untitled'}
-                                <span class="badge ${status}">${status}</span>
+                        html += `<div class="submission-item" onclick="toggleSubmission(${index})" data-index="${index}">
+                            <div class="submission-header">
+                                <div style="flex: 1;">
+                                    <div class="submission-title">
+                                        ${sub.title || 'Untitled'}
+                                        <span class="badge ${status}">${status}</span>
+                                    </div>
+                                    <div class="submission-meta">
+                                        Hash: ${submissionHash.substring(0, 16)}... | 
+                                        Category: ${sub.category || 'N/A'} | 
+                                        ${sub.timestamp ? new Date(sub.timestamp).toLocaleDateString() : ''}
+                                    </div>
+                                </div>
+                                <span class="expand-icon">▼</span>
                             </div>
-                            <div class="submission-meta">
-                                Hash: ${sub.submission_hash?.substring(0, 16)}...<br>
-                                Category: ${sub.category || 'N/A'}<br>
-                                ${sub.evaluation ? `
-                                    Coherence: ${sub.evaluation.coherence?.toFixed(0) || 'N/A'} | 
-                                    Density: ${sub.evaluation.density?.toFixed(0) || 'N/A'} | 
-                                    Novelty: ${sub.evaluation.novelty?.toFixed(0) || 'N/A'}<br>
-                                    ${allocation ? `Allocated: ${parseFloat(allocation.reward).toLocaleString()} SYNTH (${allocation.epoch}, ${allocation.tier})` : ''}
-                                ` : 'Pending evaluation...'}
+                            <div class="submission-details">
+                                <div class="detail-section">
+                                    <h4>📊 Evaluation Results</h4>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <strong>Coherence (Φ)</strong>
+                                            <span>${(evaluation.coherence || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Density (ρ)</strong>
+                                            <span>${(evaluation.density || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Novelty</strong>
+                                            <span>${((evaluation.novelty || 0) * 100).toFixed(1)}%</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Redundancy (R)</strong>
+                                            <span>${((evaluation.redundancy || 0) * 100).toFixed(1)}%</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>PoD Score</strong>
+                                            <span>${(sub.pod_score || 0).toFixed(2)}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Tier</strong>
+                                            <span style="text-transform: capitalize;">${evaluation.tier || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                ${allocation ? `
+                                <div class="detail-section">
+                                    <h4>💰 Token Allocation</h4>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <strong>Epoch</strong>
+                                            <span style="text-transform: capitalize;">${allocation.epoch || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Tier</strong>
+                                            <span style="text-transform: capitalize;">${allocation.tier || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>SYNTH Tokens</strong>
+                                            <span>${parseFloat(allocation.reward || 0).toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${evaluation.tier_justification ? `
+                                <div class="detail-section">
+                                    <h4>📝 Tier Justification</h4>
+                                    <p style="color: #666; line-height: 1.6; margin-top: 8px;">${evaluation.tier_justification}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${evaluation.reasoning ? `
+                                <div class="detail-section">
+                                    <h4>💭 Evaluation Reasoning</h4>
+                                    <p style="color: #666; line-height: 1.6; margin-top: 8px;">${evaluation.reasoning}</p>
+                                </div>
+                                ` : ''}
+                                
+                                <div class="action-buttons">
+                                    <button class="btn-small btn-pdf" onclick="event.stopPropagation(); downloadPDF('${submissionHash}')">
+                                        📄 View PDF
+                                    </button>
+                                    ${allocation ? `
+                                    <button class="btn-small btn-register" onclick="event.stopPropagation(); registerCertificate('${submissionHash}', '${sub.contributor || ''}')">
+                                        🔗 Register Certificate
+                                    </button>
+                                    ` : ''}
+                                </div>
                             </div>
                         </div>`;
                     });
@@ -761,6 +945,26 @@
                 document.getElementById('submissionsContent').innerHTML = 
                     `<div class="error">Error loading submissions: ${error.message}</div>`;
             }
+        }
+        
+        // Toggle submission expansion
+        function toggleSubmission(index) {
+            const items = document.querySelectorAll('.submission-item');
+            const item = items[index];
+            if (item) {
+                item.classList.toggle('expanded');
+            }
+        }
+        
+        // Download PDF
+        function downloadPDF(submissionHash) {
+            window.open(`/api/pdf/${submissionHash}`, '_blank');
+        }
+        
+        // Register certificate
+        function registerCertificate(submissionHash, contributor) {
+            // Navigate to register page with pre-filled data
+            window.location.href = `/register?hash=${submissionHash}&contributor=${encodeURIComponent(contributor)}`;
         }
         
         // Auto-refresh

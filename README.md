@@ -60,7 +60,9 @@ See [Layer 1 README](layer1/README.md) for detailed documentation.
 Full-featured web interface for PoD submissions
 - **Document Upload**: Upload PDF files for PoD evaluation
 - **Real-time Status**: View epoch status, token balances, and thresholds
-- **Submission Tracking**: See all PoD submissions with scores and allocations
+- **Interactive Submissions**: Expandable submission list with detailed PoD metrics, PDF viewing, and certificate registration
+- **PDF Viewing**: Direct access to submitted PDF documents
+- **Certificate Registration**: Blockchain registration with wallet integration, payment info, and gas balance tracking
 - **Email Reports**: Optional email notifications with PoD certificates
 - **Status**: ✅ Fully Operational
 
@@ -186,7 +188,7 @@ This will start:
 | RAG API | ✅ Operational | Fully functional with Groq integration, unified Syntheverse AI system prompt, scraper, parser, vectorizer, and web UI |
 | Layer 2 | ✅ Operational | Complete PoD evaluator with direct Grok API integration (no RAG dependency), token allocator, and persistent tokenomics state |
 | Layer 1 | ✅ Operational | Full blockchain implementation with epochs, tiers, token distribution, and state persistence |
-| Web UI | ✅ Operational | Full-featured web interface with document upload, real-time status, and email reports |
+| Web UI | ✅ Operational | Full-featured web interface with document upload, expandable submissions, PDF viewing, certificate registration with wallet integration, real-time status, and email reports |
 | Submission UI | 🚧 In Development | Basic HTML interface scaffold created |
 | Admin UI | 🚧 In Development | Basic HTML interface scaffold created |
 | Documentation | ✅ Complete | Comprehensive architecture, API, and deployment docs |

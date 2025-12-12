@@ -305,6 +305,48 @@ def get_report(submission_hash):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@app.route('/api/pdf/<submission_hash>', methods=['GET'])
+def get_pdf(submission_hash):
+    """Get PDF file for a submission."""
+    try:
+        # Find submission
+        submission = None
+        for sub in ui.submissions:
+            if sub.get('submission_hash') == submission_hash:
+                submission = sub
+                break
+        
+        if not submission:
+            return jsonify({"success": False, "error": "Submission not found"}), 404
+        
+        # Get PDF path
+        pdf_path = submission.get('pdf_path') or submission.get('evidence')
+        if not pdf_path:
+            return jsonify({"success": False, "error": "PDF path not found"}), 404
+        
+        # Check if file exists
+        full_path = Path(pdf_path)
+        if not full_path.is_absolute():
+            # Try relative to uploads folder
+            full_path = Path(app.config['UPLOAD_FOLDER']) / pdf_path
+            if not full_path.exists():
+                # Try as absolute path from project root
+                full_path = Path(pdf_path)
+        
+        if not full_path.exists():
+            return jsonify({"success": False, "error": "PDF file not found"}), 404
+        
+        # Return PDF file
+        return send_from_directory(
+            str(full_path.parent),
+            full_path.name,
+            mimetype='application/pdf'
+        )
+    
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 def send_pod_report_email(to_email: str, submission: dict, submission_hash: str):
     """
     Send PoD report email to submitter with PDF report and certificate.
