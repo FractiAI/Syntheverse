@@ -69,22 +69,49 @@ See Layer 1 README￼ for detailed documentation.
 
 ⸻
 
-4. Web UI (ui_web/)
+4. PoC Frontend (ui-poc/) - NEW
 
-Full-featured web interface for PoD / PoT / PoA submissions
+Modern Next.js frontend for Proof-of-Contribution system
+	•	Contributor Dashboard: Statistics, charts, and system overview
+	•	Submissions Explorer: TanStack Table with sorting, filtering, and search
+	•	Submission Detail: Full contribution details with evaluation metrics
+	•	Contribution Registry: Append-only chronological timeline view
+	•	Sandbox Map: Interactive network visualization with overlap/redundancy detection
+	•	Multi-Metal Display: Visual representation of Gold, Silver, and Copper contributions
+	•	Stack: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui, vis-network
+	•	Status: ✅ Fully Operational
+
+See PoC Frontend README (ui-poc/README.md) for detailed documentation.
+
+⸻
+
+5. Web UI (ui_web/) - Legacy
+
+Full-featured Flask web interface for PoD / PoT / PoA submissions (legacy)
 	•	Document & Artifact Upload
 	•	Real-time Status: Epochs, balances, thresholds
 	•	Interactive Submissions: Expandable evaluation metrics
 	•	Artifact Viewing: PDFs and submitted files
 	•	Certificate Registration: Blockchain anchoring with wallet integration
-	•	In-UI Results
-	•	Status: ✅ Fully Operational
+	•	Status: ✅ Fully Operational (Legacy System)
 
-See Web UI README￼ for detailed documentation.
+See Web UI README for detailed documentation.
 
 ⸻
 
-5. Submission UI (ui-submission/)
+6. API Server (ui-poc-api/) - NEW
+
+Flask REST API server connecting PoC frontend to backend
+	•	RESTful API endpoints for all PoC operations
+	•	CORS-enabled for Next.js frontend
+	•	Integrates with PoC Server and Archive
+	•	Status: ✅ Fully Operational
+
+See API Server README (ui-poc-api/README.md) for details.
+
+⸻
+
+7. Submission UI (ui-submission/)
 
 Basic HTML interface for submitting PoD / PoT / PoA contributions
 	•	Submit discoveries, technologies, or alignment artifacts
@@ -94,7 +121,7 @@ Basic HTML interface for submitting PoD / PoT / PoA contributions
 
 ⸻
 
-6. Admin UI (ui-admin/)
+8. Admin UI (ui-admin/)
 
 Administrative interface
 	•	Review and manage PoD / PoT / PoA submissions
