@@ -1,0 +1,56 @@
+═══════════════════════════════════════════════════════════════
+  START SYNTHEVERSE POC UI FOR BROWSER TESTING
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Open Terminal Window 1 - Start API Server
+─────────────────────────────────────────────────────
+
+Run this command:
+
+    cd /Users/macbook/FractiAI/Syntheverse/ui-poc-api && python3 app.py
+
+You should see:
+  ✓ PoC Server initialized successfully
+  * Running on http://0.0.0.0:5001
+
+Keep this terminal open!
+
+
+STEP 2: Open Terminal Window 2 - Start Frontend
+─────────────────────────────────────────────────
+
+Run this command:
+
+    cd /Users/macbook/FractiAI/Syntheverse/ui-poc && npm run dev
+
+You should see:
+  ▲ Next.js 14.x.x
+  - Local: http://localhost:3000
+
+Keep this terminal open too!
+
+
+STEP 3: Open Browser
+─────────────────────
+
+1. Open your web browser
+2. Go to: http://localhost:3000
+3. You should see the Syntheverse PoC UI!
+
+
+WHAT TO TEST:
+─────────────
+
+✓ Dashboard - View statistics and charts
+✓ Submission - Submit a new contribution
+✓ Explorer - Browse contributions in a table
+✓ Registry - View chronological log
+✓ Sandbox Map - Visualize contribution network
+
+
+STOP SERVICES:
+──────────────
+
+Press Ctrl+C in both terminal windows
+
+═══════════════════════════════════════════════════════════════

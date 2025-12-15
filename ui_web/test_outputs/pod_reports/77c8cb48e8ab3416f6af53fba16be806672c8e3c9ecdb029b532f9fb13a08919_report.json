@@ -1,0 +1,99 @@
+{
+  "submission": {
+    "hash": "77c8cb48e8ab3416f6af53fba16be806672c8e3c9ecdb029b532f9fb13a08919",
+    "title": "The 10-1 Framework Re-F",
+    "contributor": "Marek01",
+    "category": "scientific",
+    "timestamp": "2025-12-11T18:28:02.267737"
+  },
+  "evaluation": {
+    "coherence": 9200.0,
+    "density": 9600.0,
+    "redundancy": 0.3,
+    "novelty": 0.7,
+    "epoch_weight": 1.0,
+    "pod_score": 236.16,
+    "tier": "silver",
+    "epoch": "pioneer",
+    "tier_justification": "novel trinary model, clear descriptions, and analogies",
+    "redundancy_analysis": "similar ideas, unique application and presentation",
+    "epoch_justification": "high density score, significant contribution to the field",
+    "retroactive_mining": null,
+    "reasoning": "",
+    "status": "approved",
+    "rejection_reason": null
+  },
+  "pod_score": 0.61824,
+  "allocation": {
+    "submission_hash": "77c8cb48e8ab3416f6af53fba16be806672c8e3c9ecdb029b532f9fb13a08919",
+    "recipient": "Marek01",
+    "pod_score": 0.61824,
+    "epoch": "founder",
+    "tier": "gold",
+    "reward": 2250600749690.388,
+    "timestamp": "2025-12-11T18:28:02.256766"
+  },
+  "status": "approved",
+  "blockchain": {
+    "chain_length": 5,
+    "latest_block": 4
+  },
+  "epoch_status": {
+    "current_epoch": "founder",
+    "epochs": {
+      "founder": {
+        "epoch": "founder",
+        "is_active": true,
+        "is_unlocked": false,
+        "balance": 34152749885829.613,
+        "threshold": 0,
+        "can_unlock": true,
+        "distribution_percent": 50.0
+      },
+      "pioneer": {
+        "epoch": "pioneer",
+        "is_active": false,
+        "is_unlocked": false,
+        "balance": 9000000000000.0,
+        "threshold": 1000000,
+        "can_unlock": false,
+        "distribution_percent": 10.0
+      },
+      "community": {
+        "epoch": "community",
+        "is_active": false,
+        "is_unlocked": false,
+        "balance": 18000000000000.0,
+        "threshold": 2000000,
+        "can_unlock": false,
+        "distribution_percent": 20.0
+      },
+      "ecosystem": {
+        "epoch": "ecosystem",
+        "is_active": false,
+        "is_unlocked": false,
+        "balance": 18000000000000.0,
+        "threshold": 3000000,
+        "can_unlock": false,
+        "distribution_percent": 20.0
+      }
+    },
+    "transition_history": []
+  },
+  "token_stats": {
+    "total_supply": 90000000000000,
+    "total_distributed": 10847250114170.387,
+    "total_remaining": 79152749885829.61,
+    "epoch_balances": {
+      "founder": 34152749885829.613,
+      "pioneer": 9000000000000.0,
+      "community": 18000000000000.0,
+      "ecosystem": 18000000000000.0
+    },
+    "current_epoch": "founder",
+    "founder_halving_count": 0,
+    "total_coherence_density": 36900.0,
+    "total_holders": 2,
+    "total_rewards": 4
+  }
+}
