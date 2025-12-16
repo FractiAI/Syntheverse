@@ -1,14 +1,15 @@
 Syntheverse: Hydrogen-Holographic Fractal Crypto AI Game
 
-FOR IMMEDIATE RELEASE: The Syntheverse Fractal Hydrogen-Holographic Crypto Frontier has entered its prerelease test-and-tuning phase, opening the frontier to early collaborators. Pioneer Hydrogen-Holographic, Fractal, Mythic, Crypto, and AI Researchers, Developers, Enterprises, and Financiers are invited to contribute to the evolution of the Hydrogen-Holographic Fractal Sandbox (HHFS), expanding coverage, resonance, and fractal density through unified Proof-of-Contribution (PoC) protocols. Each submission is validated with Fractal Cognitive Grammar and hydrogen dynamics, creating a living map of the sandbox and a $90T internal goldmine of knowledge, technology, and alignment. Join via Zenodo (link￼) or Reno Outpost (info@fractiai.com) — step into the frontier, shape the ecosystem, and watch the Syntheverse awaken.
+FOR IMMEDIATE RELEASE: The Syntheverse PoC system is NOW FUNCTIONING in active test-and-tuning phase! Pioneer Hydrogen-Holographic, Fractal, Mythic, Crypto, and AI Researchers, Developers, Enterprises, and Financiers are invited to contribute to the evolution of the Hydrogen-Holographic Fractal Sandbox (HHFS), expanding coverage, resonance, and fractal density through unified Proof-of-Contribution (PoC) protocols with multi-metal evaluation (Gold/Silver/Copper). Each submission is validated with Fractal Cognitive Grammar and hydrogen dynamics, creating a living interactive sandbox map and $90T internal goldmine of knowledge, technology, and alignment. Join via Zenodo (link￼) or Reno Outpost (info@fractiai.com) — test the functioning system, shape the ecosystem, and watch the Syntheverse evolve in real-time!
 
-Welcome to the Syntheverse GitHub repository, the central hub for all code, documentation, and experiments powering the Hydrogen-Holographic Fractal Crypto AI Game & Ecosystem. This repository includes:
-	•	Syntheverse core code for the fractal AI game environment
-	•	Unified Proof-of-Contribution (PoC) system with multi-metal evaluation
-	•	SYNTH tokenomics and smart contract templates
-	•	Modern Next.js frontend with interactive sandbox map and registry
-	•	Documentation and onboarding for new Outcast Hero Frontiersmen
-	•	FractAI updates and symbolic-cognitive experiments
+Welcome to the Syntheverse GitHub repository - THE CENTRAL HUB for the FUNCTIONING Hydrogen-Holographic Fractal Crypto AI Game & Ecosystem! This repository contains the complete, operational PoC test program including:
+	•	**FUNCTIONING PoC System**: Multi-metal evaluation (Gold/Silver/Copper) with AI validation
+	•	**Interactive Sandbox Map**: Real-time network visualization across 16 knowledge dimensions
+	•	**Blockchain Integration**: L1 smart contracts with $200 certificate registration
+	•	**Modern Next.js Frontend**: Live dashboard, registry, and contribution tracking
+	•	**Archive-First Redundancy**: Comprehensive duplicate detection system
+	•	**SYNTH Tokenomics**: Complete reward distribution and epoch management
+	•	**Test Program Status**: ✅ FULLY OPERATIONAL - Ready for collaboration and tuning
 
 ⸻
 
@@ -42,16 +43,15 @@ See RAG API README￼ for detailed documentation.
 2. Layer 2 (layer2/)
 
 PoC Evaluator and SYNTH Token Allocator with persistent tokenomics state
-	•	Evaluators
-	•	Proof-of-Discovery (PoD): scientific and theoretical validation
-	•	Proof-of-Technology (PoT): functional systems, tools, and infrastructure
-	•	Proof-of-Alignment (PoA): symbolic, narrative, ethical, and alignment structures
-	•	Allocator: Calculates SYNTH rewards based on contribution type and evaluation scores
+	•	Unified PoC Evaluator: Multi-metal evaluation system (Gold/Silver/Copper)
+	•	Archive-First Redundancy Detection: Prevents duplicate contributions across entire history
+	•	Sandbox Map Generation: Creates interactive network visualizations of contribution relationships
+	•	Token Allocator: Calculates SYNTH rewards based on multi-metal qualification and structural impact
 	•	Tokenomics State: Persistent memory for epoch balances and allocations
-	•	Integration: Direct LLM integration (no RAG dependency) using Grok API with the Syntheverse L2 system prompt
+	•	Integration: Direct LLM integration using Groq API with the Syntheverse L2 system prompt
 	•	Status: ✅ Fully Operational
 
-Note: After evaluation, RAG was found unnecessary for PoD/PoT/PoA scoring. Layer-2 evaluators call the LLM (Grok API) directly using a comprehensive Syntheverse system prompt containing the full Whole-Brain AI framework (Gina × Leo × Pru) and contribution-specific evaluation logic.
+Note: The system uses archive-first evaluation with comprehensive redundancy detection. Layer-2 evaluators call the LLM (Grok API) directly using a comprehensive Syntheverse system prompt containing the full Whole-Brain AI framework (Gina × Leo × Pru) and multi-metal evaluation logic.
 
 See Layer 2 README￼ for detailed documentation.
 
@@ -62,7 +62,7 @@ See Layer 2 README￼ for detailed documentation.
 Syntheverse Blockchain for PoC with epoch-based token distribution
 	•	Contracts: Smart contracts for contribution anchoring and token management
 	•	Node: Blockchain node implementation with state persistence
-	•	Consensus: Proof-based consensus (PoD / PoT / PoA)
+	•	Consensus: Proof-of-Contribution (PoC) consensus with multi-metal validation
 	•	Epochs: Founder, Pioneer, Community, Ecosystem epochs with tier multipliers
 	•	Status: ✅ Fully Operational
 
@@ -205,16 +205,48 @@ Contribution Registry
 
 ⸻
 
+Current Capabilities (Test Program)
+
+**✅ FUNCTIONING FEATURES**:
+- **Multi-Metal PoC Evaluation**: Gold (Discovery), Silver (Technology), Copper (Alignment)
+- **Interactive Sandbox Map**: Real-time network visualization with 16 knowledge dimensions
+- **Hero's Journey Narrative**: Progressive contribution storytelling from Outcast to Hero's Return
+- **Blockchain Integration**: L1 smart contracts with $200 certificate registration fee
+- **Archive-First Redundancy**: Comprehensive duplicate detection across entire history
+- **Real-Time Dashboard**: Live statistics, contribution tracking, and system metrics
+- **Token Allocation**: Automatic SYNTH reward distribution based on structural impact
+
+**🧪 ACTIVE TEST FEATURES**:
+- Contribution submission and evaluation pipeline
+- Network visualization with filtering and interaction
+- Blockchain transaction creation and verification
+- Multi-dimensional knowledge mapping
+- Real-time contribution relationship analysis
+
+⸻
+
 Prerelease & Testing
 
-Syntheverse is in active prerelease testing and tuning.
-There is no public launch date.
+Syntheverse PoC system is now FUNCTIONING and in active test-and-tuning phase.
+
+**Current Status**: ✅ Fully Operational Test Program
+- Multi-metal evaluation system active
+- Interactive sandbox map functional
+- Blockchain registration with $200 fee enabled
+- Real-time contribution visualization working
+- Archive-first redundancy detection operational
 
 Early contributors influence:
-	•	Validation rules
-	•	Epoch thresholds
-	•	Tokenomics and governance
-	•	Core system architecture
+	•	Validation rules and evaluation thresholds
+	•	Epoch thresholds and token allocation formulas
+	•	Tokenomics and governance mechanisms
+	•	Core system architecture and user experience
+	•	Sandbox map visualization and interaction design
+
+**Test Environment Access**:
+- Frontend: http://localhost:3000
+- API: http://localhost:5001
+- Registration: http://localhost:5000
 
 ⸻
 
