@@ -1,0 +1,24 @@
+[profile.default]
+src = 'contracts'
+out = 'out'
+libs = ['lib']
+test = 'test'
+cache_path = 'cache'
+remappings = [
+    '@openzeppelin/=lib/openzeppelin-contracts/',
+    'forge-std/=lib/forge-std/src/'
+]
+
+[rpc_endpoints]
+base_sepolia = "https://sepolia.base.org"
+base_mainnet = "https://mainnet.base.org"
+local = "http://localhost:8545"
+
+[etherscan]
+base_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+base_mainnet = { key = "${ETHERSCAN_API_KEY}" }
+
+[solc]
+version = "0.8.19"
+optimizer = true
+optimizer_runs = 200

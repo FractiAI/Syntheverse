@@ -263,8 +263,8 @@
 
                 <div class="wallet-card" style="margin-top: 15px;">
                     <h3>Registration Fee</h3>
-                    <div class="value" id="registrationFee" style="color: #dc2626; font-weight: bold;">$0 USD</div>
-                    <small id="feeDescription" style="color: #666; margin-top: 5px; display: block;">First 3 PoC submissions are FREE!</small>
+                    <div class="value" style="color: #dc2626; font-weight: bold;">$200 USD</div>
+                    <small style="color: #666; margin-top: 5px; display: block;">One-time blockchain registration fee</small>
                 </div>
             </div>
             
@@ -484,41 +484,6 @@
             e.target.value = value;
         });
         
-        // Calculate and display registration fee
-        async function calculateFee(contributor) {
-            try {
-                const response = await fetch(`/api/contributions?contributor=${encodeURIComponent(contributor)}`);
-                const contributions = await response.json();
-
-                const submissionCount = Array.isArray(contributions) ? contributions.length : 0;
-                const feeElement = document.getElementById('registrationFee');
-                const descElement = document.getElementById('feeDescription');
-
-                if (submissionCount < 3) {
-                    feeElement.textContent = '$0 USD';
-                    descElement.textContent = `First 3 PoC submissions are FREE! (${submissionCount}/3 used)`;
-                    feeElement.style.color = '#10b981'; // Green for free
-                } else {
-                    feeElement.textContent = '$50 USD';
-                    descElement.textContent = `Standard registration fee ($${50 * submissionCount} total for ${submissionCount} submissions)`;
-                    feeElement.style.color = '#dc2626'; // Red for paid
-                }
-
-                return submissionCount < 3 ? 0 : 50;
-            } catch (error) {
-                console.error('Failed to calculate fee:', error);
-                // Default to free if we can't check
-                return 0;
-            }
-        }
-
-        // Update fee when contributor changes
-        document.getElementById('contributor').addEventListener('input', async function(e) {
-            if (e.target.value.length > 10) { // Only check when we have a reasonable contributor ID
-                await calculateFee(e.target.value);
-            }
-        });
-
         // Form submission
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -533,9 +498,6 @@
             messageDiv.innerHTML = '<div style="padding: 15px; background: #e3f2fd; border-radius: 8px; margin-top: 20px;">Registering certificate on blockchain...</div>';
 
             try {
-                // Calculate the fee
-                const registrationFee = await calculateFee(contributor);
-
                 // Call the actual blockchain registration API
                 const response = await fetch('/api/register-poc', {
                     method: 'POST',
@@ -545,7 +507,7 @@
                     body: JSON.stringify({
                         submission_hash: submissionHash,
                         contributor: contributor,
-                        registration_fee: registrationFee
+                        registration_fee: 200.00
                     })
                 });
 
@@ -559,10 +521,6 @@
 
                     if (result.allocated_tokens) {
                         message += `<br/>🎉 Allocated ${result.allocated_tokens.toLocaleString()} SYNTH tokens!`;
-                    }
-
-                    if (registrationFee === 0) {
-                        message += '<br/>🎁 FREE registration (within first 3 submissions)';
                     }
 
                     message += '</div>';
