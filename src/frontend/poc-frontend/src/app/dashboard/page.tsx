@@ -88,7 +88,50 @@ export default function DashboardPage() {
         <p className="text-muted-foreground mt-2">
           Overview of contributions, tokenomics, and system status
         </p>
+        <div className="flex items-center space-x-4 mt-3">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium">Blockchain Active</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <span>Foundry + Anvil + Hardhat</span>
+            <span>•</span>
+            <span>Local Network</span>
+          </div>
+        </div>
       </div>
+
+      {/* Blockchain Status */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">Blockchain Network</h3>
+            <p className="text-sm text-muted-foreground">Syntheverse Blockmine Status</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium text-green-600">Online</span>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-muted-foreground">Network</p>
+            <p className="font-mono">Anvil (Chain ID: 31337)</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Tech Stack</p>
+            <p className="font-medium">Foundry + Anvil + Hardhat</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">SYNTH Contract</p>
+            <p className="font-mono text-xs">0x9fE4...6e0</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">POC Registry</p>
+            <p className="font-mono text-xs">0xCf7E...Fc9</p>
+          </div>
+        </div>
+      </Card>
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

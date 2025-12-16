@@ -124,12 +124,13 @@ class PoCArchive:
         status: ContributionStatus = ContributionStatus.DRAFT,
         category: Optional[str] = None,
         metals: Optional[List[MetalType]] = None,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
+        is_test: bool = False
     ) -> Dict:
         """
         Add a contribution to the archive.
         Archive-first rule: ALL contributions are stored regardless of status.
-        
+
         Args:
             submission_hash: Unique submission identifier
             title: Contribution title
@@ -139,7 +140,8 @@ class PoCArchive:
             category: Category (scientific/tech/alignment)
             metals: List of metal types this contribution contains
             metadata: Additional metadata (evaluation results, scores, etc.)
-        
+            is_test: Whether this is a test submission (marked for cleanup)
+
         Returns:
             Contribution record
         """
@@ -161,6 +163,7 @@ class PoCArchive:
             "category": category,
             "metals": [m.value for m in metals],
             "metadata": metadata or {},
+            "is_test": is_test,  # Mark for automatic cleanup
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat(),
         }

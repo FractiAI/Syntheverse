@@ -1,0 +1,42 @@
+{
+  "_format": "hh3-artifact-1",
+  "contractName": "ISYNTH",
+  "sourceName": "src/POCRegistry.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum ISYNTH.Epoch",
+          "name": "epoch",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "metal",
+          "type": "string"
+        }
+      ],
+      "name": "allocatePOC",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "immutableReferences": {},
+  "inputSourceName": "project/src/POCRegistry.sol",
+  "buildInfoId": "solc-0_8_19-beda35edfcc5b229c5898fc9ec154e8ddd967932"
+}

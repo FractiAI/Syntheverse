@@ -70,9 +70,14 @@ class PoCServer:
         self.tokenomics = TokenomicsState(state_file=tokenomics_state_file)
         self.archive = PoCArchive(archive_file=archive_file)
         self.sandbox_map = SandboxMap(self.archive)
-        
+
         print("✓ PoC Archive initialized")
         print("✓ Syntheverse Sandbox Map initialized")
+
+        # Run initial cleanup of any existing test submissions
+        cleanup_result = self.cleanup_test_submissions()
+        if cleanup_result.get("cleaned_count", 0) > 0:
+            print(f"✓ Cleaned up {cleanup_result['cleaned_count']} existing test submissions")
     
     def submit_contribution(
         self,
@@ -82,6 +87,7 @@ class PoCServer:
         text_content: Optional[str] = None,
         pdf_path: Optional[str] = None,
         category: Optional[str] = None,
+        is_test: bool = False,
         progress_callback: Optional[Callable[[str, str], None]] = None
     ) -> Dict:
         """
@@ -125,7 +131,8 @@ class PoCServer:
             contributor=contributor,
             text_content=text_content,
             status=ContributionStatus.DRAFT,
-            category=category
+            category=category,
+            is_test=is_test
         )
         
         # Update status to SUBMITTED
@@ -252,31 +259,78 @@ class PoCServer:
             progress_callback("calling_llm", "Calling Grok API for HHFE evaluation...")
         
         try:
+            print(f"🤖 Starting Grok API evaluation for {submission_hash}...")
+
+            # Update status to show evaluation is in progress
+            self.archive.update_contribution(
+                submission_hash,
+                metadata={"evaluation_status": "preparing_evaluation", "progress": "🤖 Preparing evaluation data for Grok AI..."}
+            )
+
+            # Prepare evaluation context
+            self.archive.update_contribution(
+                submission_hash,
+                metadata={"evaluation_status": "analyzing_archive", "progress": "🔍 Analyzing archive for redundancy detection..."}
+            )
+
             evaluation_result = self._call_grok_api(evaluation_query)
+            print(f"✅ Grok API evaluation completed for {submission_hash}")
+
+            # Store the raw Grok response for user display
+            self.archive.update_contribution(
+                submission_hash,
+                metadata={
+                    "evaluation_status": "grok_response_received",
+                    "progress": "📨 Grok AI response received - processing evaluation...",
+                    "grok_raw_response": evaluation_result
+                }
+            )
+
         except Exception as e:
+            print(f"❌ Grok API evaluation failed for {submission_hash}: {e}")
             self.archive.update_contribution(
                 submission_hash,
                 status=ContributionStatus.UNQUALIFIED,
-                metadata={"evaluation_error": str(e)}
+                metadata={
+                    "evaluation_error": str(e),
+                    "error_type": "api_failure",
+                    "evaluation_status": "failed",
+                    "progress": f"Evaluation failed: {str(e)[:50]}..."
+                }
             )
             return {
                 "success": False,
-                "error": f"Evaluation failed: {e}"
+                "error": f"AI evaluation failed: {str(e)[:100]}..."
             }
         
         # Parse evaluation result (extract scores and metals)
+        self.archive.update_contribution(
+            submission_hash,
+            metadata={"evaluation_status": "extracting_scores", "progress": "📊 Extracting coherence, density, and redundancy scores..."}
+        )
+
         parsed_evaluation = self._parse_evaluation_result(evaluation_result, contribution)
 
         # Override redundancy for first submission
         if is_first_submission:
             parsed_evaluation["redundancy"] = 0.0
             parsed_evaluation["redundancy_analysis"] = "First submission in archive - zero redundancy"
-        
+
         # Determine qualification status
+        self.archive.update_contribution(
+            submission_hash,
+            metadata={"evaluation_status": "determining_qualification", "progress": "⚖️ Determining contribution qualification and metal assignment..."}
+        )
+
         qualified = self._determine_qualification(parsed_evaluation)
         status = ContributionStatus.QUALIFIED if qualified else ContributionStatus.UNQUALIFIED
         
         # Calculate allocations for each metal (multi-metal support)
+        self.archive.update_contribution(
+            submission_hash,
+            metadata={"evaluation_status": "calculating_rewards", "progress": "💰 Calculating SYNTH token rewards based on evaluation scores..."}
+        )
+
         allocations = []
         if qualified and parsed_evaluation.get("metals"):
             for metal in parsed_evaluation["metals"]:
@@ -398,18 +452,33 @@ EVALUATION REQUIREMENTS:
         # Use the system prompt from the original pod_server
         # For now, using a simplified version - in production, include full system prompt
         system_prompt = """You are Syntheverse PoC Reviewer evaluating contributions using the Hydrogen-Holographic Fractal Engine (HHFE)."""
-        
-        response = self.groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": query}
-            ],
-            temperature=0.7,
-            max_tokens=2000
-        )
-        
-        return response.choices[0].message.content
+
+        print("🔗 Calling Grok API with detailed evaluation query...")
+        print(f"📊 Query length: {len(query)} characters")
+
+        try:
+            print("⏳ Sending evaluation request to Grok AI...")
+            print("🔬 Grok is analyzing coherence, density, and redundancy...")
+
+            response = self.groq_client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": query}
+                ],
+                temperature=0.0,  # Deterministic evaluation for consistency
+                max_tokens=2000,
+                timeout=300  # 5 minute timeout for complex evaluations - let Grok finish
+            )
+
+            print("📨 Grok AI evaluation completed!")
+            print(f"📝 Response length: {len(response.choices[0].message.content)} characters")
+            print("✅ Grok has provided detailed evaluation metrics")
+
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"💥 Grok API call failed: {e}")
+            raise e
     
     def _parse_evaluation_result(self, result: str, contribution: Dict) -> Dict:
         """Parse Grok API evaluation result."""
@@ -589,3 +658,90 @@ EVALUATION REQUIREMENTS:
     def get_tokenomics_statistics(self) -> Dict:
         """Get tokenomics statistics."""
         return self.tokenomics.get_statistics()
+
+    def cleanup_test_submissions(self) -> Dict:
+        """
+        Clean up test submissions from the archive.
+        Removes all contributions marked as test submissions.
+
+        Returns:
+            Cleanup statistics
+        """
+        test_submissions = []
+
+        # Find all test submissions (marked or detected by patterns)
+        for submission_hash, contribution in self.archive.archive["contributions"].items():
+            is_test = contribution.get("is_test", False)
+
+            # Also detect by patterns (for existing submissions)
+            if not is_test:
+                title = contribution.get("title", "").lower()
+                contributor = contribution.get("contributor", "").lower()
+                is_test = (
+                    'test' in title or 'test' in contributor or
+                    'demo' in title or 'demo' in contributor or
+                    submission_hash.endswith('-test-123') or
+                    submission_hash.endswith('-123') or
+                    'blockchain-test' in submission_hash
+                )
+
+            if is_test:
+                test_submissions.append(submission_hash)
+
+        cleaned_count = 0
+        for submission_hash in test_submissions:
+            try:
+                # Remove from all indexes
+                contribution = self.archive.archive["contributions"].get(submission_hash)
+                if contribution:
+                    content_hash = contribution.get("content_hash")
+                    contributor = contribution.get("contributor")
+                    metals = contribution.get("metals", [])
+                    status = contribution.get("status")
+
+                    # Remove from content hash index
+                    if content_hash and content_hash in self.archive.archive["content_hashes"]:
+                        if submission_hash in self.archive.archive["content_hashes"][content_hash]:
+                            self.archive.archive["content_hashes"][content_hash].remove(submission_hash)
+                            if not self.archive.archive["content_hashes"][content_hash]:
+                                del self.archive.archive["content_hashes"][content_hash]
+
+                    # Remove from status index
+                    if status and status in self.archive.archive["by_status"]:
+                        if submission_hash in self.archive.archive["by_status"][status]:
+                            self.archive.archive["by_status"][status].remove(submission_hash)
+
+                    # Remove from contributor index
+                    if contributor and contributor in self.archive.archive["by_contributor"]:
+                        if submission_hash in self.archive.archive["by_contributor"][contributor]:
+                            self.archive.archive["by_contributor"][contributor].remove(submission_hash)
+                            if not self.archive.archive["by_contributor"][contributor]:
+                                del self.archive.archive["by_contributor"][contributor]
+
+                    # Remove from metal indexes
+                    for metal in metals:
+                        if metal in self.archive.archive["by_metal"]:
+                            if submission_hash in self.archive.archive["by_metal"][metal]:
+                                self.archive.archive["by_metal"][metal].remove(submission_hash)
+
+                    # Remove the contribution itself
+                    del self.archive.archive["contributions"][submission_hash]
+                    cleaned_count += 1
+
+            except Exception as e:
+                print(f"Warning: Failed to clean up test submission {submission_hash}: {e}")
+                continue
+
+        # Save the cleaned archive
+        self.archive.save_archive()
+
+        # Update metadata
+        self.archive.archive["metadata"]["total_contributions"] = len(self.archive.archive["contributions"])
+        self.archive.save_archive()
+
+        return {
+            "success": True,
+            "cleaned_count": cleaned_count,
+            "remaining_contributions": len(self.archive.archive["contributions"]),
+            "message": f"Cleaned up {cleaned_count} test submissions"
+        }

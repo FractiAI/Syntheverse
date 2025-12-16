@@ -10,6 +10,8 @@ import { Upload, FileText, Loader2 } from 'lucide-react'
 export default function SubmissionPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [evaluating, setEvaluating] = useState(false)
+  const [grokResponse, setGrokResponse] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -63,15 +65,54 @@ export default function SubmissionPage() {
       // Submit contribution
       const result = await api.submitContribution(submissionData)
 
-      setSuccess(`Contribution submitted! Hash: ${result.submission_hash.slice(0, 16)}...`)
+      setSuccess(`Contribution submitted! Waiting for evaluation... Hash: ${result.submission_hash.slice(0, 16)}...`)
+      setLoading(false)
+      setEvaluating(true)
 
-      // Redirect to submission detail after a short delay
-      setTimeout(() => {
-        router.push(`/submission/${result.submission_hash}`)
-      }, 2000)
+      // Wait for evaluation to complete
+      const maxWaitTime = 60000 // 60 seconds max wait
+      const pollInterval = 2000 // Poll every 2 seconds
+      const startTime = Date.now()
+
+      const waitForEvaluation = async () => {
+        try {
+          const contribution = await api.getContribution(result.submission_hash)
+
+          // Update progress display with actual evaluation status from metadata
+          if (contribution.metadata?.progress) {
+            setSuccess(`${success.split(' - ')[0]} - ${contribution.metadata.progress}`)
+          }
+
+          // If we have the raw Grok response, show it
+          if (contribution.metadata?.grok_raw_response) {
+            setGrokResponse(contribution.metadata.grok_raw_response)
+          }
+
+          // Check if evaluation is complete
+          if (contribution.status !== 'submitted' && contribution.status !== 'evaluating') {
+            // Evaluation complete, redirect to results
+            router.push(`/submission/${result.submission_hash}`)
+            return
+          }
+
+          // Continue waiting if not timed out (increased to 6 minutes to match API timeout + buffer)
+          if (Date.now() - startTime < 360000) {
+            setTimeout(waitForEvaluation, pollInterval)
+          } else {
+            // Timeout reached, show error but don't redirect
+            setEvaluating(false)
+            setError('Evaluation is taking longer than expected. Please check back later or contact support.')
+          }
+        } catch (err) {
+          // On error, redirect anyway
+          router.push(`/submission/${result.submission_hash}`)
+        }
+      }
+
+      // Start waiting for evaluation
+      setTimeout(waitForEvaluation, pollInterval)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit contribution')
-    } finally {
       setLoading(false)
     }
   }
@@ -214,16 +255,62 @@ export default function SubmissionPage() {
             )}
 
             {success && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-md text-green-800">
-                {success}
+              <div className={`p-4 border rounded-md ${
+                evaluating
+                  ? 'bg-blue-50 border-blue-200 text-blue-800'
+                  : 'bg-green-50 border-green-200 text-green-800'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  {evaluating && <Loader2 className="h-4 w-4 animate-spin" />}
+                  <span>{success}</span>
+                </div>
+                {evaluating && (
+                  <div className="text-sm mt-2 space-y-1">
+                    <p className="opacity-75">
+                      🤖 AI evaluation in progress with Grok. Please wait...
+                    </p>
+                    <div className="bg-blue-100 p-2 rounded text-xs font-mono">
+                      Status: Communicating with Grok AI for detailed evaluation...
+                    </div>
+                    <div className="bg-green-50 p-2 rounded text-xs space-y-1">
+                      <p className="font-medium">📋 Evaluation Progress:</p>
+                      <div className="space-y-0.5 text-xs">
+                        <p>• 🤖 Preparing evaluation data for Grok AI...</p>
+                        <p>• 🔍 Analyzing archive for redundancy detection...</p>
+                        <p>• 🔬 Grok is analyzing coherence, density, and redundancy...</p>
+                        <p>• 📊 Extracting coherence, density, and redundancy scores...</p>
+                        <p>• ⚖️ Determining contribution qualification and metal assignment...</p>
+                        <p>• 💰 Calculating SYNTH token rewards based on evaluation scores...</p>
+                      </div>
+                    </div>
+
+                    {grokResponse && (
+                      <div className="bg-purple-50 p-3 rounded text-xs space-y-2 border border-purple-200">
+                        <p className="font-medium text-purple-800">🤖 Grok AI Evaluation Response:</p>
+                        <div className="bg-white p-2 rounded text-xs font-mono max-h-40 overflow-y-auto border">
+                          <pre className="whitespace-pre-wrap text-gray-800">{grokResponse}</pre>
+                        </div>
+                        <p className="text-purple-600 italic">Processing scores from Grok's evaluation...</p>
+                      </div>
+                    )}
+                    <p className="text-xs opacity-60">
+                      This may take up to 5 minutes for complex content. The page will automatically redirect when evaluation is complete.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
-            <Button type="submit" disabled={loading || (!hasFile && !hasTextContent)} className="w-full">
+            <Button type="submit" disabled={loading || evaluating || (!hasFile && !hasTextContent)} className="w-full">
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing PDF...
+                </>
+              ) : evaluating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Evaluating with AI...
                 </>
               ) : (
                 'Submit PDF Contribution'

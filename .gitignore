@@ -12,19 +12,21 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Data directories (exclude data files, but keep directory structure)
-data/pdfs/*.pdf
-data/parsed/*.json
-data/vectorized/embeddings/*.json
-data/vectorized/metadata/*.json
+src/data/pdfs/*.pdf
+src/data/parsed/*.json
+src/data/vectorized/embeddings/*.json
+src/data/vectorized/metadata/*.json
+src/api/poc-api/uploads/*.pdf
+src/api/test_outputs/*.json
 *.pdf
 scrape_results.json
 
 # Keep directory structure
-!data/pdfs/.gitkeep
-!data/parsed/.gitkeep
-!data/vectorized/embeddings/.gitkeep
-!data/vectorized/metadata/.gitkeep
-!data/**/README.md
+!src/data/pdfs/.gitkeep
+!src/data/parsed/.gitkeep
+!src/data/vectorized/embeddings/.gitkeep
+!src/data/vectorized/metadata/.gitkeep
+!src/data/**/README.md
 
 # Node
 node_modules/
@@ -59,7 +61,24 @@ logs/
 # ChromaDB
 chroma_db/
 
+# Foundry/Smart Contracts
+src/blockchain/contracts/cache/
+src/blockchain/contracts/out/
+src/blockchain/contracts/broadcast/
+src/blockchain/foundry/foundry.toml
+!src/blockchain/foundry/foundry.toml.example
+
+# Hardhat
+src/blockchain/hardhat/artifacts/
+src/blockchain/hardhat/cache/
+src/blockchain/hardhat/coverage/
+
 # Temporary files
 *.tmp
 *.temp
+
+# Test outputs and logs
+test_outputs/
+*.log
+logs/
 

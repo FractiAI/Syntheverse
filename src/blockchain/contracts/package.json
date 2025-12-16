@@ -1,0 +1,52 @@
+{
+  "name": "syntheverse-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Syntheverse PoC system",
+  "scripts": {
+    "test": "npm run test:hardhat",
+    "test:forge": "forge test",
+    "test:hardhat": "npx mocha test/hardhat/*.test.js --exit",
+    "test:watch": "forge test --watch",
+    "coverage": "forge coverage",
+    "build": "forge build",
+    "compile": "npx hardhat compile",
+    "deploy:anvil": "forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "deploy:hardhat": "npx hardhat --network localhost deploy",
+    "deploy:base-goerli": "forge script script/Deploy.s.sol --rpc-url https://goerli.base.org --broadcast --verify",
+    "deploy:base-sepolia": "forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast --verify",
+    "deploy:hardhat:base-sepolia": "npx hardhat --network base_sepolia deploy",
+    "anvil": "anvil",
+    "lint": "solhint 'src/**/*.sol'",
+    "format": "prettier --write 'src/**/*.sol' 'test/**/*.sol'",
+    "clean": "npx hardhat clean && forge clean",
+    "node": "npx hardhat node",
+    "console": "npx hardhat console"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
+    "@nomicfoundation/hardhat-ethers": "^4.0.3",
+    "@openzeppelin/contracts": "^4.9.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.2",
+    "chai": "^6.2.1",
+    "dotenv": "^17.2.3",
+    "ethers": "^5.8.0",
+    "forge-std": "^1.1.2",
+    "hardhat": "^3.1.0",
+    "mocha": "^11.7.5",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.1.3",
+    "solhint": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}

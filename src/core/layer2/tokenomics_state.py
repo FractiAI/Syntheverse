@@ -37,10 +37,10 @@ class TokenomicsState:
     
     # Epoch distribution percentages
     EPOCH_DISTRIBUTION = {
-        Epoch.FOUNDER: 0.50,    # 45T (50%)
-        Epoch.PIONEER: 0.10,    # 9T (10%)
-        Epoch.COMMUNITY: 0.20,  # 18T (20%)
-        Epoch.ECOSYSTEM: 0.20,  # 18T (20%)
+        Epoch.FOUNDER: 0.50,      # 45T (50%)
+        Epoch.PIONEER: 0.25,      # 22.5T (25%)
+        Epoch.COMMUNITY: 0.125,   # 11.25T (12.5%)
+        Epoch.ECOSYSTEM: 0.125,   # 11.25T (12.5%)
     }
     
     # Epoch qualification thresholds (density scores)
@@ -241,13 +241,23 @@ class TokenomicsState:
         # Calculate base reward as percentage of available epoch balance
         base_reward = allocation_percentage * epoch_balance
 
-        # Apply tier multiplier (this represents the metal's share of the allocation)
-        tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
-        # Normalize tier multipliers so they represent proportional shares
-        # Gold (1000) gets largest share, Copper (1) gets smallest
-        total_tier_weight = 1000 + 100 + 1  # Assuming all 3 metals
-        tier_share = tier_multiplier / total_tier_weight
-        reward = base_reward * tier_share
+        # Check how many tiers are available in this epoch
+        available_tiers_in_epoch = [
+            t for t in self.TIER_EPOCH_AVAILABILITY.keys()
+            if epoch in self.TIER_EPOCH_AVAILABILITY[t]
+        ]
+
+        if len(available_tiers_in_epoch) == 1:
+            # Single tier epoch (like Founders with only Gold) - use full allocation
+            reward = base_reward
+        else:
+            # Multi-tier epoch - apply proportional sharing
+            tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
+            # Calculate total weight of available tiers only
+            total_tier_weight = sum(self.TIER_MULTIPLIERS.get(available_tier, 1.0)
+                                  for available_tier in available_tiers_in_epoch)
+            tier_share = tier_multiplier / total_tier_weight
+            reward = base_reward * tier_share
 
         # Ensure we don't exceed epoch balance (accounting for halvings)
         reward = min(reward, epoch_balance)

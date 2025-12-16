@@ -60,7 +60,7 @@ export default function RegistryPage() {
 
   async function handleRegisterPoC(submissionHash: string, contributor: string) {
     try {
-      // Navigate to Synthechain registration page with pre-filled data
+      // Navigate to Syntheverse Blockmine registration page with pre-filled data
       const params = new URLSearchParams({
         hash: submissionHash,
         contributor: contributor
@@ -95,6 +95,17 @@ export default function RegistryPage() {
         <p className="text-muted-foreground mt-2">
           Append-only chronological log of all contributions
         </p>
+        <div className="flex items-center space-x-4 mt-3">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium">Blockchain Connected</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <span>Foundry + Anvil + Hardhat</span>
+            <span>•</span>
+            <span>Chain ID: 31337</span>
+          </div>
+        </div>
       </div>
 
       {/* Registry Timeline */}

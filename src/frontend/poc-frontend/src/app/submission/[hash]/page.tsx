@@ -52,12 +52,12 @@ function cleanTextFormatting(text: string): string {
 
 async function handleRegisterPoC(submissionHash: string, contributor: string) {
   try {
-    // Navigate to Synthechain registration page with pre-filled data
+    // Navigate to Syntheverse Blockmine registration page with pre-filled data
     const params = new URLSearchParams({
       hash: submissionHash,
       contributor: contributor
     })
-    window.open(`http://localhost:5001/register?${params.toString()}`, '_blank')
+    window.open(`http://localhost:5000/register?${params.toString()}`, '_blank')
   } catch (err) {
     console.error('Failed to open registration page:', err)
     alert('Failed to open registration page. Please try again.')
@@ -110,8 +110,25 @@ export default function SubmissionDetailPage() {
   useEffect(() => {
     if (hash) {
       loadData()
+      // Poll for updates if evaluation is in progress
+      const pollInterval = setInterval(async () => {
+        if (contribution && (contribution.status === 'submitted' || contribution.status === 'evaluating')) {
+          try {
+            const updated = await api.getContribution(hash)
+            setContribution(updated)
+            // Stop polling if evaluation is complete
+            if (updated.status !== 'submitted' && updated.status !== 'evaluating') {
+              clearInterval(pollInterval)
+            }
+          } catch (err) {
+            // Ignore polling errors
+          }
+        }
+      }, 2000) // Poll every 2 seconds
+
+      return () => clearInterval(pollInterval)
     }
-  }, [hash])
+  }, [hash, contribution?.status])
 
   async function loadData() {
     try {
@@ -154,6 +171,11 @@ export default function SubmissionDetailPage() {
   const metadata = contribution.metadata || {}
   // Evaluation data is stored directly in metadata
   const evaluationData = metadata
+  // Check if evaluation data actually exists (has scores)
+  const hasEvaluationData = evaluationData &&
+    (evaluationData.coherence !== null && evaluationData.coherence !== undefined) &&
+    (evaluationData.density !== null && evaluationData.density !== undefined) &&
+    (evaluationData.pod_score !== null && evaluationData.pod_score !== undefined)
 
   return (
     <div className="space-y-6">
@@ -218,34 +240,34 @@ export default function SubmissionDetailPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {evaluationData ? (
+            {hasEvaluationData ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Coherence</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.coherence?.toFixed(0) || 'N/A'}
+                      {evaluationData.coherence?.toFixed(0)}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Density</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.density?.toFixed(0) || 'N/A'}
+                      {evaluationData.density?.toFixed(0)}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Redundancy</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.redundancy?.toFixed(0) || 'N/A'}
+                      {evaluationData.redundancy?.toFixed(0)}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000 (lower is better)</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">PoC Score</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.pod_score?.toFixed(0) || 'N/A'}
+                      {evaluationData.pod_score?.toFixed(0)}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
@@ -256,6 +278,90 @@ export default function SubmissionDetailPage() {
                 Evaluation in progress or not yet completed.
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Blockchain Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Blockchain Information</CardTitle>
+            <CardDescription>
+              Syntheverse Blockmine - Foundry + Anvil + Hardhat
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Network</label>
+                <p className="font-mono text-sm mt-1 flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  Anvil Local (Chain ID: 31337)
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">SYNTH Token Contract</label>
+                <p className="font-mono text-sm mt-1 break-all">
+                  0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">POC Registry Contract</label>
+                <p className="font-mono text-sm mt-1 break-all">
+                  0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Registration Status</label>
+                <p className="mt-1">
+                  {contribution.status === 'qualified' ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Eligible for Registration
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Evaluation Required
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {hasEvaluationData && (
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium mb-2">Registration Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <label className="text-muted-foreground">Registration Fee</label>
+                    <p className="font-medium">
+                      {contribution.metals && contribution.metals.length > 3 ? '$50.00 USD' : 'FREE (First 3)'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground">Metals to Register</label>
+                    <p className="font-medium">{contribution.metals?.join(', ') || 'None'}</p>
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground">Blockchain Tech Stack</label>
+                    <p className="font-medium">Foundry + Anvil + Hardhat</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium">Grok AI Evaluation</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Evaluation powered by Grok AI with real-time progress tracking
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">AI-Powered</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -319,10 +425,24 @@ export default function SubmissionDetailPage() {
               <div className="mt-6 pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium">Register on Synthechain</h4>
+                    <h4 className="font-medium">Register on Syntheverse Blockmine</h4>
                     <p className="text-sm text-muted-foreground">
-                      Generate a certificate to permanently register this PoC on the blockchain
+                      Submit to blockchain using Foundry + Anvil + Hardhat
                     </p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                        <span>Foundry</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        <span>Anvil</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                        <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                        <span>Hardhat</span>
+                      </div>
+                    </div>
                   </div>
                   <Button
                     onClick={() => handleRegisterPoC(contribution.submission_hash, contribution.contributor)}
@@ -355,7 +475,7 @@ export default function SubmissionDetailPage() {
       </Card>
 
       {/* Evaluation Details */}
-      {evaluationData && (
+      {hasEvaluationData && (
         <Card>
           <CardHeader>
             <CardTitle>Evaluation Details</CardTitle>

@@ -3,3 +3,4 @@
 PyPDF2>=3.0.0  # For PDF text extraction fallback
 openai>=1.0.0  # For Grok API client
 python-dotenv>=1.0.0  # Optional: For loading .env file (falls back to system env vars if not available)
+web3>=6.0.0  # For blockchain integration with Foundry/Hardhat contracts

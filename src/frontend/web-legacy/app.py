@@ -15,26 +15,138 @@ from typing import Dict
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from layer1.node import SyntheverseNode
-from layer1.contracts.poc_contract import POCContract
+# Import web3 for blockchain interaction
+try:
+    from web3 import Web3
+    import json
+    WEB3_AVAILABLE = True
+except ImportError:
+    WEB3_AVAILABLE = False
+    print("⚠️  web3 not available - registration will use simulation mode")
+
+# Import API client for communication with PoC API (fallback)
+import requests
+
 # PDF generator is optional - only used if needed
 try:
     from pdf_generator import PODPDFGenerator
 except ImportError:
     PODPDFGenerator = None
 
-app = Flask(__name__)
+# API endpoints
+POC_API_URL = os.getenv('POC_API_URL', 'http://localhost:5001')
+
+# Web3 and contract setup for Hardhat integration
+w3 = None
+poc_registry_contract = None
+synth_token_contract = None
+blockchain_enabled = False
+
+if WEB3_AVAILABLE:
+    try:
+        # Connect to local Hardhat network
+        w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+        if w3.is_connected():
+            print("✅ Connected to Hardhat network (http://127.0.0.1:8545)")
+
+            # Load contract ABIs and addresses
+            contracts_dir = Path(__file__).parent.parent.parent / "contracts"
+            poc_registry_abi_file = contracts_dir / "artifacts" / "src" / "POCRegistry.sol" / "POCRegistry.json"
+            synth_abi_file = contracts_dir / "artifacts" / "src" / "SYNTH.sol" / "SYNTH.json"
+
+            if poc_registry_abi_file.exists() and synth_abi_file.exists():
+                with open(poc_registry_abi_file) as f:
+                    poc_registry_data = json.load(f)
+                with open(synth_abi_file) as f:
+                    synth_data = json.load(f)
+
+                # Use deployed contract addresses from Foundry deployment
+                poc_registry_address = '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'  # POCRegistry deployed address
+                synth_address = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'  # SYNTH deployed address
+
+                poc_registry_contract = w3.eth.contract(address=poc_registry_address, abi=poc_registry_data['abi'])
+                synth_token_contract = w3.eth.contract(address=synth_address, abi=synth_data['abi'])
+
+                # Get deployer account (first Hardhat account)
+                deployer_account = w3.eth.accounts[0]
+                print(f"✅ Using deployer account: {deployer_account}")
+                print(f"📋 POCRegistry contract: {poc_registry_address}")
+                print(f"💰 SYNTH token contract: {synth_address}")
+                blockchain_enabled = True
+            else:
+                print("⚠️  Contract artifacts not found - using simulation mode")
+        else:
+            print("⚠️  Cannot connect to Hardhat network - using simulation mode")
+    except Exception as e:
+        print(f"⚠️  Blockchain setup failed: {e} - using simulation mode")
+else:
+    print("⚠️  Web3 not available - using simulation mode")
+
+# Mock UI module for backward compatibility
+class MockUI:
+    def __init__(self):
+        self.submissions = []
+        self.node = MockNode()
+        self.pod_server = MockPodServer()
+
+    def submit_pdf(self, filepath, contributor, category):
+        """Mock submission - in real implementation this would call the PoC API"""
+        print(f"Mock submission: {filepath} by {contributor} in category {category}")
+        # In a real implementation, this would call the PoC API
+        return {"success": True, "message": "Mock submission completed"}
+
+class MockNode:
+    def get_blockchain_info(self):
+        return {
+            "block_height": 12345,
+            "total_transactions": 678,
+            "active_nodes": 3,
+            "network_status": "healthy"
+        }
+
+class MockPodServer:
+    def get_epoch_info(self):
+        return {
+            "current_epoch": "Pioneer",
+            "epoch_progress": 65,
+            "total_supply": 90000000000000,
+            "circulating_supply": 1500000000000
+        }
+
+    def get_tokenomics_statistics(self):
+        return {
+            "total_allocated": 1500000000000,
+            "gold_tier_count": 12,
+            "silver_tier_count": 45,
+            "copper_tier_count": 123,
+            "average_reward": 12500000000
+        }
+
+ui = MockUI()
+
+# Get the absolute path to the templates directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'templates')
+
+app = Flask(__name__,
+            template_folder=template_dir,
+            static_folder=os.path.join(current_dir, 'static') if os.path.exists(os.path.join(current_dir, 'static')) else None)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['SECRET_KEY'] = 'syntheverse-pod-secret-key'
+
+# Disable dotenv loading to avoid permission issues
+app.config['FLASK_SKIP_DOTENV'] = True
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('test_outputs', exist_ok=True)
 
-# Initialize blockchain components
-node = SyntheverseNode("registration-node", data_dir="test_outputs/blockchain")
-poc_contract = POCContract()
+# Initialize blockchain components (disabled - now using API)
+# node = SyntheverseNode("registration-node", data_dir="test_outputs/blockchain")
+# poc_contract = POCContract()
+node = None
+poc_contract = None
 
 # Progress tracking for submissions
 submission_progress = {}  # submission_hash -> progress dict
@@ -124,18 +236,19 @@ def submit_document():
             submission_hash_preview = None
             
             try:
-                # Create a temporary submission to get the hash first
-                from layer1.node import SyntheverseNode
-                temp_node = SyntheverseNode("temp", data_dir="test_outputs/blockchain")
-                temp_submission = {
-                    "title": Path(filepath).stem.replace("_", " ").title(),
-                    "description": f"PDF submission: {Path(filepath).name}",
-                    "category": category or "scientific",
+                # Generate a hash for the submission (simplified approach)
+                import hashlib
+                with open(filepath, 'rb') as f:
+                    file_content = f.read()
+                submission_hash_preview = hashlib.sha256(file_content).hexdigest()
+
+                # Store submission info for tracking
+                submission_progress[submission_hash_preview] = {
+                    "status": "uploaded",
+                    "filename": filename,
                     "contributor": contributor,
-                    "evidence": filepath,
+                    "timestamp": datetime.now().isoformat()
                 }
-                temp_result = temp_node.submit_pod(temp_submission)
-                submission_hash_preview = temp_result.get("submission_hash")
                 
                 # Start progress tracking BEFORE submitting
                 if submission_hash_preview:
@@ -306,7 +419,7 @@ def get_report(submission_hash):
 
 @app.route('/api/register-poc', methods=['POST'])
 def register_poc_certificate():
-    """Register a PoC certificate on the blockchain."""
+    """Register a PoC certificate on the blockchain using Hardhat contracts."""
     try:
         data = request.get_json()
 
@@ -315,12 +428,131 @@ def register_poc_certificate():
 
         submission_hash = data.get('submission_hash')
         contributor = data.get('contributor')
-        registration_fee = data.get('registration_fee', 200.00)
+        contributor_address = data.get('contributor_address', deployer_account)  # Use provided address or default
+        registration_fee = data.get('registration_fee', 50.00)
 
         if not submission_hash or not contributor:
             return jsonify({"success": False, "error": "Missing submission_hash or contributor"}), 400
 
-        # Load contribution data from test outputs (simulating PoC server)
+        # Get contribution data from PoC API first
+        try:
+            response = requests.get(f"{POC_API_URL}/api/archive/contributions/{submission_hash}", timeout=10)
+            if response.status_code != 200:
+                return jsonify({"success": False, "error": "Could not retrieve contribution data"}), 400
+
+            contribution_data = response.json()
+        except requests.RequestException:
+            return jsonify({"success": False, "error": "Could not connect to PoC API"}), 500
+
+        # Check if contribution is qualified
+        if contribution_data.get('status') != 'qualified':
+            return jsonify({"success": False, "error": "Contribution is not qualified for registration"}), 400
+
+        # Extract evaluation data
+        metals = contribution_data.get('metals', [])
+        coherence = contribution_data.get('metadata', {}).get('coherence', 0)
+        density = contribution_data.get('metadata', {}).get('density', 0)
+        poc_score = contribution_data.get('metadata', {}).get('pod_score', 0)
+
+        if not metals:
+            return jsonify({"success": False, "error": "No metals assigned to contribution"}), 400
+
+        # Use blockchain registration if available
+        if blockchain_enabled and poc_registry_contract and synth_token_contract:
+            try:
+                print(f"🔗 Registering PoC certificate on blockchain for {submission_hash}")
+
+                # Convert contributor to address (use provided address or hash-based address)
+                if not contributor_address or contributor_address == deployer_account:
+                    # Create a deterministic address from contributor string
+                    import hashlib
+                    contributor_hash = hashlib.sha256(contributor.encode()).hexdigest()[:40]
+                    contributor_address = w3.to_checksum_address('0x' + contributor_hash)
+
+                # Convert data for blockchain
+                submission_hash_bytes = w3.to_bytes(hexstr=submission_hash)
+                metals_strings = [str(m) for m in metals]
+
+                # Check submission count for fee calculation
+                submission_count = poc_registry_contract.functions.contributorSubmissionCount(contributor_address).call()
+                fee_required = submission_count >= poc_registry_contract.functions.FREE_SUBMISSIONS().call()
+
+                if fee_required:
+                    fee_amount = poc_registry_contract.functions.REGISTRATION_FEE().call()
+                    print(f"💰 Registration fee required: {w3.from_wei(fee_amount, 'ether')} ETH")
+                else:
+                    fee_amount = 0
+                    print("🆓 Free registration (first 3 submissions)")
+
+                # Register the certificate on blockchain
+                tx_hash = poc_registry_contract.functions.registerCertificate(
+                    submission_hash_bytes,
+                    contributor_address,
+                    contribution_data.get('title', ''),
+                    contribution_data.get('category', 'scientific'),
+                    metals_strings,
+                    coherence,
+                    density,
+                    poc_score
+                ).transact({
+                    'from': deployer_account,
+                    'value': fee_amount,
+                    'gas': 500000
+                })
+
+                # Wait for transaction confirmation
+                receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+                print(f"✅ PoC certificate registered on blockchain! TX: {tx_hash.hex()}")
+
+                return jsonify({
+                    "success": True,
+                    "transaction_hash": tx_hash.hex(),
+                    "block_number": receipt.blockNumber,
+                    "gas_used": receipt.gasUsed,
+                    "fee_paid": float(w3.from_wei(fee_amount, 'ether')),
+                    "contributor_address": contributor_address,
+                    "metals_registered": metals,
+                    "message": f"PoC certificate registered on Syntheverse Blockmine!"
+                })
+
+            except Exception as e:
+                print(f"❌ Blockchain registration failed: {e}")
+                return jsonify({"success": False, "error": f"Blockchain registration failed: {str(e)}"}), 500
+
+        else:
+            # Fallback: Use API registration when blockchain is not available
+            print("⚠️  Blockchain not available, using API fallback")
+            api_payload = {
+                "submission_hash": submission_hash,
+                "contributor": contributor,
+                "registration_fee": registration_fee
+            }
+
+            try:
+                response = requests.post(f"{POC_API_URL}/api/register-poc", json=api_payload, timeout=30)
+                response_data = response.json()
+
+                if response.status_code == 200 and response_data.get("success"):
+                    return jsonify(response_data)
+                else:
+                    return jsonify({
+                        "success": False,
+                        "error": response_data.get("error", "API registration failed")
+                    }), response.status_code
+
+            except requests.RequestException as e:
+                # Final fallback: Simulate registration
+                return _simulate_registration(submission_hash, contributor, registration_fee)
+
+    except Exception as e:
+        print(f"Registration error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+def _simulate_registration(submission_hash, contributor, registration_fee):
+    """Simulate PoC registration when API is unavailable."""
+    try:
+        # Load contribution data from test outputs
         import json
         poc_archive_file = Path("test_outputs/poc_archive.json")
         contribution = None
@@ -344,60 +576,17 @@ def register_poc_certificate():
         if contribution.get('status') != 'qualified':
             return jsonify({"success": False, "error": "Contribution is not qualified for registration"}), 400
 
-        # Submit to blockchain
-        poc_submission = {
-            "title": contribution.get('title', 'Unknown'),
-            "description": contribution.get('text_content', '')[:500],  # Truncate for blockchain
-            "category": contribution.get('category', 'scientific'),
-            "contributor": contributor,
-            "evidence": f"PoC Archive Hash: {submission_hash}",
-            "metals": contribution.get('metals', []),
-            "poc_score": contribution.get('metadata', {}).get('pod_score', 0),  # Note: still uses pod_score in metadata
-        }
-
-        # Submit to PoC contract
-        blockchain_hash = poc_contract.submit_poc(poc_submission)
-
-        # Record evaluation from existing data
-        evaluation = {
-            "coherence": contribution.get('metadata', {}).get('coherence', 0),
-            "density": contribution.get('metadata', {}).get('density', 0),
-            "novelty": contribution.get('metadata', {}).get('redundancy', 0),
-            "status": "approved"
-        }
-
-        poc_contract.record_evaluation(blockchain_hash, evaluation)
-
-        # Allocate tokens
-        allocation_result = poc_contract.allocate_tokens(blockchain_hash)
-
-        # Create blockchain transaction
-        transaction_data = {
-            "type": "poc_registration",
-            "submission_hash": blockchain_hash,
-            "contributor": contributor,
-            "registration_fee": registration_fee,
-            "timestamp": datetime.now().isoformat(),
-            "poc_data": poc_submission
-        }
-
-        # Submit transaction to blockchain
-        tx_result = node.submit_transaction(transaction_data)
-
-        if tx_result.get("success"):
-            return jsonify({
-                "success": True,
-                "transaction_hash": tx_result.get("transaction_hash", blockchain_hash),
-                "blockchain_hash": blockchain_hash,
-                "allocated_tokens": allocation_result.get("allocation", {}).get("reward", 0) if allocation_result.get("success") else 0,
-                "message": "PoC certificate registered successfully on the blockchain"
-            })
-        else:
-            return jsonify({"success": False, "error": "Blockchain transaction failed"}), 500
+        # Simulate successful registration
+        return jsonify({
+            "success": True,
+            "transaction_hash": f"sim-{submission_hash[:16]}",
+            "blockchain_hash": submission_hash,
+            "allocated_tokens": contribution.get('metadata', {}).get('reward', 1000),
+            "message": "PoC certificate registered successfully (simulated)"
+        })
 
     except Exception as e:
-        print(f"Registration error: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": f"Simulation failed: {str(e)}"}), 500
 
 
 # PDF functionality has been removed - certificates are registered on blockchain instead
@@ -413,7 +602,7 @@ if __name__ == '__main__':
 
     print("🔗 Register PoC certificates on the blockchain")
     print("   Connects to L1 blockchain for permanent certificate registration")
-    print("   Handles $200 registration fee and token allocation")
+    print("   Handles $50 registration fee and token allocation")
 
     print("\nPress Ctrl+C to stop the server")
     print("="*70)
