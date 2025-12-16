@@ -61,16 +61,17 @@ See Layer 2 README￼ for detailed documentation.
 
 ⸻
 
-3. Layer 1 (layer1/)
+3. Smart Contracts (contracts/)
 
-Syntheverse Blockchain for PoC with epoch-based token distribution
-	•	Contracts: Smart contracts for contribution anchoring and token management
-	•	Node: Blockchain node implementation with state persistence
-	•	Consensus: Proof-of-Contribution (PoC) consensus with multi-metal validation
-	•	Epochs: Founder, Pioneer, Community, Ecosystem epochs with tier multipliers
-	•	Status: ✅ Fully Operational
+Solidity contracts for Synthechain L1 on Base blockchain
+	•	**SYNTH.sol**: Internal accounting token with epoch-based rewards
+	•	**POCRegistry.sol**: Contribution management and certificate registration
+	•	**Technology**: Foundry + Anvil for development, Hardhat for deployment
+	•	**Networks**: Local Anvil → Base Sepolia (testnet) → Base Mainnet
+	•	**Fee Structure**: First 3 submissions FREE, then $50 per certificate
+	•	Status: ✅ Under Development (Foundry + Anvil)
 
-See Layer 1 README￼ for detailed documentation.
+See contracts/README.md for detailed documentation.
 
 ⸻
 
@@ -146,7 +147,43 @@ Comprehensive documentation
 
 ⸻
 
-Quick Start
+Blockchain Development Quick Start
+
+### **🔨 Phase 1: Foundry + Anvil (Recommended)**
+```bash
+# Install Foundry (Rust-based Ethereum toolkit)
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+
+# Navigate to contracts
+cd contracts
+
+# Install dependencies
+forge install OpenZeppelin/openzeppelin-contracts
+
+# Run tests
+forge test
+
+# Start local Ethereum node
+anvil
+
+# Deploy contracts locally
+forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast
+```
+
+### **📦 Phase 3: Base Sepolia Deployment**
+```bash
+# Set environment variables
+export PRIVATE_KEY=your_private_key_without_0x
+export ETHERSCAN_API_KEY=your_etherscan_api_key
+
+# Deploy to Base Sepolia
+forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast --verify
+```
+
+⸻
+
+Full System Quick Start
 
 Prerequisites
 	•	Python 3.8+
@@ -239,18 +276,29 @@ Current Capabilities (Test Program)
 
 **Current Status**: ✅ **FULLY FUNCTIONING LOCAL TEST PROGRAM**
 
-**Next Phase**: ⛓️ **PUBLIC BLOCKCHAIN TESTNET DEPLOYMENT**
+**Next Phase**: ⛓️ **SMART CONTRACT DEVELOPMENT & DEPLOYMENT**
 
-### **🎯 Deployment Strategy**
+### **🎯 Blockchain Development Strategy**
 
-#### **Testnet Selection: Base Goerli** (Free → Production Migration Path)
-- **Why Base**: Coinbase's Layer 2 blockchain, optimized for low-cost, high-throughput transactions
-- **Free Testnet**: Base Goerli provides free gas tokens for comprehensive testing
-- **One-Click Migration**: Same contracts deploy directly to Base mainnet without changes
-- **Ethereum Compatible**: Full EVM support with MetaMask, Coinbase Wallet, and all major wallets
-- **High Performance**: ~2-second block times, extremely low fees even on testnet
-- **Developer Friendly**: Rich ecosystem, excellent documentation, active community
-- **Production Ready**: Base mainnet has processed millions of transactions with <$0.01 fees
+#### **Phase 1: Foundry + Anvil** (Current - Local Development)
+**Status**: ✅ **IN PROGRESS**
+- **Foundry**: Rust-based Ethereum development framework for fast contract development
+- **Anvil**: Local Ethereum node for instant testing and deterministic behavior
+- **Focus**: Core SYNTH token logic, POC registry mechanics, multi-metal evaluation
+- **Benefits**: No network delays, zero-cost testing, rapid iteration on protocol logic
+
+#### **Phase 2: Hardhat Integration** (Next - Base Compatibility)
+**Status**: 🔄 **PLANNED**
+- **Hardhat**: JavaScript-based framework for deployment scripts and network management
+- **OP Stack Alignment**: Configure for Base's underlying Optimism technology
+- **Focus**: Deployment automation, multi-network configs, upgrade simulations
+- **Benefits**: Seamless Base compatibility, production deployment preparation
+
+#### **Phase 3: Base Sepolia Deployment** (Final - Public Testing)
+**Status**: 🔄 **PLANNED**
+- **Base Sepolia**: Official Base testnet for final validation
+- **External Confidence**: Real network testing with actual gas costs and timing
+- **Migration Ready**: Direct path to Base mainnet with zero contract changes
 
 #### **Phase 1: Testnet Deployment** (Next 2-4 weeks)
 - **Smart Contract Deployment**:

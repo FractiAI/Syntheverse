@@ -1,0 +1,23 @@
+{
+  "name": "syntheverse-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Syntheverse PoC system",
+  "scripts": {
+    "test": "forge test",
+    "test:watch": "forge test --watch",
+    "coverage": "forge coverage",
+    "build": "forge build",
+    "deploy:anvil": "forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast --verify",
+    "deploy:base-goerli": "forge script script/Deploy.s.sol --rpc-url https://goerli.base.org --broadcast --verify",
+    "deploy:base-sepolia": "forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast --verify",
+    "anvil": "anvil",
+    "lint": "solhint 'src/**/*.sol'",
+    "format": "prettier --write 'src/**/*.sol' 'test/**/*.sol'"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.9.0",
+    "solhint": "^3.6.2",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.1.3"
+  }
+}
