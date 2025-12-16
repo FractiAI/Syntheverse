@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { api, type Contribution } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatDate, truncateHash } from '@/lib/utils'
-import { FileText, ArrowRight } from 'lucide-react'
+import { FileText, ArrowRight, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const COLORS = {
@@ -55,6 +55,20 @@ export default function RegistryPage() {
       setError(err instanceof Error ? err.message : 'Failed to load registry')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleRegisterPoC(submissionHash: string, contributor: string) {
+    try {
+      // Navigate to Synthechain registration page with pre-filled data
+      const params = new URLSearchParams({
+        hash: submissionHash,
+        contributor: contributor
+      })
+      window.open(`http://localhost:5000/register?${params.toString()}`, '_blank')
+    } catch (err) {
+      console.error('Failed to open registration page:', err)
+      alert('Failed to open registration page. Please try again.')
     }
   }
 
@@ -131,9 +145,16 @@ export default function RegistryPage() {
                       </div>
 
                       {contribution.metadata?.pod_score && (
-                        <div className="text-sm">
-                          <span className="font-medium">PoC Score: </span>
-                          <span>{contribution.metadata.pod_score.toFixed(0)}</span>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="font-medium">PoC Score: </span>
+                            <span>{contribution.metadata.pod_score.toFixed(0)}</span>
+                          </div>
+                          {contribution.status === 'qualified' && contribution.metals && contribution.metals.length > 0 && (
+                            <div className="text-green-600 font-medium">
+                              ✓ {contribution.metals.length} metal{contribution.metals.length > 1 ? 's' : ''} allocated
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -146,9 +167,28 @@ export default function RegistryPage() {
                   </div>
                 </div>
 
-                <Button variant="ghost" size="icon" className="flex-shrink-0">
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  {/* Register PoC button for qualified contributions */}
+                  {contribution.status === 'qualified' && contribution.metals && contribution.metals.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation() // Prevent card click
+                        handleRegisterPoC(contribution.submission_hash, contribution.contributor)
+                      }}
+                      className="text-xs"
+                    >
+                      <Award className="h-3 w-3 mr-1" />
+                      Register PoC
+                    </Button>
+                  )}
+
+                  {/* View details button */}
+                  <Button variant="ghost" size="icon">
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

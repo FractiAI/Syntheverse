@@ -1,0 +1,80 @@
+{
+  "epoch_balances": {
+    "founder": 334096179951.3799,
+    "pioneer": 9000000000000.0,
+    "community": 18000000000000.0,
+    "ecosystem": 18000000000000.0
+  },
+  "total_coherence_density": 27000.0,
+  "founder_halving_count": 0,
+  "current_epoch": "founder",
+  "epoch_progression": {
+    "founder": false,
+    "pioneer": false,
+    "community": false,
+    "ecosystem": false
+  },
+  "allocation_history": [
+    {
+      "submission_hash": "3692f836ee6540cfaee463f17fa733f4",
+      "contributor": "Pru-El-Taino-01",
+      "timestamp": "2025-12-15T14:56:34.528461",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 8910.0,
+        "allocation_percentage": 0.891,
+        "base_reward": 40095000000000.0,
+        "tier_multiplier": 1000.0,
+        "reward": 36416893732970.02,
+        "epoch_balance_before": 45000000000000.0,
+        "epoch_balance_after": 8583106267029.977
+      },
+      "coherence": 9500.0
+    },
+    {
+      "submission_hash": "9d4c7ca5f2124734b5481d8a45ef6502",
+      "contributor": "Pru-El-Taino-01",
+      "timestamp": "2025-12-15T15:07:59.267797",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 9000.0,
+        "allocation_percentage": 0.9,
+        "base_reward": 7724795640326.9795,
+        "tier_multiplier": 1000.0,
+        "reward": 7016163161059.927,
+        "epoch_balance_before": 8583106267029.977,
+        "epoch_balance_after": 1566943105970.0498
+      },
+      "coherence": 9000.0
+    },
+    {
+      "submission_hash": "9d4c7ca5f2124734b5481d8a45ef6502",
+      "contributor": "Pru-El-Taino-01",
+      "timestamp": "2025-12-15T15:08:00.690535",
+      "allocation": {
+        "success": true,
+        "available": true,
+        "epoch": "founder",
+        "tier": "gold",
+        "pod_score": 8662.5,
+        "allocation_percentage": 0.86625,
+        "base_reward": 1357364465546.5557,
+        "tier_multiplier": 1000.0,
+        "reward": 1232846926018.67,
+        "epoch_balance_before": 1566943105970.0498,
+        "epoch_balance_after": 334096179951.3799
+      },
+      "coherence": 8500.0
+    }
+  ],
+  "contributor_balances": {
+    "Pru-El-Taino-01": 44665903820048.625
+  },
+  "last_updated": "2025-12-15T15:08:00.690549"
+}

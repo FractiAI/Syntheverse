@@ -21,6 +21,9 @@ export default function SubmissionPage() {
     file: null as File | null,
   })
 
+  const hasFile = formData.file !== null
+  const hasTextContent = formData.textContent.trim().length > 0
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -28,27 +31,40 @@ export default function SubmissionPage() {
     setLoading(true)
 
     try {
+      // Validate that we have either a file or text content
+      if (!formData.file && !formData.textContent.trim()) {
+        throw new Error('Please provide either a PDF file or text content')
+      }
+
       // Generate submission hash
       const submissionHash = crypto.randomUUID().replace(/-/g, '')
 
-      // Handle file upload if file exists
-      let textContent = formData.textContent
-      if (formData.file) {
-        // For now, we'll just use the file name - in production, you'd want to extract text from PDF
-        textContent = `[File: ${formData.file.name}]\n\n${textContent}`
-      }
-
-      // Submit contribution
-      const result = await api.submitContribution({
+      // Prepare submission data
+      const submissionData: any = {
         submission_hash: submissionHash,
         title: formData.title,
         contributor: formData.contributor,
-        text_content: textContent,
         category: formData.category,
-      })
+      }
+
+      // Include file if available
+      if (formData.file) {
+        submissionData.file = formData.file
+
+        // Include additional text if provided
+        if (formData.textContent.trim()) {
+          submissionData.text_content = formData.textContent.trim()
+        }
+      } else {
+        // No file, use text content
+        submissionData.text_content = formData.textContent.trim()
+      }
+
+      // Submit contribution
+      const result = await api.submitContribution(submissionData)
 
       setSuccess(`Contribution submitted! Hash: ${result.submission_hash.slice(0, 16)}...`)
-      
+
       // Redirect to submission detail after a short delay
       setTimeout(() => {
         router.push(`/submission/${result.submission_hash}`)
@@ -71,9 +87,9 @@ export default function SubmissionPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Contribution Details</CardTitle>
+          <CardTitle>Submit Contribution</CardTitle>
           <CardDescription>
-            Provide information about your contribution. Archive-first: All submissions are stored regardless of evaluation status.
+            Upload a PDF file containing your contribution. Text will be automatically extracted and evaluated. Archive-first: All submissions are stored regardless of evaluation status.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -130,20 +146,23 @@ export default function SubmissionPage() {
 
             <div>
               <label htmlFor="file" className="block text-sm font-medium mb-2">
-                PDF File (Optional)
+                PDF File *
               </label>
               <div className="flex items-center space-x-4">
                 <label
                   htmlFor="file"
-                  className="flex items-center space-x-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-accent"
+                  className={`flex items-center space-x-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-accent ${
+                    hasFile ? 'bg-green-50 border-green-300' : ''
+                  }`}
                 >
                   <Upload className="h-4 w-4" />
-                  <span>Choose PDF</span>
+                  <span>{hasFile ? 'PDF Selected' : 'Choose PDF'}</span>
                 </label>
                 <input
                   id="file"
                   type="file"
                   accept=".pdf"
+                  required={!hasTextContent}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -153,30 +172,39 @@ export default function SubmissionPage() {
                   className="hidden"
                 />
                 {formData.file && (
-                  <span className="text-sm text-muted-foreground flex items-center space-x-2">
+                  <span className="text-sm text-green-700 flex items-center space-x-2 font-medium">
                     <FileText className="h-4 w-4" />
                     <span>{formData.file.name}</span>
                   </span>
                 )}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Upload a PDF file. Text will be automatically extracted from the PDF. Ensure your PDF contains selectable text.
+              </p>
             </div>
 
             <div>
               <label htmlFor="textContent" className="block text-sm font-medium mb-2">
-                Content *
+                Additional Notes (Optional)
               </label>
               <textarea
                 id="textContent"
-                required
                 value={formData.textContent}
                 onChange={(e) => setFormData({ ...formData, textContent: e.target.value })}
-                rows={12}
+                rows={6}
                 className="w-full px-4 py-2 border rounded-md font-mono text-sm"
-                placeholder="Enter contribution content or paste text from your document..."
+                placeholder="Optional: Add any additional notes, comments, or text that should supplement the PDF content..."
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {formData.textContent.length} characters
+                {hasFile
+                  ? `${formData.textContent.length} characters (supplements PDF)`
+                  : `${formData.textContent.length} characters`}
               </p>
+              {!hasFile && !hasTextContent && (
+                <p className="text-xs text-red-600 mt-1">
+                  Either a PDF file or text content is required
+                </p>
+              )}
             </div>
 
             {error && (
@@ -191,14 +219,14 @@ export default function SubmissionPage() {
               </div>
             )}
 
-            <Button type="submit" disabled={loading} className="w-full">
+            <Button type="submit" disabled={loading || (!hasFile && !hasTextContent)} className="w-full">
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
+                  Processing PDF...
                 </>
               ) : (
-                'Submit Contribution'
+                'Submit PDF Contribution'
               )}
             </Button>
           </form>

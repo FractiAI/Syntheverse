@@ -1,11 +1,12 @@
 Syntheverse: Hydrogen-Holographic Fractal Crypto AI Game
 
-FOR IMMEDIATE RELEASE: The Syntheverse Fractal Hydrogen-Holographic Crypto Frontier has entered its prerelease test-and-tuning phase, opening the frontier to early collaborators. Pioneer Hydrogen-Holographic, Fractal, Mythic, Crypto, and AI Researchers, Developers, Enterprises, and Financiers are invited to contribute to the evolution of the Hydrogen-Holographic Fractal Sandbox (HHFS), expanding coverage, resonance, and fractal density through Proof-of-Contribution (PoC) protocols. Each submission is validated with Fractal Cognitive Grammar and hydrogen dynamics, creating a living map of the sandbox and a $90T internal goldmine of knowledge, technology, and alignment. Join via Zenodo (link￼) or Reno Outpost (info@fractiai.com) — step into the frontier, shape the ecosystem, and watch the Syntheverse awaken.
+FOR IMMEDIATE RELEASE: The Syntheverse Fractal Hydrogen-Holographic Crypto Frontier has entered its prerelease test-and-tuning phase, opening the frontier to early collaborators. Pioneer Hydrogen-Holographic, Fractal, Mythic, Crypto, and AI Researchers, Developers, Enterprises, and Financiers are invited to contribute to the evolution of the Hydrogen-Holographic Fractal Sandbox (HHFS), expanding coverage, resonance, and fractal density through unified Proof-of-Contribution (PoC) protocols. Each submission is validated with Fractal Cognitive Grammar and hydrogen dynamics, creating a living map of the sandbox and a $90T internal goldmine of knowledge, technology, and alignment. Join via Zenodo (link￼) or Reno Outpost (info@fractiai.com) — step into the frontier, shape the ecosystem, and watch the Syntheverse awaken.
 
 Welcome to the Syntheverse GitHub repository, the central hub for all code, documentation, and experiments powering the Hydrogen-Holographic Fractal Crypto AI Game & Ecosystem. This repository includes:
 	•	Syntheverse core code for the fractal AI game environment
-	•	Proof-of-Discovery (PoD), Proof-of-Technology (PoT), and Proof-of-Alignment (PoA) protocols
+	•	Unified Proof-of-Contribution (PoC) system with multi-metal evaluation
 	•	SYNTH tokenomics and smart contract templates
+	•	Modern Next.js frontend with interactive sandbox map and registry
 	•	Documentation and onboarding for new Outcast Hero Frontiersmen
 	•	FractAI updates and symbolic-cognitive experiments
 
@@ -15,7 +16,7 @@ About Syntheverse
 
 Syntheverse is a hydrogen-holographic fractal blockchain game and living ecosystem where independent fractal, hydrogen-holographic, mythic, crypto, and AI research frontiersmen explore, test, and expand a distributed, immutable, scientific, technological, AI, and alignment economy.
 
-Participants contribute discoveries (PoD), functional technologies (PoT), and alignment or symbolic systems (PoA), validate them through Layer-2 evaluation, and earn SYNTH tokens, while experimenting in an active prerelease testing and tuning environment.
+Participants contribute through a unified Proof-of-Contribution (PoC) system that evaluates submissions across multiple metals (Gold: Discovery, Silver: Technology, Copper: Alignment). Contributions are validated through Layer-2 AI evaluation, earn SYNTH tokens based on structural impact, and participate in an active prerelease testing and tuning environment.
 
 ⸻
 
@@ -40,7 +41,7 @@ See RAG API README￼ for detailed documentation.
 
 2. Layer 2 (layer2/)
 
-PoD / PoT / PoA Evaluators and SYNTH Token Allocator with persistent tokenomics state
+PoC Evaluator and SYNTH Token Allocator with persistent tokenomics state
 	•	Evaluators
 	•	Proof-of-Discovery (PoD): scientific and theoretical validation
 	•	Proof-of-Technology (PoT): functional systems, tools, and infrastructure
@@ -58,7 +59,7 @@ See Layer 2 README￼ for detailed documentation.
 
 3. Layer 1 (layer1/)
 
-Syntheverse Blockchain for PoD, PoT, and PoA with epoch-based token distribution
+Syntheverse Blockchain for PoC with epoch-based token distribution
 	•	Contracts: Smart contracts for contribution anchoring and token management
 	•	Node: Blockchain node implementation with state persistence
 	•	Consensus: Proof-based consensus (PoD / PoT / PoA)
@@ -154,19 +155,22 @@ git clone https://github.com/FractiAI/Syntheverse.git
 cd Syntheverse
 ./Syntheverse.sh start
 
-Web UI: http://localhost:5000
+PoC Frontend: http://localhost:3000
+Legacy Web UI: http://localhost:5000
 
 ⸻
 
 Key Features
 
 Proof Systems
-	•	PoD — Scientific discovery
-	•	PoT — Functional technologies
-	•	PoA — Alignment and symbolic systems
+	•	Unified PoC — Multi-metal evaluation system
+	•	Gold Metal — Scientific discovery and breakthroughs
+	•	Silver Metal — Functional technologies and tools
+	•	Copper Metal — Alignment and symbolic systems
 
 Evaluated via the Hydrogen-Holographic Fractal Engine (HHFE)
 Metrics: coherence, density, novelty, redundancy (0–10000)
+Archive-first redundancy detection prevents duplicates
 
 Tokenomics
 	•	Total Supply: 90 Trillion SYNTH
@@ -177,9 +181,27 @@ Tokenomics
 ⸻
 
 Participation & Contribution
-	•	Submit discoveries (PoD), technologies (PoT), or alignment systems (PoA)
-	•	Earn SYNTH tokens based on validated structural impact
+	•	Submit contributions through unified PoC system
+	•	Earn multiple SYNTH metals (Gold/Silver/Copper) based on structural impact
+	•	Visualize contribution relationships in interactive sandbox map
+	•	Register qualified contributions on blockchain with $200 fee
 	•	Collaborate with frontier researchers, technologists, and builders
+
+⸻
+
+Interactive Features
+
+Sandbox Map
+	•	Visual network of qualified contributions across 16 knowledge dimensions
+	•	Hero's Journey narrative progression from Outcast to Hero's Return
+	•	Interactive filtering by metals, dimensions, and contribution types
+	•	Real-time relationship visualization with redundancy detection
+
+Contribution Registry
+	•	Append-only chronological timeline of all contributions
+	•	Multi-metal qualification display (Gold/Silver/Copper)
+	•	Immutable contribution history with evaluation metrics
+	•	Direct blockchain registration for qualified submissions
 
 ⸻
 

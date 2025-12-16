@@ -34,6 +34,36 @@ function MetalBadge({ metals }: { metals: string[] }) {
   )
 }
 
+function cleanTextFormatting(text: string): string {
+  if (!text) return text
+
+  // Handle PDF text where each word is on a separate line
+  // Join words that were separated by newlines (but keep paragraph breaks)
+  text = text.replace(/([a-zA-Z0-9,.;:!?'"])\n([a-zA-Z0-9])/g, '$1 $2')
+
+  // Clean up remaining formatting
+  text = text.replace(/ +/g, ' ')  // Multiple spaces to single
+  text = text.replace(/\n\s*\n\s*\n+/g, '\n\n')  // Multiple newlines to double
+  text = text.replace(/^\s+/gm, '')  // Remove line-start spaces
+  text = text.replace(/\s+$/gm, '')  // Remove line-end spaces
+
+  return text.trim()
+}
+
+async function handleRegisterPoC(submissionHash: string, contributor: string) {
+  try {
+    // Navigate to Synthechain registration page with pre-filled data
+    const params = new URLSearchParams({
+      hash: submissionHash,
+      contributor: contributor
+    })
+    window.open(`http://localhost:5001/register?${params.toString()}`, '_blank')
+  } catch (err) {
+    console.error('Failed to open registration page:', err)
+    alert('Failed to open registration page. Please try again.')
+  }
+}
+
 function StatusBadge({ status }: { status: string }) {
   const statusConfig: Record<string, { color: string; icon: React.ReactNode }> = {
     qualified: {
@@ -74,7 +104,6 @@ export default function SubmissionDetailPage() {
   const hash = params.hash as string
 
   const [contribution, setContribution] = useState<Contribution | null>(null)
-  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -87,12 +116,9 @@ export default function SubmissionDetailPage() {
   async function loadData() {
     try {
       setLoading(true)
-      const [contrib, evalResult] = await Promise.all([
-        api.getContribution(hash),
-        api.evaluateContribution(hash).catch(() => null), // Evaluation may not exist
-      ])
+      const contrib = await api.getContribution(hash)
       setContribution(contrib)
-      setEvaluation(evalResult)
+      // Evaluation data is stored in contribution metadata
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load submission')
     } finally {
@@ -100,21 +126,6 @@ export default function SubmissionDetailPage() {
     }
   }
 
-  async function handleEvaluate() {
-    if (!hash) return
-    try {
-      setLoading(true)
-      const result = await api.evaluateContribution(hash)
-      setEvaluation(result)
-      // Reload contribution to get updated status
-      const contrib = await api.getContribution(hash)
-      setContribution(contrib)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to evaluate')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (loading && !contribution) {
     return (
@@ -141,7 +152,8 @@ export default function SubmissionDetailPage() {
   }
 
   const metadata = contribution.metadata || {}
-  const evaluationData = evaluation?.evaluation
+  // Evaluation data is stored directly in metadata
+  const evaluationData = metadata
 
   return (
     <div className="space-y-6">
@@ -201,13 +213,9 @@ export default function SubmissionDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>Evaluation Metrics</CardTitle>
-            {contribution.status !== 'evaluating' && contribution.status !== 'qualified' && (
-              <CardDescription>
-                <Button onClick={handleEvaluate} disabled={loading} className="mt-2">
-                  {loading ? 'Evaluating...' : 'Evaluate Contribution'}
-                </Button>
-              </CardDescription>
-            )}
+            <CardDescription>
+              Evaluation occurs automatically upon submission
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {evaluationData ? (
@@ -245,7 +253,7 @@ export default function SubmissionDetailPage() {
               </>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                No evaluation available. Click "Evaluate Contribution" to start evaluation.
+                Evaluation in progress or not yet completed.
               </div>
             )}
           </CardContent>
@@ -253,15 +261,21 @@ export default function SubmissionDetailPage() {
       </div>
 
       {/* Allocations */}
-      {evaluation?.allocations && evaluation.allocations.length > 0 && (
+      {contribution.status === 'qualified' && (
         <Card>
           <CardHeader>
             <CardTitle>Token Allocations</CardTitle>
-            <CardDescription>Multi-metal allocation breakdown</CardDescription>
+            <CardDescription>
+              {metadata.allocations && metadata.allocations.length > 0
+                ? `Total: ${formatNumber(metadata.allocations.reduce((sum, alloc) => sum + alloc.allocation.reward, 0) / 1e12)}T across ${metadata.allocations.length} metal${metadata.allocations.length > 1 ? 's' : ''}`
+                : `Tokens allocated for ${contribution.metals.length} qualified metal${contribution.metals.length > 1 ? 's' : ''}`
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {evaluation.allocations.map((allocation, idx) => (
+              {metadata.allocations && metadata.allocations.length > 0 ? (
+                metadata.allocations.map((allocation, idx) => (
                 <div
                   key={idx}
                   className="border rounded-lg p-4"
@@ -293,7 +307,32 @@ export default function SubmissionDetailPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Tokens have been allocated for this qualified contribution.</p>
+                  <p className="text-sm mt-2">Detailed breakdown available for future submissions.</p>
+                </div>
+              )}
+
+              {/* Register PoC Button */}
+              <div className="mt-6 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Register on Synthechain</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Generate a certificate to permanently register this PoC on the blockchain
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => handleRegisterPoC(contribution.submission_hash, contribution.contributor)}
+                    className="flex items-center space-x-2"
+                  >
+                    <Award className="h-4 w-4" />
+                    <span>Register PoC</span>
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -307,10 +346,10 @@ export default function SubmissionDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="prose max-w-none">
-            <pre className="whitespace-pre-wrap font-mono text-sm bg-muted p-4 rounded-lg max-h-96 overflow-y-auto">
-              {contribution.text_content?.slice(0, 5000) || 'No content available'}
-              {contribution.text_content && contribution.text_content.length > 5000 && '...'}
-            </pre>
+            <div className="font-mono text-sm bg-muted p-4 rounded-lg max-h-96 overflow-y-auto whitespace-pre-line">
+              {contribution.text_content ? cleanTextFormatting(contribution.text_content).slice(0, 5000) : 'No content available'}
+              {contribution.text_content && cleanTextFormatting(contribution.text_content).length > 5000 && '...'}
+            </div>
           </div>
         </CardContent>
       </Card>

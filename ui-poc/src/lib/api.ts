@@ -159,11 +159,37 @@ class PoCApi {
     text_content?: string
     pdf_path?: string
     category?: string
+    file?: File
   }): Promise<{ success: boolean; submission_hash: string }> {
-    return this.fetch('/api/submit', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
+    if (data.file) {
+      // Use FormData for file uploads
+      const formData = new FormData()
+      formData.append('submission_hash', data.submission_hash)
+      formData.append('title', data.title)
+      formData.append('contributor', data.contributor)
+      formData.append('category', data.category || 'scientific')
+      if (data.text_content) {
+        formData.append('text_content', data.text_content)
+      }
+      formData.append('file', data.file)
+
+      const response = await fetch(`${this.baseUrl}/api/submit`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`)
+      }
+
+      return response.json()
+    } else {
+      // Use JSON for text-only submissions
+      return this.fetch('/api/submit', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+    }
   }
 
   async evaluateContribution(submissionHash: string): Promise<EvaluationResult> {

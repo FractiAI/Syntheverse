@@ -96,9 +96,16 @@ class PoCArchive:
         """Save archive to file."""
         self.archive["metadata"]["last_updated"] = datetime.now().isoformat()
         self.archive["metadata"]["total_contributions"] = len(self.archive["contributions"])
+
+        # Custom JSON encoder to handle enums
+        def json_encoder(obj):
+            if hasattr(obj, 'value'):  # Enum with value attribute
+                return obj.value
+            raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
         try:
             with open(self.archive_file, "w") as f:
-                json.dump(self.archive, f, indent=2)
+                json.dump(self.archive, f, indent=2, default=json_encoder)
         except Exception as e:
             print(f"Error saving archive: {e}")
     

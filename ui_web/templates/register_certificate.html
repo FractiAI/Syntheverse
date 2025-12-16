@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register PoD Certificate - Syntheverse</title>
+    <title>Register PoC Certificate - Syntheverse</title>
     <style>
         * {
             margin: 0;
@@ -231,12 +231,42 @@
 </head>
 <body>
     <div class="container">
-        <a href="/" class="back-link">← Back to Submissions</a>
-        
+        <a href="/" class="back-link">← Back to Syntheverse</a>
+
         <div class="card">
-            <h1>🔗 Register PoD Certificate on Blockchain</h1>
-            
-            <p>Register your Proof-of-Discovery certificate on the Syntheverse blockchain to create an immutable record of your contribution.</p>
+            <h1>🔗 Register PoC Certificate on Synthechain</h1>
+
+            <p>Register your Proof-of-Contribution certificate on the Synthechain blockchain to create an immutable record of your contribution and claim your allocated tokens.</p>
+
+            <!-- PoC Details Section -->
+            <div id="pocDetails" style="display: none;">
+                <h2>📋 PoC Contribution Details</h2>
+                <div class="wallet-info">
+                    <div class="wallet-card">
+                        <h3>Submission Hash</h3>
+                        <div class="value" id="pocHash">Loading...</div>
+                    </div>
+                    <div class="wallet-card">
+                        <h3>Contributor</h3>
+                        <div class="value" id="pocContributor">Loading...</div>
+                    </div>
+                    <div class="wallet-card">
+                        <h3>Status</h3>
+                        <div class="value" id="pocStatus">Qualified</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 15px;">Token Allocations</h3>
+                <div id="tokenAllocations">
+                    <!-- Token allocations will be populated here -->
+                </div>
+
+                <div class="wallet-card" style="margin-top: 15px;">
+                    <h3>Registration Fee</h3>
+                    <div class="value" style="color: #dc2626; font-weight: bold;">$200 USD</div>
+                    <small style="color: #666; margin-top: 5px; display: block;">One-time blockchain registration fee</small>
+                </div>
+            </div>
             
             <button class="btn btn-wallet" id="walletBtn" onclick="toggleWallet()">
                 💳 Connect Wallet / Add Payment Info
@@ -457,37 +487,54 @@
         // Form submission
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const submissionHash = document.getElementById('submissionHash').value;
             const contributor = document.getElementById('contributor').value;
             const messageDiv = document.getElementById('message');
             const registerBtn = document.getElementById('registerBtn');
-            
+
             registerBtn.disabled = true;
             registerBtn.textContent = '⏳ Registering...';
             messageDiv.innerHTML = '<div style="padding: 15px; background: #e3f2fd; border-radius: 8px; margin-top: 20px;">Registering certificate on blockchain...</div>';
-            
-            // In a real implementation, this would call the blockchain API
-            // For now, we'll simulate the registration
-            setTimeout(() => {
-                const savedWallet = localStorage.getItem('syntheverse_wallet');
-                const wallet = savedWallet ? JSON.parse(savedWallet) : null;
-                
-                let message = '<div class="success">';
-                message += '✅ Certificate registered successfully!<br/>';
-                message += `Transaction Hash: ${submissionHash.substring(0, 16)}...<br/>`;
-                message += 'Your certificate is now permanently recorded on the Syntheverse blockchain.<br/>';
-                
-                if (wallet && wallet.address) {
-                    message += `<br/>Wallet: ${wallet.address.substring(0, 10)}...${wallet.address.substring(wallet.address.length - 6)}`;
+
+            try {
+                // Call the actual blockchain registration API
+                const response = await fetch('/api/register-poc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        submission_hash: submissionHash,
+                        contributor: contributor,
+                        registration_fee: 200.00
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    let message = '<div class="success">';
+                    message += '✅ Certificate registered successfully!<br/>';
+                    message += `Transaction Hash: ${result.transaction_hash || submissionHash.substring(0, 16)}...<br/>`;
+                    message += 'Your certificate is now permanently recorded on the Syntheverse blockchain.<br/>';
+
+                    if (result.allocated_tokens) {
+                        message += `<br/>🎉 Allocated ${result.allocated_tokens.toLocaleString()} SYNTH tokens!`;
+                    }
+
+                    message += '</div>';
+
+                    messageDiv.innerHTML = message;
+                } else {
+                    messageDiv.innerHTML = `<div class="error">❌ Registration failed: ${result.error || 'Unknown error'}</div>`;
                 }
-                
-                message += '</div>';
-                
-                messageDiv.innerHTML = message;
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'Register Certificate';
-            }, 2000);
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">❌ Registration failed: ${error.message}</div>`;
+            }
+
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Register Certificate';
         });
     </script>
 </body>

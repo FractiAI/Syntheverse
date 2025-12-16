@@ -11,7 +11,7 @@ from .blockchain import (
     ContributionTier,
 )
 from .contracts.synth_token import SYNTHToken
-from .contracts.pod_contract import PODContract
+from .contracts.poc_contract import POCContract
 from .epoch_manager import EpochManager
 from .node import SyntheverseNode
 
@@ -23,7 +23,7 @@ __all__ = [
     "Epoch",
     "ContributionTier",
     "SYNTHToken",
-    "PODContract",
+    "POCContract",
     "EpochManager",
     "SyntheverseNode",
 ]

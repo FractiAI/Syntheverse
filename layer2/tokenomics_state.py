@@ -204,13 +204,16 @@ class TokenomicsState:
         tier: ContributionTier
     ) -> Dict:
         """
-        Calculate token allocation based on PoD score, epoch, and tier.
-        
+        Calculate token allocation based on PoC score as percentage of available tokens.
+
+        The PoC score (0-10000) represents the percentage allocation of available tokens
+        in the epoch, accounting for halvings and tier multipliers.
+
         Args:
-            pod_score: PoD score (0-10000)
-            epoch: Qualified epoch
-            tier: Contribution tier
-        
+            pod_score: PoC score (0-10000) representing allocation percentage
+            epoch: Qualified epoch (with current balance accounting for halvings)
+            tier: Contribution tier with multiplier
+
         Returns:
             Allocation details with availability check
         """
@@ -231,14 +234,22 @@ class TokenomicsState:
                 "available": False,
             }
         
-        # Calculate base reward
-        base_reward = (pod_score / 10000) * epoch_balance
-        
-        # Apply tier multiplier
+        # PoC score represents percentage of available tokens allocated (0-100%)
+        # Convert PoC score (0-10000) to decimal percentage (0-1)
+        allocation_percentage = pod_score / 10000.0  # PoC score of 10000 = 100% allocation
+
+        # Calculate base reward as percentage of available epoch balance
+        base_reward = allocation_percentage * epoch_balance
+
+        # Apply tier multiplier (this represents the metal's share of the allocation)
         tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
-        reward = base_reward * tier_multiplier
-        
-        # Ensure we don't exceed epoch balance
+        # Normalize tier multipliers so they represent proportional shares
+        # Gold (1000) gets largest share, Copper (1) gets smallest
+        total_tier_weight = 1000 + 100 + 1  # Assuming all 3 metals
+        tier_share = tier_multiplier / total_tier_weight
+        reward = base_reward * tier_share
+
+        # Ensure we don't exceed epoch balance (accounting for halvings)
         reward = min(reward, epoch_balance)
         
         return {
@@ -247,6 +258,7 @@ class TokenomicsState:
             "epoch": epoch.value,
             "tier": tier.value,
             "pod_score": pod_score,
+            "allocation_percentage": allocation_percentage,  # PoC score as percentage (0-100%)
             "base_reward": base_reward,
             "tier_multiplier": tier_multiplier,
             "reward": reward,

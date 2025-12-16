@@ -27,11 +27,21 @@ if [ -z "$GROQ_API_KEY" ]; then
     echo ""
 fi
 
-# Check if API server is already running
+# Kill any existing processes before starting
+echo -e "${BLUE}Killing any existing processes...${NC}"
 if lsof -ti:5001 > /dev/null 2>&1; then
-    echo -e "${YELLOW}API server already running on port 5001${NC}"
-else
-    echo -e "${BLUE}Starting API server...${NC}"
+    echo -e "${YELLOW}Killing processes on port 5001...${NC}"
+    kill $(lsof -ti:5001) 2>/dev/null || true
+fi
+if lsof -ti:3000 > /dev/null 2>&1; then
+    echo -e "${YELLOW}Killing processes on port 3000...${NC}"
+    kill $(lsof -ti:3000) 2>/dev/null || true
+fi
+# Wait for ports to be freed
+sleep 2
+echo ""
+
+echo -e "${BLUE}Starting API server...${NC}"
     cd "$SCRIPT_DIR/ui-poc-api"
     
     # Check if virtual environment exists
@@ -73,13 +83,8 @@ else
             exit 1
         fi
     done
-fi
 
-# Check if frontend is already running
-if lsof -ti:3000 > /dev/null 2>&1; then
-    echo -e "${YELLOW}Frontend already running on port 3000${NC}"
-else
-    echo -e "${BLUE}Starting Next.js frontend...${NC}"
+echo -e "${BLUE}Starting Next.js frontend...${NC}"
     cd "$SCRIPT_DIR/ui-poc"
     
     # Install dependencies if needed
@@ -111,7 +116,6 @@ else
             echo -e "   Check logs: tail -f /tmp/poc_frontend.log"
         fi
     done
-fi
 
 echo ""
 echo -e "${BLUE}========================================${NC}"

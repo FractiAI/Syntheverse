@@ -1,6 +1,6 @@
 """
-Syntheverse PoD Submission Web UI
-Browser-based interface for submitting documents for PoD scoring.
+Syntheverse PoC Registration Web UI
+Browser-based interface for registering PoC certificates on the blockchain.
 """
 
 import os
@@ -16,8 +16,7 @@ from typing import Dict
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from layer1.node import SyntheverseNode
-from layer2.pod_server import PODServer
-from ui_pod_submission import PODSubmissionUI
+from layer1.contracts.poc_contract import POCContract
 # PDF generator is optional - only used if needed
 try:
     from pdf_generator import PODPDFGenerator
@@ -33,9 +32,9 @@ app.config['SECRET_KEY'] = 'syntheverse-pod-secret-key'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('test_outputs', exist_ok=True)
 
-# Initialize UI components
-ui = PODSubmissionUI()
-pdf_generator = PODPDFGenerator() if PODPDFGenerator else None
+# Initialize blockchain components
+node = SyntheverseNode("registration-node", data_dir="test_outputs/blockchain")
+poc_contract = POCContract()
 
 # Progress tracking for submissions
 submission_progress = {}  # submission_hash -> progress dict
@@ -305,63 +304,118 @@ def get_report(submission_hash):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route('/api/pdf/<submission_hash>', methods=['GET'])
-def get_pdf(submission_hash):
-    """Get PDF file for a submission."""
+@app.route('/api/register-poc', methods=['POST'])
+def register_poc_certificate():
+    """Register a PoC certificate on the blockchain."""
     try:
-        # Find submission
-        submission = None
-        for sub in ui.submissions:
-            if sub.get('submission_hash') == submission_hash:
-                submission = sub
-                break
-        
-        if not submission:
-            return jsonify({"success": False, "error": "Submission not found"}), 404
-        
-        # Get PDF path
-        pdf_path = submission.get('pdf_path') or submission.get('evidence')
-        if not pdf_path:
-            return jsonify({"success": False, "error": "PDF path not found"}), 404
-        
-        # Check if file exists
-        full_path = Path(pdf_path)
-        if not full_path.is_absolute():
-            # Try relative to uploads folder
-            full_path = Path(app.config['UPLOAD_FOLDER']) / pdf_path
-            if not full_path.exists():
-                # Try as absolute path from project root
-                full_path = Path(pdf_path)
-        
-        if not full_path.exists():
-            return jsonify({"success": False, "error": "PDF file not found"}), 404
-        
-        # Return PDF file
-        return send_from_directory(
-            str(full_path.parent),
-            full_path.name,
-            mimetype='application/pdf'
-        )
-    
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"success": False, "error": "No data provided"}), 400
+
+        submission_hash = data.get('submission_hash')
+        contributor = data.get('contributor')
+        registration_fee = data.get('registration_fee', 200.00)
+
+        if not submission_hash or not contributor:
+            return jsonify({"success": False, "error": "Missing submission_hash or contributor"}), 400
+
+        # Load contribution data from test outputs (simulating PoC server)
+        import json
+        poc_archive_file = Path("test_outputs/poc_archive.json")
+        contribution = None
+
+        if poc_archive_file.exists():
+            try:
+                with open(poc_archive_file, 'r') as f:
+                    archive_data = json.load(f)
+                    # Find the contribution in the archive
+                    for contrib_hash, contrib_data in archive_data.items():
+                        if contrib_hash == submission_hash:
+                            contribution = contrib_data
+                            break
+            except (json.JSONDecodeError, IOError):
+                pass
+
+        if not contribution:
+            return jsonify({"success": False, "error": "PoC contribution not found"}), 404
+
+        # Check if contribution is qualified
+        if contribution.get('status') != 'qualified':
+            return jsonify({"success": False, "error": "Contribution is not qualified for registration"}), 400
+
+        # Submit to blockchain
+        poc_submission = {
+            "title": contribution.get('title', 'Unknown'),
+            "description": contribution.get('text_content', '')[:500],  # Truncate for blockchain
+            "category": contribution.get('category', 'scientific'),
+            "contributor": contributor,
+            "evidence": f"PoC Archive Hash: {submission_hash}",
+            "metals": contribution.get('metals', []),
+            "poc_score": contribution.get('metadata', {}).get('pod_score', 0),  # Note: still uses pod_score in metadata
+        }
+
+        # Submit to PoC contract
+        blockchain_hash = poc_contract.submit_poc(poc_submission)
+
+        # Record evaluation from existing data
+        evaluation = {
+            "coherence": contribution.get('metadata', {}).get('coherence', 0),
+            "density": contribution.get('metadata', {}).get('density', 0),
+            "novelty": contribution.get('metadata', {}).get('redundancy', 0),
+            "status": "approved"
+        }
+
+        poc_contract.record_evaluation(blockchain_hash, evaluation)
+
+        # Allocate tokens
+        allocation_result = poc_contract.allocate_tokens(blockchain_hash)
+
+        # Create blockchain transaction
+        transaction_data = {
+            "type": "poc_registration",
+            "submission_hash": blockchain_hash,
+            "contributor": contributor,
+            "registration_fee": registration_fee,
+            "timestamp": datetime.now().isoformat(),
+            "poc_data": poc_submission
+        }
+
+        # Submit transaction to blockchain
+        tx_result = node.submit_transaction(transaction_data)
+
+        if tx_result.get("success"):
+            return jsonify({
+                "success": True,
+                "transaction_hash": tx_result.get("transaction_hash", blockchain_hash),
+                "blockchain_hash": blockchain_hash,
+                "allocated_tokens": allocation_result.get("allocation", {}).get("reward", 0) if allocation_result.get("success") else 0,
+                "message": "PoC certificate registered successfully on the blockchain"
+            })
+        else:
+            return jsonify({"success": False, "error": "Blockchain transaction failed"}), 500
+
     except Exception as e:
+        print(f"Registration error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-# Email functionality has been removed - all results are displayed in the UI
+# PDF functionality has been removed - certificates are registered on blockchain instead
 
 
 if __name__ == '__main__':
     print("="*70)
-    print("SYNTHVERSE PoD SUBMISSION WEB UI")
+    print("SYNTHVERSE PoC REGISTRATION WEB UI")
     print("="*70)
-    print("\n🌐 Starting web server...")
+    print("\n🌐 Starting registration web server...")
     print("📱 Open your browser and go to: http://localhost:5000")
     print()
-    
-    print("📄 All PoD evaluation results are displayed in the UI")
-    print("   No email configuration needed - view results in the 'Results' tab")
-    
+
+    print("🔗 Register PoC certificates on the blockchain")
+    print("   Connects to L1 blockchain for permanent certificate registration")
+    print("   Handles $200 registration fee and token allocation")
+
     print("\nPress Ctrl+C to stop the server")
     print("="*70)
-    
+
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -133,13 +133,43 @@ class PoCServer:
             submission_hash,
             status=ContributionStatus.SUBMITTED
         )
-        
-        return {
-            "success": True,
-            "submission_hash": submission_hash,
-            "status": "submitted",
-            "archive_entry": contribution
-        }
+
+        # Automatically evaluate the contribution
+        if progress_callback:
+            progress_callback("evaluating", "Automatically evaluating contribution...")
+
+        try:
+            evaluation_result = self.evaluate_contribution(
+                submission_hash=submission_hash,
+                progress_callback=progress_callback
+            )
+
+            if evaluation_result.get("success"):
+                return {
+                    "success": True,
+                    "submission_hash": submission_hash,
+                    "status": "evaluated",
+                    "evaluation": evaluation_result,
+                    "archive_entry": contribution
+                }
+            else:
+                # Evaluation failed, but submission succeeded
+                return {
+                    "success": True,
+                    "submission_hash": submission_hash,
+                    "status": "submitted",
+                    "evaluation_error": evaluation_result.get("error", "Evaluation failed"),
+                    "archive_entry": contribution
+                }
+        except Exception as e:
+            # Evaluation failed, but submission succeeded
+            return {
+                "success": True,
+                "submission_hash": submission_hash,
+                "status": "submitted",
+                "evaluation_error": str(e),
+                "archive_entry": contribution
+            }
     
     def evaluate_contribution(
         self,
@@ -176,7 +206,10 @@ class PoCServer:
         # Archive-first redundancy check
         # Get ALL contributions from archive for redundancy comparison
         all_archive_content = self.archive.get_all_content_for_redundancy_check()
-        
+
+        # For first submission, set redundancy to 0
+        is_first_submission = len([c for c in all_archive_content if c["submission_hash"] != submission_hash]) == 0
+
         # Check for exact duplicates
         content_hash = contribution["content_hash"]
         duplicate_history = self.archive.get_content_hash_history(content_hash)
@@ -233,18 +266,15 @@ class PoCServer:
         
         # Parse evaluation result (extract scores and metals)
         parsed_evaluation = self._parse_evaluation_result(evaluation_result, contribution)
+
+        # Override redundancy for first submission
+        if is_first_submission:
+            parsed_evaluation["redundancy"] = 0.0
+            parsed_evaluation["redundancy_analysis"] = "First submission in archive - zero redundancy"
         
         # Determine qualification status
         qualified = self._determine_qualification(parsed_evaluation)
         status = ContributionStatus.QUALIFIED if qualified else ContributionStatus.UNQUALIFIED
-        
-        # Update archive with evaluation results
-        self.archive.update_contribution(
-            submission_hash,
-            status=status,
-            metals=parsed_evaluation.get("metals", []),
-            metadata=parsed_evaluation
-        )
         
         # Calculate allocations for each metal (multi-metal support)
         allocations = []
@@ -257,7 +287,27 @@ class PoCServer:
                 )
                 if allocation:
                     allocations.append(allocation)
-        
+
+                    # Record the allocation in tokenomics state
+                    self.tokenomics.record_allocation(
+                        submission_hash=submission_hash,
+                        contributor=contribution["contributor"],
+                        allocation=allocation["allocation"],
+                        coherence=parsed_evaluation.get("coherence", 0)
+                    )
+
+        # Store allocations in metadata for frontend access
+        evaluation_with_allocations = parsed_evaluation.copy()
+        evaluation_with_allocations["allocations"] = allocations
+
+        # Update archive with evaluation results and allocations
+        self.archive.update_contribution(
+            submission_hash,
+            status=status,
+            metals=parsed_evaluation.get("metals", []),
+            metadata=evaluation_with_allocations
+        )
+
         return {
             "success": True,
             "submission_hash": submission_hash,
@@ -314,7 +364,11 @@ EVALUATION REQUIREMENTS:
 
 1. Evaluate using Hydrogen-Holographic Fractal Engine (HHFE) metrics:
    - Coherence (Φ): 0-10000 (fractal grammar closure, structural consistency)
-   - Density (ρ): 0-10000 (structural contribution per fractal unit)
+   - Density (ρ): 0-10000 (information richness, depth, and foundational significance)
+     * Foundational papers defining core concepts: 9000-10000
+     * Substantial research contributions: 7000-9000
+     * Significant insights/applications: 5000-7000
+     * Basic contributions: 2000-5000
    - Redundancy (R): 0-10000 (compare against ENTIRE archive, lower is better)
 
 2. Determine METALS (multi-metal support - contribution can contain multiple):
@@ -324,7 +378,7 @@ EVALUATION REQUIREMENTS:
    - A single contribution may contain Gold + Silver + Copper
 
 3. Calculate PoC Score:
-   PoC Score = (coherence/10000) × (density/10000) × ((10000 - redundancy)/10000) × 10000
+   PoC Score = ((coherence + density) / 2) × ((10000 - redundancy) / 10000)
 
 4. Return JSON format:
 {{
@@ -359,9 +413,17 @@ EVALUATION REQUIREMENTS:
     
     def _parse_evaluation_result(self, result: str, contribution: Dict) -> Dict:
         """Parse Grok API evaluation result."""
-        # Try to extract JSON from response
+        # Try to extract JSON from response - look for JSON within markdown code blocks first
         import re
-        json_match = re.search(r'\{.*\}', result, re.DOTALL)
+
+        # Try to find JSON within ```json ... ``` blocks
+        json_block_match = re.search(r'```json\s*\n(.*?)\n\s*```', result, re.DOTALL)
+        if json_block_match:
+            json_str = json_block_match.group(1).strip()
+            json_match = re.search(r'\{.*\}', json_str, re.DOTALL)
+        else:
+            # Fallback to finding any JSON object
+            json_match = re.search(r'\{.*\}', result, re.DOTALL)
         
         if json_match:
             try:
@@ -384,12 +446,20 @@ EVALUATION REQUIREMENTS:
                 if not metals:
                     metals = [MetalType.GOLD]  # Default
                 
+                # Calculate correct PoC score
+                coherence = float(eval_dict.get("coherence", 0))
+                density = float(eval_dict.get("density", 0))
+                redundancy = float(eval_dict.get("redundancy", 0))
+
+                # PoC Score = ((coherence + density) / 2) × ((10000 - redundancy) / 10000)
+                pod_score = ((coherence + density) / 2) * ((10000 - redundancy) / 10000)
+
                 return {
-                    "coherence": float(eval_dict.get("coherence", 0)),
-                    "density": float(eval_dict.get("density", 0)),
-                    "redundancy": float(eval_dict.get("redundancy", 0)),
+                    "coherence": coherence,
+                    "density": density,
+                    "redundancy": redundancy,
                     "metals": metals,
-                    "pod_score": float(eval_dict.get("pod_score", 0)),
+                    "pod_score": pod_score,
                     "tier_justification": eval_dict.get("tier_justification", ""),
                     "redundancy_analysis": eval_dict.get("redundancy_analysis", ""),
                     "status": eval_dict.get("status", "rejected"),
@@ -470,21 +540,39 @@ EVALUATION REQUIREMENTS:
         return None
     
     def _extract_text_from_pdf(self, pdf_path: str) -> Optional[str]:
-        """Extract text from PDF file."""
+        """Extract text from PDF file and clean up formatting."""
         try:
             import PyPDF2
             with open(pdf_path, "rb") as f:
                 reader = PyPDF2.PdfReader(f)
                 text = "\n".join([page.extract_text() for page in reader.pages])
-                return text if text.strip() else None
+                if not text.strip():
+                    return None
         except Exception:
             try:
                 import pdfplumber
                 with pdfplumber.open(pdf_path) as pdf:
                     text = "\n".join([page.extract_text() for page in pdf.pages])
-                    return text if text.strip() else None
+                    if not text.strip():
+                        return None
             except Exception:
                 return None
+
+        # Clean up the extracted text formatting
+        import re
+
+        # Remove excessive whitespace and normalize line breaks
+        # Replace multiple spaces with single space
+        text = re.sub(r' +', ' ', text)
+        # Replace multiple newlines with double newlines (paragraph breaks)
+        text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)
+        # Remove excessive whitespace at line starts/ends
+        text = re.sub(r'^\s+', '', text, flags=re.MULTILINE)
+        text = re.sub(r'\s+$', '', text, flags=re.MULTILINE)
+        # Ensure paragraphs are properly separated
+        text = re.sub(r'([.!?])\s*\n\s*([A-Z])', r'\1\n\n\2', text)
+
+        return text.strip()
     
     def get_sandbox_map(self, **kwargs) -> Dict:
         """Get Syntheverse Sandbox Map."""

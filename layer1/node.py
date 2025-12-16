@@ -9,7 +9,7 @@ import json
 import os
 
 from .blockchain import Blockchain, Transaction, TransactionType, Block
-from .contracts.pod_contract import PODContract
+from .contracts.poc_contract import POCContract
 from .contracts.synth_token import SYNTHToken
 from .epoch_manager import EpochManager
 
@@ -32,7 +32,7 @@ class SyntheverseNode:
         self.node_id = node_id
         self.blockchain = Blockchain(difficulty=difficulty)
         self.synth_token = SYNTHToken()
-        self.pod_contract = PODContract(synth_token=self.synth_token)
+        self.poc_contract = POCContract(synth_token=self.synth_token)
         self.epoch_manager = EpochManager(synth_token=self.synth_token)
         self.data_dir = data_dir
         
@@ -53,7 +53,7 @@ class SyntheverseNode:
             Submission result with hash
         """
         # Submit to POD contract
-        submission_hash = self.pod_contract.submit_pod(submission)
+        submission_hash = self.poc_contract.submit_poc(submission)
         
         # Create transaction
         tx = Transaction(
@@ -86,7 +86,7 @@ class SyntheverseNode:
             Evaluation result
         """
         # Record evaluation in contract
-        success = self.pod_contract.record_evaluation(submission_hash, evaluation)
+        success = self.poc_contract.record_evaluation(submission_hash, evaluation)
         
         if success:
             # Create transaction
@@ -120,7 +120,7 @@ class SyntheverseNode:
             Allocation result
         """
         # Allocate tokens through contract
-        result = self.pod_contract.allocate_tokens(submission_hash)
+        result = self.poc_contract.allocate_tokens(submission_hash)
         
         if result["success"]:
             # Create transaction
@@ -182,13 +182,13 @@ class SyntheverseNode:
     def get_pod_statistics(self) -> Dict[str, Any]:
         """Get POD contract statistics."""
         return {
-            "total_submissions": len(self.pod_contract.submissions),
+            "total_submissions": len(self.poc_contract.submissions),
             "approved_submissions": sum(
-                1 for s in self.pod_contract.submissions.values()
+                1 for s in self.poc_contract.submissions.values()
                 if s.get("status") == "approved"
             ),
-            "total_rewards": len(self.pod_contract.rewards),
-            "epoch_statistics": self.pod_contract.get_epoch_statistics(),
+            "total_rewards": len(self.poc_contract.rewards),
+            "epoch_statistics": self.poc_contract.get_epoch_statistics(),
         }
     
     def get_node_status(self) -> Dict[str, Any]:
@@ -215,13 +215,13 @@ class SyntheverseNode:
                 json.dump(self.synth_token.to_dict(), f, indent=2, default=str)
             
             # Save POD contract (simplified - just submissions and rewards)
-            pod_file = os.path.join(self.data_dir, "pod_contract.json")
+            pod_file = os.path.join(self.data_dir, "poc_contract.json")
             pod_data = {
-                "submissions": self.pod_contract.submissions,
-                "rewards": self.pod_contract.rewards,
-                "contributors": self.pod_contract.contributors,
+                "submissions": self.poc_contract.submissions,
+                "rewards": self.poc_contract.rewards,
+                "contributors": self.poc_contract.contributors,
                 "tier_assignments": {
-                    k: v.value for k, v in self.pod_contract.tier_assignments.items()
+                    k: v.value for k, v in self.poc_contract.tier_assignments.items()
                 },
             }
             with open(pod_file, "w") as f:
@@ -246,21 +246,21 @@ class SyntheverseNode:
                     data = json.load(f)
                     self.synth_token = SYNTHToken.from_dict(data)
                     # Recreate POD contract with loaded token
-                    self.pod_contract = PODContract(synth_token=self.synth_token)
+                    self.poc_contract = POCContract(synth_token=self.synth_token)
                     self.epoch_manager = EpochManager(synth_token=self.synth_token)
             
             # Load POD contract data
-            pod_file = os.path.join(self.data_dir, "pod_contract.json")
+            pod_file = os.path.join(self.data_dir, "poc_contract.json")
             if os.path.exists(pod_file):
                 with open(pod_file, "r") as f:
                     data = json.load(f)
-                    self.pod_contract.submissions = data.get("submissions", {})
-                    self.pod_contract.rewards = data.get("rewards", {})
-                    self.pod_contract.contributors = data.get("contributors", {})
+                    self.poc_contract.submissions = data.get("submissions", {})
+                    self.poc_contract.rewards = data.get("rewards", {})
+                    self.poc_contract.contributors = data.get("contributors", {})
                     # Restore tier assignments
                     tier_data = data.get("tier_assignments", {})
                     from .blockchain import ContributionTier
-                    self.pod_contract.tier_assignments = {
+                    self.poc_contract.tier_assignments = {
                         k: ContributionTier(v) for k, v in tier_data.items()
                     }
         except Exception as e:
