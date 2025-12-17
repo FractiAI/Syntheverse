@@ -50,7 +50,6 @@ class TestBlockchainLayer1(SyntheverseTestCase):
     def _create_test_node(self, node_id: str = "test-node-001", difficulty: int = 1):
         """Helper method to create properly initialized SyntheverseNode"""
         # Blockchain modules ensured in setUp()
-            raise RuntimeError("Blockchain modules not available")
         from layer1.node import SyntheverseNode
         return SyntheverseNode(node_id=node_id, difficulty=difficulty)
 

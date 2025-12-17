@@ -12,12 +12,33 @@ from test_framework import test_config, ensure_dependency, ensure_service_runnin
 
 # Load environment variables from .env file if it exists
 def load_env_file():
-    """Load environment variables with dependency management"""
+    """Load environment variables with fallback for missing python-dotenv"""
     try:
-        # Ensure python-dotenv is available
-        ensure_dependency("python-dotenv")
+        # Try to ensure python-dotenv is available, but don't fail if it can't be installed
+        try:
+            ensure_dependency("python-dotenv")
+            dotenv_available = True
+        except RuntimeError:
+            dotenv_available = False
+            print("⚠️  python-dotenv not available, using manual .env parsing")
 
-        from dotenv import load_dotenv
+        if dotenv_available:
+            from dotenv import load_dotenv
+            load_dotenv_func = load_dotenv
+        else:
+            # Fallback: manual .env parsing
+            def load_dotenv_func(env_path):
+                try:
+                    with open(env_path, 'r') as f:
+                        for line in f:
+                            line = line.strip()
+                            if line and not line.startswith('#'):
+                                if '=' in line:
+                                    key, value = line.split('=', 1)
+                                    os.environ[key.strip()] = value.strip()
+                    return True
+                except Exception:
+                    return False
 
         # Try multiple possible paths for .env file
         possible_paths = [
@@ -28,7 +49,7 @@ def load_env_file():
 
         for env_path in possible_paths:
             if env_path.exists():
-                result = load_dotenv(env_path)
+                result = load_dotenv_func(env_path)
                 groq_key = os.getenv('GROQ_API_KEY')
                 if groq_key:
                     print(f"✓ Loaded GROQ_API_KEY from {env_path}")

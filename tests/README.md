@@ -2,7 +2,16 @@
 
 ## Purpose
 
-Test suites for validating system functionality, API endpoints, submission flows, and integration testing. Features test framework with execution, reporting, caching, and analytics.
+Comprehensive test suites for validating system functionality, API endpoints, submission flows, and integration testing. Features real-only testing framework with automatic dependency management, service startup, execution, reporting, caching, and analytics.
+
+## Testing Policy
+
+**REAL-ONLY TESTING**: All tests use real implementations with no mocking or skipping. Dependencies are automatically installed and services are automatically started. Tests either pass or fail with clear error messages - they never skip.
+
+- ✅ **Zero Mock Usage**: All tests use real API calls, file operations, and service interactions
+- ✅ **Zero Skip Conditions**: Tests never skip - dependencies are installed and services are started automatically
+- ✅ **Automatic Dependency Management**: Python packages and system services are installed/started as needed
+- ✅ **Clear Failure Messages**: When tests fail, they provide detailed error information for debugging
 
 ## Test Framework
 
@@ -11,7 +20,7 @@ Test suites for validating system functionality, API endpoints, submission flows
 - **`test_framework.py`** - Test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, error reporting, and utilities
 - **`test_runner.py`** - Python test orchestrator with discovery, filtering, caching, parallel execution, and HTML reporting
 - **`run_tests.sh`** - Shell script for test execution with colored output and reporting
-- **`test_config.json`** - Configuration file for test settings, scenarios, thresholds, and mock responses
+- **`test_config.json`** - Configuration file for test settings, scenarios, thresholds, and dependency requirements
 - **`conftest.py`** - Pytest configuration for proper test discovery and marker definitions
 
 ### Test Categories

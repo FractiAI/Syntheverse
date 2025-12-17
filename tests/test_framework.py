@@ -87,9 +87,9 @@ def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
 
     for attempt in range(max_attempts):
         try:
-            # Try to install the package
+            # Try to install the package (use --user to avoid externally managed environment issues)
             result = subprocess.run(
-                [sys.executable, '-m', 'pip', 'install', package_name],
+                [sys.executable, '-m', 'pip', 'install', '--user', package_name],
                 capture_output=True,
                 text=True,
                 timeout=60
@@ -418,6 +418,20 @@ class SyntheverseTestCase(unittest.TestCase):
     def cleanup_files(self, file_paths: List[str]):
         """Clean up test files"""
         TestFixtures.cleanup_test_files(file_paths)
+
+    def ensure_dependency(self, package_name: str, max_attempts: int = 3):
+        """Ensure a Python dependency is available, installing it if necessary"""
+        return ensure_dependency(package_name, max_attempts)
+
+    def ensure_service(self, service_name: str, startup_command: list = None, health_url: str = None,
+                      startup_timeout: int = 60, health_check_interval: float = 2.0):
+        """Ensure a service is running, starting it if necessary"""
+        return ensure_service_running(service_name, startup_command, health_url,
+                                     startup_timeout, health_check_interval)
+
+    def ensure_module(self, module_name: str, package_name: str = None, max_attempts: int = 3):
+        """Ensure a Python module is available, installing the package if necessary"""
+        return ensure_module_available(module_name, package_name, max_attempts)
 
 class TestConfig:
     """Test configuration management"""
@@ -884,7 +898,7 @@ class APITestCase(SyntheverseTestCase):
     def require_service(self, service_name: str):
         """Require a specific service to be available for this test"""
         if not self.services_available.get(service_name, False):
-            self.skipTest(f"{service_name} service not available")
+            self.fail(f"{service_name} service not available - tests should ensure services are started")
 
     def get_service_url(self, service: str) -> str:
         """Get the URL for a service"""
