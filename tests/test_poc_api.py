@@ -315,11 +315,11 @@ class TestPoCAPI(APITestCase):
             self.assertIn("success", result)
             if result["success"]:
                 self.assertIn("evaluation", result)
-                self.assertIn("tier", result["evaluation"])
+                self.assertIn("metals", result["evaluation"])
 
-                tier = result["evaluation"]["tier"]
-                self.log_info(f"✅ Evaluation successful, tier: {tier}")
-                self.add_metric("evaluation_tier", tier)
+                metals = result["evaluation"]["metals"]
+                self.log_info(f"✅ Evaluation successful, metals: {metals}")
+                self.add_metric("evaluation_metals", metals)
             else:
                 self.log_info("⚠️  Evaluation in progress or failed")
                 self.add_metric("evaluation_status", "in_progress")

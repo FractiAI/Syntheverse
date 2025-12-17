@@ -336,11 +336,12 @@ class TestFixtures:
     @staticmethod
     def generate_test_pdf():
         """Generate a simple test PDF file for testing"""
+        import tempfile
+        import os
+
         try:
             from reportlab.pdfgen import canvas
             from reportlab.lib.pagesizes import letter
-            import tempfile
-            import os
 
             # Create temporary PDF
             fd, pdf_path = tempfile.mkstemp(suffix='.pdf')
@@ -355,7 +356,6 @@ class TestFixtures:
             return pdf_path
         except ImportError:
             # Fallback: create a text file that looks like a PDF
-            import tempfile
             fd, pdf_path = tempfile.mkstemp(suffix='.pdf')
             with os.fdopen(fd, 'w') as f:
                 f.write("%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n")
