@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Test suites for validating system functionality, API endpoints, submission flows, and integration testing.
+Real-only test suites for validating system functionality, API endpoints, submission flows, and integration testing. All tests use real implementations with automatic dependency management and service startup.
 
 ## Key Modules
 
@@ -75,12 +75,13 @@ Test suites for validating system functionality, API endpoints, submission flows
 
 ## Development Guidelines
 
-- Write tests for new functionality
-- Follow test-driven development (TDD)
-- Test both happy paths and error scenarios
+- Write real tests for new functionality (no mocking)
+- Follow test-driven development (TDD) with real dependencies
+- Test both happy paths and error scenarios using real implementations
 - Keep tests maintainable and readable
-- Use appropriate test frameworks
-- Document test usage
+- Use automatic dependency management and service startup
+- Document test dependencies and isolation requirements
+- Never skip tests - ensure dependencies are available or installable
 
 ## Common Patterns
 

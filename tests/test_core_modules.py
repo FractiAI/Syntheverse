@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """
 Core Modules Unit Test Suite
-Comprehensive testing of core business logic including:
+Comprehensive testing of core business logic with real implementations:
 - PoC Archive: Contribution storage, retrieval, and status management
 - Tokenomics State: Epoch management, allocation calculations, and balance tracking
 - Sandbox Map: Network visualization and contributor relationship mapping
-- PoC Evaluator: Content evaluation with scoring and recommendation generation
+- PoC Evaluator: Content evaluation with real GROQ API calls
 - Token Allocator: SYNTH token reward calculations and distribution logic
 - PoC Server: Main orchestration server with evaluation pipeline integration
 
-Test Coverage: Unit tests with mocking for external dependencies,
+Test Coverage: Real implementation tests with automatic dependency management,
 edge cases, error scenarios, and performance validation.
+
+Dependencies: Automatically ensures required modules are available via ensure_module_available().
+Services: Uses real GROQ API calls - requires valid GROQ_API_KEY.
+Isolation: Uses temporary directories for file operations with automatic cleanup.
 """
 
 import sys

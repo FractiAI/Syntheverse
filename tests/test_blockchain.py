@@ -315,7 +315,6 @@ class TestBlockchainLayer1(SyntheverseTestCase):
 
             self.log_info("✅ Contract classes loaded successfully")
 
-        except ImportError:
         except Exception as e:
             self.fail(f"Contract class loading test failed: {e}")
 

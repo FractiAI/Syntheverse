@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Test script to send a simple query to the RAG API.
-Uses standardized test framework for consistent execution and reporting.
+RAG API Test Suite
+Tests RAG API functionality with real API calls and automatic service management.
+
+Dependencies: Automatically installs requests library if needed.
+Services: Requires RAG API service (automatically started by conftest.py).
+Isolation: Uses real API calls with proper error handling and metrics collection.
 """
 
 import sys

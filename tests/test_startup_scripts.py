@@ -12,6 +12,7 @@ import time
 import subprocess
 import shutil
 from pathlib import Path
+from unittest.mock import patch, MagicMock, mock_open
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))

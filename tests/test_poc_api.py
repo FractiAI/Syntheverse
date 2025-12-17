@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
 Comprehensive PoC API Test Suite
-Tests all endpoints of the PoC API server (port 5001)
+Tests all endpoints of the PoC API server (port 5001) with real implementations.
+
+Dependencies: Automatically installs PDF generation libraries if needed.
+Services: Requires PoC API service (automatically started by conftest.py).
+Isolation: Creates test contributions with real file operations and automatic cleanup.
+Data Setup: Automatically creates test data if none exists for evaluation/certificate tests.
 """
 
 import sys

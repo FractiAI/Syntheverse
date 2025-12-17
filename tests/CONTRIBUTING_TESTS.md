@@ -2,7 +2,17 @@
 
 ## Overview
 
-This guide provides comprehensive instructions for developing, running, and maintaining tests for the Syntheverse project. The test suite uses a standardized framework with categorized testing, automated reporting, and comprehensive coverage.
+This guide provides comprehensive instructions for developing, running, and maintaining tests for the Syntheverse project. The test suite uses a **real-only testing framework** with automatic dependency management, service startup, and comprehensive error reporting.
+
+## Testing Policy
+
+**REAL-ONLY TESTING**: All tests must use real implementations with no mocking or skipping. The framework automatically manages dependencies and services.
+
+### Key Principles
+- **No Mocking**: Tests use real API calls, file operations, and service interactions
+- **No Skipping**: Tests never skip - dependencies are installed and services are started automatically
+- **Automatic Setup**: Python packages and services are installed/started as needed
+- **Clear Failures**: Tests fail with detailed error messages when issues occur
 
 ## Test Framework Architecture
 
@@ -22,32 +32,32 @@ This guide provides comprehensive instructions for developing, running, and main
 
 3. **`test_config.json`** - Configuration management
    - API endpoints, timeouts, test data
-   - Test scenarios and mock responses
+   - Test scenarios and dependency requirements
    - Environment and reporting settings
 
-4. **`test_fixtures.py`** - Test utilities and mocks
+4. **`test_fixtures.py`** - Test utilities and isolation
    - Data generators for test scenarios
-   - Service mocking utilities
-   - Temporary environment management
+   - Temporary file and directory management
+   - Test isolation and cleanup utilities
 
 ## Test Categories
 
 ### Unit Tests (`test_category = "unit"`)
-- Test individual functions and classes in isolation
-- Mock external dependencies
+- Test individual functions and classes with real dependencies
+- Use temporary files and isolated environments
 - Focus on logic correctness and edge cases
-- **Examples**: `test_core_modules.py`, `test_rag_timeout.py`
+- **Examples**: `test_core_modules.py`, `test_anvil_manager.py`
 
 ### Integration Tests (`test_category = "integration"`)
 - Test component interactions and API communications
-- May require services to be running or mocked
-- Validate data flow between components
-- **Examples**: `test_poc_api.py`, `test_rag_api.py`, `test_frontend_integration.py`
+- Services automatically started by framework
+- Validate real data flow between components
+- **Examples**: `test_poc_api.py`, `test_rag_api.py`, `test_blockchain.py`
 
 ### End-to-End Tests (`test_category = "end_to_end"`)
 - Test complete user workflows from start to finish
-- Require full system to be operational
-- Validate real user scenarios
+- Full system with real services and dependencies
+- Validate actual user scenarios
 - **Examples**: `test_submission_flow.py`, `test_full_submission_flow.py`, `test_blockchain.py`
 
 ## Writing Tests

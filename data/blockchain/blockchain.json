@@ -345,6 +345,27 @@
       "pod_score": 75,
       "nonce": 26,
       "hash": "04fecae8d9230f94b1806411013d65a8deb1bd2007bfe68c3f8a887e9d4d15c9"
+    },
+    {
+      "index": 17,
+      "transactions": [
+        {
+          "hash": "f34ae5fdffc2a6712ac2abf8c6e6e5d0f014176fddbb8549413676c9c34263dc",
+          "type": "pod_submission",
+          "data": {
+            "pod_score": 75,
+            "submission_hash": "test_hash"
+          },
+          "sender": "test-miner",
+          "timestamp": "2025-12-17T10:57:21.717280"
+        }
+      ],
+      "previous_hash": "04fecae8d9230f94b1806411013d65a8deb1bd2007bfe68c3f8a887e9d4d15c9",
+      "timestamp": "2025-12-17T10:57:21.717301",
+      "validator": "test-node-001",
+      "pod_score": 75,
+      "nonce": 24,
+      "hash": "0a95e2b0c364e06668dbb3779ac8859783376648398ad1221268c2d498d64b6f"
     }
   ],
   "pending_transactions": [],
