@@ -101,6 +101,7 @@ main() {
     # Kill any existing servers
     kill_port 5000 "Web UI"
     kill_port 5001 "PoC API"
+    kill_port 3001 "Next.js Frontend"
     kill_port 8000 "Demo Server"
 
     echo ""
@@ -109,17 +110,27 @@ main() {
     # Check if ports are now free
     check_port 5000 "Web UI" || exit 1
     check_port 5001 "PoC API" || exit 1
+    check_port 3001 "Next.js Frontend" || exit 1
 
     echo ""
     print_info "Step 3: Starting Syntheverse servers..."
 
     # Start PoC API server
-    POC_API_CMD="FLASK_SKIP_DOTENV=1 # GROQ_API_KEY=your-groq-api-key-here python3 src/api/poc-api/app.py"
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    POC_API_CMD="cd $PROJECT_ROOT && FLASK_SKIP_DOTENV=1 PYTHONPATH=$PROJECT_ROOT/src/core:$PROJECT_ROOT/src:$PROJECT_ROOT python3 src/api/poc-api/app.py"
     start_server "$POC_API_CMD" "PoC API Server" "5001"
 
-    # Start Web UI server
-    WEB_UI_CMD="FLASK_SKIP_DOTENV=1 python3 src/frontend/web-legacy/app.py"
-    start_server "$WEB_UI_CMD" "Web UI Server" "5000"
+    # Start Web UI server (legacy)
+    WEB_UI_CMD="cd $PROJECT_ROOT && FLASK_SKIP_DOTENV=1 python3 src/frontend/web-legacy/app.py"
+    start_server "$WEB_UI_CMD" "Web UI Server (Legacy)" "5000"
+    
+    # Start Next.js Frontend
+    FRONTEND_DIR="$PROJECT_ROOT/src/frontend/poc-frontend"
+    if [ -d "$FRONTEND_DIR" ]; then
+        NEXTJS_CMD="cd $FRONTEND_DIR && PORT=3001 npm run dev"
+        start_server "$NEXTJS_CMD" "Next.js Frontend" "3001"
+    fi
 
     echo ""
     print_info "Step 4: System startup complete!"
@@ -127,11 +138,13 @@ main() {
     echo ""
     echo "🌐 SYNTHVERSE SERVERS RUNNING:"
     echo "================================"
-    print_status "Web UI:        http://127.0.0.1:5000"
-    print_status "PoC API:       http://127.0.0.1:5001"
-    print_status "API Status:    http://127.0.0.1:5001/api/status"
+    print_status "Web UI (Legacy): http://127.0.0.1:5000"
+    print_status "PoC API:         http://127.0.0.1:5001"
+    print_status "Next.js UI:      http://127.0.0.1:3001"
+    print_status "API Status:      http://127.0.0.1:5001/api/status"
     echo ""
-    print_info "Open http://127.0.0.1:5000 in your browser to access the Syntheverse UI"
+    print_info "Open http://127.0.0.1:3001 in your browser to access the Syntheverse UI (Next.js)"
+    print_info "Or http://127.0.0.1:5000 for the legacy UI"
     echo ""
     print_info "Press Ctrl+C to stop all servers"
     echo ""
@@ -144,6 +157,7 @@ main() {
     print_info "Shutting down servers..."
     kill_port 5000 "Web UI"
     kill_port 5001 "PoC API"
+    kill_port 3001 "Next.js Frontend"
     print_status "All servers stopped. Goodbye! 👋"
 }
 

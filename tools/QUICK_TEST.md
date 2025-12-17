@@ -12,13 +12,13 @@ export GROQ_API_KEY=your-groq-api-key
 
 This will:
 1. Start the API server on port 5001
-2. Start the Next.js frontend on port 3000
+2. Start the Next.js frontend on port 3001
 3. Wait for both to be ready
 
 ## Test the System
 
 ### 1. Open the Frontend
-Navigate to: **http://localhost:3000**
+Navigate to: **http://localhost:3001**
 
 ### 2. Test Each View
 
@@ -82,7 +82,7 @@ This tests:
 - Check logs: `tail -f /tmp/poc_api.log`
 
 ### Frontend Won't Start
-- Check if port 3000 is in use: `lsof -ti:3000`
+- Check if port 3001 is in use: `lsof -ti:3001`
 - Install dependencies: `cd ui-poc && npm install`
 - Check logs: `tail -f /tmp/poc_frontend.log`
 

@@ -8,6 +8,7 @@ import json
 import sys
 import time
 from pathlib import Path
+import pytest
 
 RAG_API_URL = "http://localhost:8000"
 
@@ -88,11 +89,19 @@ Return JSON format:
 
 def test_full_submission_flow():
     """Test the full submission flow with progress tracking."""
-    
+
+    # Check if RAG API is available before proceeding
+    try:
+        health_check = requests.get(f"{RAG_API_URL}/health", timeout=5)
+        if health_check.status_code != 200:
+            pytest.skip(f"RAG API not available (status: {health_check.status_code})")
+    except requests.exceptions.RequestException:
+        pytest.skip("RAG API not available (connection refused)")
+
     print("=" * 70)
     print("Testing Full Submission Flow with RAG API")
     print("=" * 70)
-    
+
     # Step 1: Health check
     print("\n[1] Checking RAG API health...")
     try:
@@ -104,10 +113,10 @@ def test_full_submission_flow():
             print(f"   Model: {health_data.get('ollama_model', 'unknown')}")
         else:
             print(f"   ❌ Health check failed: {health_response.status_code}")
-            return False
+            raise AssertionError(f"Health check failed with status {health_response.status_code}")
     except Exception as e:
         print(f"   ❌ Health check error: {e}")
-        return False
+        raise AssertionError(f"Health check error: {e}")
     
     # Step 2: Simulate a submission
     print("\n[2] Simulating PDF submission...")
@@ -235,34 +244,34 @@ Evaluate this artifact using the HHFE model and provide the required metrics.
                         print(f"   - Tier: {json_data.get('tier')}")
                         print(f"   - Epoch: {json_data.get('epoch')}")
                         print(f"   - Status: {json_data.get('status')}")
-                    
-                    return True
+
+                    # Test passed successfully
                 except json.JSONDecodeError as e:
                     print(f"\n   ⚠️  JSON found but could not parse: {e}")
                     print(f"   JSON snippet: {json_match.group()[:200]}")
             else:
                 print(f"\n   ⚠️  No JSON found in response")
                 print(f"   Full response: {answer}")
-            
-            return True
+
+            # Test passed successfully
         else:
             print(f"\n   ❌ Query failed: {response.status_code}")
             print(f"   Response: {response.text[:500]}")
-            return False
+            raise AssertionError(f"Query failed with status {response.status_code}")
             
     except requests.exceptions.Timeout:
         print(f"\n   ❌ Query timed out after 180 seconds")
         print(f"   The RAG API may be overloaded or the LLM is taking too long")
-        return False
+        raise AssertionError("Query timed out after 180 seconds")
     except requests.exceptions.ConnectionError:
         print(f"\n   ❌ Connection error")
         print(f"   Check if RAG API is running: curl http://localhost:8000/health")
-        return False
+        raise AssertionError("Connection error - RAG API not available")
     except Exception as e:
         print(f"\n   ❌ Error: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        raise AssertionError(f"Unexpected error: {e}")
 
 if __name__ == "__main__":
     print("\nThis test simulates the full submission flow:")
@@ -271,19 +280,27 @@ if __name__ == "__main__":
     print("3. Send to RAG API with system prompt")
     print("4. Parse and validate response\n")
     
-    success = test_full_submission_flow()
-    
-    if success:
+    try:
+        test_full_submission_flow()
         print("\n" + "=" * 70)
         print("✅ Full submission flow test PASSED")
         print("=" * 70)
         print("\nThe RAG API is working correctly for PoD evaluations.")
         print("If progress bar isn't updating, the issue is in the progress tracking, not the RAG API.")
-    else:
+        sys.exit(0)
+    except AssertionError as e:
         print("\n" + "=" * 70)
         print("❌ Full submission flow test FAILED")
         print("=" * 70)
+        print(f"\nError: {e}")
         print("\nCheck the error messages above to diagnose the issue.")
-    
-    sys.exit(0 if success else 1)
+        sys.exit(1)
+    except Exception as e:
+        print("\n" + "=" * 70)
+        print("❌ Full submission flow test FAILED")
+        print("=" * 70)
+        print(f"\nUnexpected error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 

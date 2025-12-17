@@ -8,6 +8,7 @@ import json
 import sys
 import time
 from pathlib import Path
+import pytest
 
 RAG_API_URL = "http://localhost:8000"
 
@@ -196,11 +197,19 @@ Return JSON format:
 
 def test_submission_flow():
     """Test the complete submission flow step by step."""
-    
+
+    # Check if RAG API is available before proceeding
+    try:
+        health_check = requests.get(f"{RAG_API_URL}/health", timeout=5)
+        if health_check.status_code != 200:
+            pytest.skip(f"RAG API not available (status: {health_check.status_code})")
+    except requests.exceptions.RequestException:
+        pytest.skip("RAG API not available (connection refused)")
+
     print("=" * 70)
     print("Testing Complete Submission Flow to RAG API")
     print("=" * 70)
-    
+
     # Step 1: Health check
     print("\n[Step 1] Health Check")
     print("-" * 70)
@@ -216,10 +225,10 @@ def test_submission_flow():
             print(f"   LLM: {health_data.get('default_llm', 'unknown')}")
         else:
             print(f"   ❌ Health check failed")
-            return False
+            raise AssertionError("Health check failed")
     except Exception as e:
         print(f"   ❌ Health check error: {e}")
-        return False
+        raise AssertionError(f"Health check error: {e}")
     
     # Step 2: Create a test evaluation query (simulating what pod_server sends)
     print("\n[Step 2] Preparing Evaluation Query")
@@ -343,34 +352,46 @@ Evaluate this artifact using the HHFE model and provide:
                     print(f"\n   ⚠️  JSON found but parse error: {e}")
             else:
                 print(f"\n   ⚠️  No JSON found in response")
-            
-            return True
+
+            # Test passed successfully
         else:
             print(f"   ❌ Query failed: {response.status_code}")
             print(f"   Response: {response.text[:500]}")
-            return False
+            raise AssertionError(f"Query failed with status {response.status_code}")
             
     except requests.exceptions.Timeout:
         print(f"   ❌ Query timed out after 180 seconds")
         print(f"   The RAG API may be overloaded or the LLM is taking too long")
-        return False
+        raise AssertionError("Query timed out after 180 seconds")
     except requests.exceptions.ConnectionError:
         print(f"   ❌ Connection error")
         print(f"   Check if RAG API is running: curl http://localhost:8000/health")
-        return False
+        raise AssertionError("Connection error - RAG API not available")
     except Exception as e:
         print(f"   ❌ Error: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        raise AssertionError(f"Unexpected error: {e}")
 
 if __name__ == "__main__":
-    success = test_submission_flow()
-    print("\n" + "=" * 70)
-    if success:
+    try:
+        test_submission_flow()
+        print("\n" + "=" * 70)
         print("✅ Test completed successfully!")
-    else:
+        print("=" * 70)
+        sys.exit(0)
+    except AssertionError as e:
+        print("\n" + "=" * 70)
         print("❌ Test failed - check errors above")
-    print("=" * 70)
-    sys.exit(0 if success else 1)
+        print(f"Error: {e}")
+        print("=" * 70)
+        sys.exit(1)
+    except Exception as e:
+        print("\n" + "=" * 70)
+        print("❌ Test failed - unexpected error")
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 70)
+        sys.exit(1)
 

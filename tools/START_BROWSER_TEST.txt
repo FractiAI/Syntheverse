@@ -25,7 +25,7 @@ Run this command:
 
 You should see:
   ▲ Next.js 14.x.x
-  - Local: http://localhost:3000
+  - Local: http://localhost:3001
 
 Keep this terminal open too!
 
@@ -34,7 +34,7 @@ STEP 3: Open Browser
 ─────────────────────
 
 1. Open your web browser
-2. Go to: http://localhost:3000
+2. Go to: http://localhost:3001
 3. You should see the Syntheverse PoC UI!
 
 

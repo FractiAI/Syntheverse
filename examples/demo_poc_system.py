@@ -11,9 +11,11 @@ from datetime import datetime
 import json
 import hashlib
 
-# Add required paths
-sys.path.insert(0, str(Path(__file__).parent / "src" / "core"))
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# Add required paths - examples run from examples/, need to go to project root
+examples_dir = Path(__file__).parent
+project_root = examples_dir.parent
+sys.path.insert(0, str(project_root / "src" / "core"))
+sys.path.insert(0, str(project_root / "src"))
 
 def simulate_poc_evaluation():
     """Simulate PoC evaluation logic"""

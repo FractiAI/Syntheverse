@@ -8,7 +8,7 @@ Before using the RAG API, test that Ollama is working:
 
 ```bash
 cd rag-api/api
-python3 test_ollama.py
+python3 ollama_check.py
 ```
 
 This will:

@@ -1,0 +1,47 @@
+[
+  {
+    "text": "Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. This document describes the system architecture and component responsibilities for AI-assisted development.",
+    "metadata": {
+      "source": "syntheverse_seed",
+      "chunk_type": "introduction",
+      "word_count": 42
+    },
+    "chunk_index": 0
+  },
+  {
+    "text": "System Architecture: Three-Layer Design: 1. Layer 1 (Blockchain): Syntheverse Blockmine L1 with smart contracts on Base 2. Layer 2 (Evaluation): PoC evaluation engine with archive-first redundancy detection 3. UI Layer: Next.js frontend with Flask API bridge",
+    "metadata": {
+      "source": "syntheverse_seed",
+      "chunk_type": "architecture",
+      "word_count": 68
+    },
+    "chunk_index": 1
+  },
+  {
+    "text": "Key Components: Source Code (src/): api/ (PoC API, RAG API), blockchain/ (contracts, Layer 1), core/ (Layer 2 evaluation, tokenomics), frontend/ (Next.js, legacy Flask), data/ (PDFs, parsed content, embeddings). Scripts: startup/, development/, deployment/, utilities/. Configuration: environment/, wallet/.",
+    "metadata": {
+      "source": "syntheverse_seed",
+      "chunk_type": "components",
+      "word_count": 85
+    },
+    "chunk_index": 2
+  },
+  {
+    "text": "Development Guidelines: Code Standards: Follow modular, well-documented, clearly reasoned code. Use test-driven development (TDD). Remove unnecessary adjectives from names. Ensure functional code. Documentation: Every folder level must have AGENTS.md and README.md. Documentation should be understated and 'show not tell'.",
+    "metadata": {
+      "source": "syntheverse_seed",
+      "chunk_type": "guidelines",
+      "word_count": 72
+    },
+    "chunk_index": 3
+  },
+  {
+    "text": "Proof-of-Contribution System: Multi-metal qualification system: Gold (Discovery/Scientific), Silver (Technology), Copper (Alignment). Archive-first evaluation: All contributions stored immediately. Direct LLM integration: Grok API for evaluations. File-based storage: JSON files for persistent state.",
+    "metadata": {
+      "source": "syntheverse_seed",
+      "chunk_type": "poc_system",
+      "word_count": 58
+    },
+    "chunk_index": 4
+  }
+]

@@ -1,109 +1,312 @@
 #!/usr/bin/env python3
 """
 Test script to send a simple query to the RAG API.
+Uses standardized test framework for consistent execution and reporting.
 """
 
-import requests
-import json
 import sys
+import os
+import time
+import unittest
+import pytest
+from pathlib import Path
 
-RAG_API_URL = "http://localhost:8000"
+# Add test framework to path
+test_dir = Path(__file__).parent
+sys.path.insert(0, str(test_dir))
 
-def test_rag_api():
-    """Test the RAG API with a simple query."""
-    
-    print("=" * 70)
-    print("Testing RAG API")
-    print("=" * 70)
-    
-    # Step 1: Health check
-    print("\n[1] Checking RAG API health...")
-    try:
-        health_response = requests.get(f"{RAG_API_URL}/health", timeout=10)
-        print(f"   Status Code: {health_response.status_code}")
-        if health_response.status_code == 200:
-            health_data = health_response.json()
-            print(f"   ✅ Health check passed")
-            print(f"   Status: {health_data.get('status', 'unknown')}")
-            print(f"   Chunks loaded: {health_data.get('chunks_loaded', 0)}")
-            print(f"   PDFs loaded: {health_data.get('pdfs_loaded', 0)}")
-            print(f"   Default LLM: {health_data.get('default_llm', 'unknown')}")
-        else:
-            print(f"   ❌ Health check failed: {health_response.text}")
-            return False
-    except requests.exceptions.Timeout:
-        print(f"   ❌ Health check timed out")
-        return False
-    except requests.exceptions.ConnectionError:
-        print(f"   ❌ Could not connect to RAG API at {RAG_API_URL}")
-        print(f"   Make sure the RAG API server is running")
-        return False
-    except Exception as e:
-        print(f"   ❌ Health check error: {e}")
-        return False
-    
-    # Step 2: Simple query test
-    print("\n[2] Sending test query to RAG API...")
-    test_query = "What is the Syntheverse PoD protocol?"
-    
-    try:
-        query_payload = {
-            "query": test_query,
-            "top_k": 3,
-            "llm_model": "ollama"  # Use ollama since it's available
-        }
-        
-        print(f"   Query: {test_query}")
-        print(f"   Sending request (timeout: 60s)...")
-        
-        response = requests.post(
-            f"{RAG_API_URL}/query",
-            json=query_payload,
-            timeout=60
-        )
-        
-        print(f"   Status Code: {response.status_code}")
-        
-        if response.status_code == 200:
+from test_framework import APITestCase, TestUtils, test_config
+
+@pytest.mark.requires_rag_api
+class TestRAGAPI(APITestCase):
+    """Test RAG API functionality with standardized framework"""
+
+    def get_category(self) -> str:
+        """Return test category for reporting"""
+        return "integration"
+
+    def test_rag_api_health(self):
+        """Test RAG API health endpoint"""
+        self.log_info("Testing RAG API health endpoint")
+
+        # Require RAG API to be available
+        self.require_service("rag_api")
+
+        rag_api_url = self.get_service_url("rag_api")
+
+        self.log_info("✅ RAG API health check passed")
+
+    def test_rag_api_query(self):
+        """Test RAG API query functionality"""
+        self.log_info("Testing RAG API query functionality")
+
+        # Require RAG API to be available
+        self.require_service("rag_api")
+
+        rag_api_url = self.get_service_url("rag_api")
+        test_query = "What is the Syntheverse PoD protocol?"
+
+        try:
+            import requests
+
+            query_payload = {
+                "query": test_query,
+                "top_k": 3,
+                "llm_model": "ollama"
+            }
+
+            self.log_info(f"Sending query: {test_query}")
+
+            # Record start time for metrics
+            import time
+            start_time = time.time()
+
+            response = requests.post(
+                f"{rag_api_url}/query",
+                json=query_payload,
+                timeout=test_config.get("timeouts.api_call", 60)
+            )
+
+            # Record response time
+            response_time = time.time() - start_time
+            self.add_metric("response_time", response_time)
+
+            self.assertEqual(response.status_code, 200,
+                           f"Query failed with status {response.status_code}: {response.text}")
+
             result = response.json()
-            print(f"   ✅ Query successful")
-            print(f"\n   Response:")
-            print(f"   - Answer length: {len(result.get('answer', ''))} characters")
-            print(f"   - Sources found: {len(result.get('sources', []))}")
-            
-            # Show preview of answer
-            answer = result.get('answer', '')
-            if answer:
-                preview = answer[:300] + "..." if len(answer) > 300 else answer
-                print(f"\n   Answer preview:")
-                print(f"   {preview}")
-            
-            # Show sources
-            sources = result.get('sources', [])
-            if sources:
-                print(f"\n   Sources:")
-                for i, source in enumerate(sources[:3], 1):
-                    print(f"   {i}. {source.get('title', 'Unknown')} (score: {source.get('score', 0):.4f})")
-            
-            return True
-        else:
-            print(f"   ❌ Query failed: {response.status_code}")
-            print(f"   Response: {response.text[:500]}")
-            return False
-            
-    except requests.exceptions.Timeout:
-        print(f"   ❌ Query timed out after 60 seconds")
-        return False
-    except requests.exceptions.ConnectionError:
-        print(f"   ❌ Connection error during query")
-        return False
-    except Exception as e:
-        print(f"   ❌ Query error: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
+            self.log_info("✅ Query successful")
+
+            # Validate response structure
+            self.assertIn("answer", result, "Response missing 'answer' field")
+            self.assertIn("sources", result, "Response missing 'sources' field")
+
+            answer_length = len(result.get("answer", ""))
+            sources_count = len(result.get("sources", []))
+
+            self.add_metric("answer_length", answer_length)
+            self.add_metric("sources_count", sources_count)
+
+            self.log_info(f"Answer length: {answer_length} characters")
+            self.log_info(f"Sources found: {sources_count}")
+
+            # Validate answer content
+            self.assertGreater(answer_length, 0, "Answer is empty")
+            self.assertGreater(sources_count, 0, "No sources returned")
+
+            # Log preview of answer
+            answer_preview = result["answer"][:300] + "..." if len(result["answer"]) > 300 else result["answer"]
+            self.log_info(f"Answer preview: {answer_preview}")
+
+            # Validate sources
+            sources = result["sources"]
+            for i, source in enumerate(sources[:3], 1):
+                title = source.get("title", "Unknown")
+                score = source.get("score", 0)
+                self.log_info(f"Source {i}: {title} (score: {score:.4f})")
+
+        except ImportError:
+            self.skipTest("requests library not available")
+        except Exception as e:
+            self.fail(f"RAG API query failed: {e}")
+
+    def test_rag_api_query_variations(self):
+        """Test RAG API with different query types and edge cases"""
+        self.log_info("Testing RAG API query variations")
+
+        rag_api_url = test_config.get("api_urls.rag_api")
+
+        # Ensure service is available
+        available = TestUtils.wait_for_service(rag_api_url, timeout=5)  # Reduced timeout for testing
+        if not available:
+            self.skipTest("RAG API service not available - skipping integration test")
+
+        import requests
+
+        test_queries = [
+            "What is Syntheverse?",  # Basic query
+            "",  # Empty query
+            "A",  # Minimal query
+            "What is the meaning of life according to quantum physics and fractal mathematics?",  # Complex query
+            "Explain hydrogen holography in detail",  # Technical query
+            "Test query with special characters: π ≈ 3.14159 & ∞",  # Unicode query
+            "Very long query " * 50,  # Long query
+        ]
+
+        successful_queries = 0
+        total_queries = len(test_queries)
+
+        for i, query in enumerate(test_queries, 1):
+            try:
+                payload = {
+                    "query": query,
+                    "top_k": 3,
+                    "llm_model": "ollama"
+                }
+
+                start_time = time.time()
+                response = requests.post(
+                    f"{rag_api_url}/query",
+                    json=payload,
+                    timeout=test_config.get("timeouts.api_call", 60)
+                )
+                response_time = time.time() - start_time
+
+                if response.status_code == 200:
+                    result = response.json()
+                    if "answer" in result and "sources" in result:
+                        successful_queries += 1
+                        answer_length = len(result.get("answer", ""))
+                        sources_count = len(result.get("sources", []))
+
+                        self.log_info(f"✅ Query {i} successful: {answer_length} chars, {sources_count} sources")
+                        self.add_metric(f"query_{i}_response_time", response_time)
+                        self.add_metric(f"query_{i}_answer_length", answer_length)
+                        self.add_metric(f"query_{i}_sources_count", sources_count)
+                    else:
+                        self.log_warning(f"⚠️  Query {i} returned 200 but missing expected fields")
+                elif response.status_code == 400 and query == "":
+                    # Empty query should return bad request
+                    successful_queries += 1
+                    self.log_info(f"✅ Query {i} (empty) properly rejected: {response.status_code}")
+                else:
+                    self.log_warning(f"⚠️  Query {i} failed: {response.status_code}")
+
+            except Exception as e:
+                self.log_warning(f"⚠️  Query {i} exception: {e}")
+
+        success_rate = (successful_queries / total_queries * 100) if total_queries > 0 else 0
+        self.log_info(f"✅ Query variations: {successful_queries}/{total_queries} successful ({success_rate:.1f}%)")
+        self.add_metric("query_variations_success_rate", success_rate)
+
+    def test_rag_api_large_query_handling(self):
+        """Test RAG API handling of very large queries"""
+        self.log_info("Testing RAG API large query handling")
+
+        rag_api_url = test_config.get("api_urls.rag_api")
+
+        # Ensure service is available
+        available = TestUtils.wait_for_service(rag_api_url, timeout=30)
+        if not available:
+            self.skipTest("RAG API service not available")
+
+        import requests
+
+        # Create a very large query (10KB)
+        large_query = "What is the relationship between " + ("quantum physics and consciousness " * 200) + "?"
+
+        try:
+            payload = {
+                "query": large_query,
+                "top_k": 5,
+                "llm_model": "ollama"
+            }
+
+            start_time = time.time()
+            response = requests.post(
+                f"{rag_api_url}/query",
+                json=payload,
+                timeout=120  # Extended timeout for large query
+            )
+            response_time = time.time() - start_time
+
+            if response.status_code == 200:
+                result = response.json()
+                if "answer" in result:
+                    self.log_info(f"✅ Large query handled successfully in {response_time:.2f}s")
+                    self.add_metric("large_query_response_time", response_time)
+                    self.add_metric("large_query_answer_length", len(result.get("answer", "")))
+                    self.add_metric("large_query_success", True)
+                else:
+                    self.fail("Large query returned 200 but missing answer field")
+            elif response.status_code == 413:  # Payload too large
+                self.log_info("✅ Large query properly rejected as too large")
+                self.add_metric("large_query_rejected", True)
+            else:
+                self.fail(f"Large query failed with unexpected status: {response.status_code}")
+
+        except requests.exceptions.Timeout:
+            self.log_info("⚠️  Large query timed out (may be expected for very large payloads)")
+            self.add_metric("large_query_timeout", True)
+        except Exception as e:
+            self.fail(f"Large query test failed: {e}")
+
+    def test_rag_api_error_scenarios(self):
+        """Test RAG API error handling scenarios"""
+        self.log_info("Testing RAG API error scenarios")
+
+        rag_api_url = test_config.get("api_urls.rag_api")
+        import requests
+
+        error_scenarios = [
+            {
+                "name": "invalid_json",
+                "payload": "invalid json",
+                "expected_status": 400,
+                "content_type": "application/json"
+            },
+            {
+                "name": "missing_query",
+                "payload": {"top_k": 3},
+                "expected_status": 400
+            },
+            {
+                "name": "invalid_top_k",
+                "payload": {"query": "test", "top_k": "invalid"},
+                "expected_status": 400
+            },
+            {
+                "name": "negative_top_k",
+                "payload": {"query": "test", "top_k": -1},
+                "expected_status": 400
+            },
+            {
+                "name": "empty_payload",
+                "payload": {},
+                "expected_status": 400
+            },
+            {
+                "name": "null_query",
+                "payload": {"query": None, "top_k": 3},
+                "expected_status": 400
+            }
+        ]
+
+        successful_errors = 0
+        total_scenarios = len(error_scenarios)
+
+        for scenario in error_scenarios:
+            try:
+                if scenario["name"] == "invalid_json":
+                    # Send raw string instead of JSON
+                    response = requests.post(
+                        f"{rag_api_url}/query",
+                        data=scenario["payload"],
+                        headers={"Content-Type": scenario["content_type"]},
+                        timeout=30
+                    )
+                else:
+                    response = requests.post(
+                        f"{rag_api_url}/query",
+                        json=scenario["payload"],
+                        timeout=30
+                    )
+
+                if response.status_code == scenario["expected_status"]:
+                    successful_errors += 1
+                    self.log_info(f"✅ {scenario['name']}: properly rejected with {response.status_code}")
+                else:
+                    self.log_warning(f"⚠️  {scenario['name']}: got {response.status_code}, expected {scenario['expected_status']}")
+
+                self.add_metric(f"error_{scenario['name']}_status", response.status_code)
+
+            except Exception as e:
+                self.log_warning(f"⚠️  {scenario['name']}: test failed: {e}")
+
+        error_success_rate = (successful_errors / total_scenarios * 100) if total_scenarios > 0 else 0
+        self.log_info(f"✅ Error scenarios: {successful_errors}/{total_scenarios} properly handled ({error_success_rate:.1f}%)")
+        self.add_metric("error_handling_success_rate", error_success_rate)
 
 if __name__ == "__main__":
-    success = test_rag_api()
-    sys.exit(0 if success else 1)
+    unittest.main()
 

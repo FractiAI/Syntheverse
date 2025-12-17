@@ -1,15 +1,47 @@
-# Layer 2 - PoD Evaluator and Token Allocator
+# Layer 2 - Proof-of-Contribution (PoC) and Proof-of-Discovery (PoD) Systems
 
-Layer 2 components for evaluating Proof-of-Discovery (PoD) submissions and allocating SYNTH tokens. This layer uses direct Grok API calls for evaluation and connects to Layer 1 blockchain for token distribution.
+Layer 2 contains two evaluation systems for Syntheverse contributions and discoveries:
+
+1. **PoC System**: Archive-first evaluation with multi-metal contributions and sandbox map visualization
+2. **PoD System**: Legacy evaluation system for discovery-based submissions
+
+Both systems use direct Grok API calls and connect to Layer 1 blockchain for token distribution.
 
 ## Status
 
-✅ **Fully Operational** - Complete PoD evaluation system with direct Grok API integration, token allocation, and persistent tokenomics state.
+✅ **PoC System**: Complete archive-first evaluation with multi-metal support, sandbox map, and persistent state
+✅ **PoD System**: Legacy evaluation system maintained for backward compatibility
 
 ## Components
 
-### 1. PoD Server (`pod_server.py`)
-Main server that orchestrates the evaluation and allocation process:
+### PoC System (Proof of Contribution)
+
+#### 1. PoC Server (`poc_server.py`)
+Archive-first contribution evaluation system:
+- **Archive-First Evaluation**: Redundancy checks against entire contribution archive
+- **Multi-Metal Support**: Gold/Silver/Copper contributions in single submission
+- **Lifecycle Tracking**: DRAFT → SUBMITTED → EVALUATING → QUALIFIED/UNQUALIFIED
+- **Sandbox Map Integration**: Generates visualization data for network graphs
+- **Grok API Integration**: Direct LLM calls for evaluation
+
+#### 2. PoC Archive (`poc_archive.py`)
+Persistent storage for all contributions:
+- **Archive-First Rule**: Stores ALL contributions regardless of status
+- **Content Hashing**: Prevents exact duplicates
+- **Multi-Metal Indexing**: Tracks Gold/Silver/Copper by contributor and metal
+- **Lifecycle Management**: Manages contribution status transitions
+
+#### 3. Sandbox Map (`sandbox_map.py`)
+Visualization system for contribution relationships:
+- **Overlap Detection**: Calculates similarity between contributions
+- **Redundancy Analysis**: Identifies highly similar submissions
+- **Network Generation**: Creates nodes and edges for frontend visualization
+- **Statistics**: Provides metal distribution and contributor metrics
+
+### PoD System (Proof of Discovery)
+
+#### 4. PoD Server (`pod_server.py`)
+Legacy discovery evaluation system:
 - **Submission Handling**: Receives PoD submissions with PDFs or text content
 - **Grok API Integration**: Direct Grok API calls for HHFE-based evaluation
 - **Evaluation Parsing**: Extracts scores from Grok API responses (markdown + JSON)
@@ -17,7 +49,21 @@ Main server that orchestrates the evaluation and allocation process:
 - **Report Generation**: Creates comprehensive PoD evaluation reports
 - **Duplicate Prevention**: Tracks submissions to prevent duplicate rewards
 
-### 2. Tokenomics State (`tokenomics_state.py`)
+#### 5. Evaluator (`evaluator/pod_evaluator.py`)
+PoD evaluation logic:
+- Evaluates submissions against Syntheverse criteria
+- Uses direct Grok API calls for evaluation
+- Generates evaluation reports
+
+#### 6. Allocator (`allocator/token_allocator.py`)
+Token allocation calculations:
+- Implements tokenomics rules and epoch-based distribution
+- Calculates rewards with tier multipliers
+- Manages token allocation schedules
+
+### Shared Components
+
+#### 7. Tokenomics State (`tokenomics_state.py`)
 Persistent state manager for token distribution:
 - **Epoch Balances**: Tracks available tokens per epoch (Founder, Pioneer, Community, Ecosystem)
 - **Coherence Density**: Tracks total coherence density for halving calculations
@@ -25,57 +71,102 @@ Persistent state manager for token distribution:
 - **Contributor Balances**: Maintains contributor token balances
 - **State Persistence**: Automatically saves/loads state from JSON file
 
-### 3. Evaluator (`evaluator/pod_evaluator.py`)
-PoD evaluation logic (scaffold for future enhancements):
-- Evaluates submissions against Syntheverse criteria
-- Uses direct Grok API calls for evaluation
-- Generates evaluation reports
-
-### 4. Allocator (`allocator/token_allocator.py`)
-Token allocation calculations:
-- Implements tokenomics rules and epoch-based distribution
-- Calculates rewards with tier multipliers
-- Manages token allocation schedules
-
 ## Features
 
-### PoD Evaluation
-- **HHFE Model**: Uses Hydrogen-Holographic Fractal Engine for evaluation
-- **Metrics**: Coherence (0-10000), Density (0-10000), Redundancy (0-1)
-- **PoD Score**: Calculated as `(coherence/10000) × (density/10000) × (1-redundancy) × epoch_weight × 10000`
+### PoC System Features
+
+#### Archive-First Evaluation
+- **Complete Archive**: All contributions stored regardless of status (drafts, unqualified, archived)
+- **Redundancy Detection**: Compares against entire archive, not just approved submissions
+- **Content Hashing**: Prevents exact duplicates across entire contribution history
+
+#### Multi-Metal Contributions
+- **Gold (Discovery)**: Novel findings and breakthroughs
+- **Silver (Technology)**: Technical implementations and tools
+- **Copper (Alignment)**: Alignment contributions and ecosystem support
+- **Single Submission**: One contribution can qualify for multiple metals
+
+#### Sandbox Map Visualization
+- **Network Graphs**: Interactive visualization of contribution relationships
+- **Overlap Detection**: Calculates similarity between contributions
+- **Metal Distribution**: Statistics and charts by contribution type
+- **Contributor Networks**: Collaboration and influence mapping
+
+### PoD System Features
+
+#### HHFE-Based Evaluation
+- **Hydrogen-Holographic Fractal Engine**: Comprehensive evaluation framework
+- **Metrics**: Coherence (0-10000), Density (0-10000), Novelty (0-10000)
+- **PoD Score**: `(coherence/10000) × (density/10000) × (novelty/10000) × 10000`
 - **Tier Classification**: Gold (scientific), Silver (technological), Copper (alignment)
-- **Epoch Qualification**: Based on density thresholds (Founder: ≥8000, Pioneer: ≥6000, Community: ≥4000)
+- **Epoch Qualification**: Density-based thresholds (Founder: ≥8000, Pioneer: ≥6000, etc.)
 
-### Token Allocation
-- **Epoch-Based**: Allocates from appropriate epoch pool
+### Shared Features
+
+#### Token Allocation
+- **Epoch-Based Distribution**: Founder, Pioneer, Community, Ecosystem epochs
 - **Tier Multipliers**: Gold (1000x), Silver (100x), Copper (1x)
-- **Formula**: `(PoD Score / 10000) × epoch_balance × tier_multiplier`
-- **Availability Checks**: Verifies tier availability in epoch before allocation
+- **Availability Rules**: Different tiers available in different epochs
+- **Persistent State**: Automatic saving/loading of allocation state
 
-### Persistent State
-- **State File**: `test_outputs/l2_tokenomics_state.json`
-- **Submissions Registry**: `test_outputs/l2_submissions_registry.json`
-- **Auto-Save**: State saved after each allocation
-- **Auto-Load**: State loaded on initialization
+#### Integration
+- **Direct Grok API**: No RAG dependency for evaluations
+- **Layer 1 Connection**: Sends results to blockchain for token distribution
+- **Comprehensive Reports**: Detailed evaluation and allocation reports
 
 ## Usage
 
-### Basic Evaluation
+### PoC System Usage
+
+```python
+from layer2.poc_server import PoCServer
+
+# Initialize PoC server
+server = PoCServer(
+    groq_api_key=None,  # Uses GROQ_API_KEY env var
+    archive_file="test_outputs/poc_archive.json"
+)
+
+# Submit contribution (archive-first)
+result = server.submit_contribution(
+    submission_hash="abc123...",
+    title="Multi-Metal Contribution",
+    contributor="researcher-001",
+    text_content="Content covering discovery, technology, and alignment...",
+    category="scientific"
+)
+
+# Evaluate contribution
+evaluation = server.evaluate_contribution(
+    submission_hash="abc123...",
+    progress_callback=lambda status, msg: print(f"{status}: {msg}")
+)
+
+if evaluation["success"]:
+    print(f"Metals: {evaluation['metals']}")  # ['gold', 'silver']
+    print(f"Qualified: {evaluation['qualified']}")
+    for allocation in evaluation["allocations"]:
+        print(f"{allocation['metal']}: {allocation['allocation']['reward']} SYNTH")
+
+# Get sandbox map for visualization
+map_data = server.get_sandbox_map()
+# Returns nodes, edges, and statistics for frontend
+```
+
+### PoD System Usage
 
 ```python
 from layer2.pod_server import PODServer
 
-# Initialize server
-# Note: Requires GROQ_API_KEY environment variable to be set
+# Initialize PoD server
 server = PODServer(
-    groq_api_key=None,  # Uses GROQ_API_KEY env var if None
-    output_dir="test_outputs/pod_reports",
-    tokenomics_state_file="test_outputs/l2_tokenomics_state.json"
+    groq_api_key=None,  # Uses GROQ_API_KEY env var
+    output_dir="test_outputs/pod_reports"
 )
 
 # Evaluate submission
 result = server.evaluate_submission(
-    submission_hash="abc123...",
+    submission_hash="def456...",
     title="Novel Discovery",
     text_content="Research paper content...",
     category="scientific",
@@ -93,7 +184,7 @@ if result["success"]:
         print(f"Tokens: {report['allocation']['allocation']['reward']}")
 ```
 
-### Tokenomics State
+### Tokenomics State (Shared)
 
 ```python
 # Get tokenomics statistics
@@ -146,34 +237,58 @@ The system prompt contains all the necessary context for evaluation, making exte
 ```
 layer2/
 ├── __init__.py
-├── pod_server.py              # Main PoD server
-├── tokenomics_state.py        # Tokenomics state manager
-├── requirements.txt           # Dependencies
 ├── README.md                  # This file
+├── requirements.txt           # Dependencies
+├── README_POC.md             # PoC system quick start
+│
+├── poc_server.py             # PoC server (archive-first, multi-metal)
+├── poc_archive.py             # PoC archive system
+├── sandbox_map.py             # Sandbox map visualization
+│
+├── pod_server.py             # PoD server (legacy)
+├── tokenomics_state.py        # Tokenomics state manager (shared)
+│
 ├── evaluator/
-│   └── pod_evaluator.py      # Evaluation logic
+│   └── pod_evaluator.py      # PoD evaluation logic
 └── allocator/
     └── token_allocator.py    # Token allocation logic
 ```
 
 ## Output Files
 
-### PoD Reports
-Saved to `test_outputs/pod_reports/`:
-- `{hash}_{timestamp}.json` - Individual evaluation reports
-- Contains: submission, evaluation, allocation, epoch status
+### PoC System Outputs
+- `test_outputs/poc_archive.json` - Complete contribution archive
+- `test_outputs/poc_reports/` - Evaluation reports with multi-metal allocations
 
-### State Files
-- `test_outputs/l2_tokenomics_state.json` - Tokenomics state
-- `test_outputs/l2_submissions_registry.json` - Submissions registry
+### PoD System Outputs
+- `test_outputs/pod_reports/` - Individual PoD evaluation reports
+- `test_outputs/l2_submissions_registry.json` - PoD submissions registry
 
-## Evaluation Flow
+### Shared Outputs
+- `test_outputs/l2_tokenomics_state.json` - Tokenomics state (epochs, balances, history)
+
+## Evaluation Flows
+
+### PoC Evaluation Flow (Archive-First)
+
+1. **Archive Submission**: Contribution added to archive as DRAFT
+2. **Status Update**: Changed to SUBMITTED
+3. **Archive-First Check**: Compare against ENTIRE archive (not just approved)
+4. **Redundancy Analysis**: Calculate similarity with existing contributions
+5. **LLM Evaluation**: Grok API evaluates with archive context
+6. **Metal Detection**: Identify Gold/Silver/Copper components
+7. **Qualification**: Determine if contribution qualifies
+8. **Multi-Metal Allocation**: Calculate allocations for each metal
+9. **Archive Update**: Update contribution with evaluation results
+10. **Sandbox Map Update**: Generate visualization data
+
+### PoD Evaluation Flow (Legacy)
 
 1. **Submission Received**: PDF or text content submitted
 2. **Redundancy Check**: Check for duplicate submissions via content hash
 3. **Evaluation Request**: Send artifact to Grok API with PoD evaluation prompt
 4. **Response Parsing**: Extract JSON from markdown + JSON response
-5. **Score Calculation**: Calculate PoD score from metrics
+5. **Score Calculation**: Calculate PoD score from coherence/density/novelty
 6. **Epoch Qualification**: Determine qualified epoch from density
 7. **Tier Classification**: Classify as Gold/Silver/Copper
 8. **Token Allocation**: Calculate tokens using tokenomics state

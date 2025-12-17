@@ -15,6 +15,7 @@ pip-delete-this-directory.txt
 src/data/pdfs/*.pdf
 src/data/parsed/*.json
 src/data/vectorized/embeddings/*.json
+!src/data/vectorized/embeddings/syntheverse_seed.json
 src/data/vectorized/metadata/*.json
 src/api/poc-api/uploads/*.pdf
 src/api/test_outputs/*.json

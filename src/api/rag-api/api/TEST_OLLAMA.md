@@ -8,7 +8,7 @@ Run the test script:
 
 ```bash
 cd rag-api/api
-python3 test_ollama.py
+python3 ollama_check.py
 ```
 
 ## What the Test Does

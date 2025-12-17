@@ -356,7 +356,7 @@ class SandboxMap:
             "contributors": {
                 contrib: {
                     "total_contributions": len(hashes),
-                    "metals": list(metals),
+                    "metals": list(contributor_metals[contrib]),
                     "contribution_hashes": hashes,
                 }
                 for contrib, hashes in contributor_contributions.items()

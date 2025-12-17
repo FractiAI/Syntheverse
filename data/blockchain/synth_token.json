@@ -1,0 +1,19 @@
+{
+  "epoch_balances": {
+    "founder": 45000000000000.0,
+    "pioneer": 9000000000000.0,
+    "community": 18000000000000.0,
+    "ecosystem": 18000000000000.0
+  },
+  "balances": {},
+  "current_epoch": "founder",
+  "epoch_progression": {
+    "founder": false,
+    "pioneer": false,
+    "community": false,
+    "ecosystem": false
+  },
+  "founder_halving_count": 0,
+  "total_coherence_density": 0.0,
+  "reward_history": []
+}

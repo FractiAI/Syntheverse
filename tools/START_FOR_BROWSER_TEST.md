@@ -38,7 +38,7 @@ npm run dev
 You should see:
 ```
  ▲ Next.js 14.x.x
- - Local:        http://localhost:3000
+ - Local:        http://localhost:3001
  - Ready in X seconds
 ```
 
@@ -47,13 +47,13 @@ You should see:
 ## Step 3: Open in Browser
 
 1. Open your web browser (Chrome, Firefox, Safari, etc.)
-2. Navigate to: **http://localhost:3000**
+2. Navigate to: **http://localhost:3001**
 3. You should see the Syntheverse PoC UI!
 
 ## Step 4: Test the UI
 
 ### Dashboard
-- Go to **http://localhost:3000/dashboard**
+- Go to **http://localhost:3001/dashboard**
 - You should see statistics and charts (may be empty if no contributions yet)
 
 ### Submit a Contribution
@@ -93,8 +93,8 @@ If you see "port already in use":
 # Kill process on port 5001 (API)
 lsof -ti:5001 | xargs kill -9
 
-# Kill process on port 3000 (Frontend)
-lsof -ti:3000 | xargs kill -9
+# Kill process on port 3001 (Frontend)
+lsof -ti:3001 | xargs kill -9
 ```
 
 ### API Not Responding
@@ -115,7 +115,7 @@ lsof -ti:3000 | xargs kill -9
 
 - [ ] API server running (Terminal 1)
 - [ ] Frontend running (Terminal 2)
-- [ ] Browser opened to http://localhost:3000
+- [ ] Browser opened to http://localhost:3001
 - [ ] Can see Dashboard
 - [ ] Can submit a contribution
 - [ ] Can view submission detail

@@ -7,6 +7,7 @@ Outputs evaluation results and allocation reports.
 
 import os
 import json
+import logging
 from typing import Dict, Optional, List, Callable
 from datetime import datetime
 from pathlib import Path
@@ -14,14 +15,17 @@ from pathlib import Path
 # Try to load .env file if python-dotenv is available
 try:
     from dotenv import load_dotenv
-    # Load .env from project root (go up two levels from layer2/)
-    env_path = Path(__file__).parent.parent / ".env"
+    # Load .env from project root (go up three levels from layer2/)
+    env_path = Path(__file__).parent.parent.parent / ".env"
     if env_path.exists():
         load_dotenv(env_path)
 except ImportError:
     pass  # python-dotenv not installed, rely on system environment variables
 
 from .tokenomics_state import TokenomicsState, Epoch, ContributionTier
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 
 class PODServer:
@@ -59,7 +63,7 @@ class PODServer:
             )
             # Test connection
             self.groq_client.models.list()
-            print("✓ Grok API initialized successfully")
+            logger.info("Grok API initialized successfully")
         except Exception as e:
             raise ValueError(f"Failed to initialize Grok API client: {e}")
         

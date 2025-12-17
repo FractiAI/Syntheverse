@@ -17,34 +17,37 @@ from pathlib import Path
 def clear_persistent_memory():
     """Clear all persistent memory files."""
     
-    base_dir = Path(__file__).parent
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    
     files_to_remove = []
     dirs_to_clear = []
     
     # L2 State Files
-    l2_state_file = base_dir / "test_outputs" / "l2_tokenomics_state.json"
-    l2_registry_file = base_dir / "test_outputs" / "l2_submissions_registry.json"
+    l2_state_file = project_root / "test_outputs" / "l2_tokenomics_state.json"
+    l2_registry_file = project_root / "test_outputs" / "l2_submissions_registry.json"
     
     # L1 State Files
-    l1_data_dir = base_dir / "test_outputs" / "blockchain"
+    l1_data_dir = project_root / "test_outputs" / "blockchain"
     l1_blockchain_file = l1_data_dir / "blockchain.json"
     l1_token_file = l1_data_dir / "synth_token.json"
     l1_pod_file = l1_data_dir / "pod_contract.json"
     
-    # UI Web State Files
-    ui_data_dir = base_dir / "ui_web" / "test_outputs" / "blockchain"
-    ui_blockchain_file = ui_data_dir / "blockchain.json"
-    ui_token_file = ui_data_dir / "synth_token.json"
-    ui_pod_file = ui_data_dir / "pod_contract.json"
+    # Legacy Web State Files (web-legacy)
+    web_legacy_data_dir = project_root / "src" / "frontend" / "web-legacy" / "test_outputs" / "blockchain"
+    web_legacy_blockchain_file = web_legacy_data_dir / "blockchain.json"
+    web_legacy_token_file = web_legacy_data_dir / "synth_token.json"
+    web_legacy_pod_file = web_legacy_data_dir / "pod_contract.json"
     
-    # UI Submission History Files
-    ui_submissions_history = base_dir / "ui_web" / "test_outputs" / "submissions_history.json"
-    ui_l2_registry = base_dir / "ui_web" / "test_outputs" / "l2_submissions_registry.json"
-    test_submissions_history = base_dir / "test_outputs" / "submissions_history.json"
+    # Legacy Submission History Files
+    web_legacy_submissions_history = project_root / "src" / "frontend" / "web-legacy" / "test_outputs" / "submissions_history.json"
+    web_legacy_l2_registry = project_root / "src" / "frontend" / "web-legacy" / "test_outputs" / "l2_submissions_registry.json"
+    test_submissions_history = project_root / "test_outputs" / "submissions_history.json"
     
-    # PoD Reports Directories
-    pod_reports_dir = base_dir / "test_outputs" / "pod_reports"
-    ui_pod_reports_dir = base_dir / "ui_web" / "test_outputs" / "pod_reports"
+    # PoD/PoC Reports Directories
+    pod_reports_dir = project_root / "test_outputs" / "pod_reports"
+    poc_reports_dir = project_root / "test_outputs" / "poc_reports"
+    web_legacy_pod_reports_dir = project_root / "src" / "frontend" / "web-legacy" / "test_outputs" / "pod_reports"
     
     # Collect all files to remove
     files_to_remove.extend([
@@ -53,18 +56,19 @@ def clear_persistent_memory():
         l1_blockchain_file,
         l1_token_file,
         l1_pod_file,
-        ui_blockchain_file,
-        ui_token_file,
-        ui_pod_file,
-        ui_submissions_history,
-        ui_l2_registry,
+        web_legacy_blockchain_file,
+        web_legacy_token_file,
+        web_legacy_pod_file,
+        web_legacy_submissions_history,
+        web_legacy_l2_registry,
         test_submissions_history,
     ])
     
     # Collect directories to clear
     dirs_to_clear.extend([
         pod_reports_dir,
-        ui_pod_reports_dir,
+        poc_reports_dir,
+        web_legacy_pod_reports_dir,
     ])
     
     print("Clearing persistent memory files...")
@@ -76,12 +80,12 @@ def clear_persistent_memory():
         if file_path.exists():
             try:
                 file_path.unlink()
-                print(f"✓ Removed: {file_path.relative_to(base_dir)}")
+                print(f"✓ Removed: {file_path.relative_to(project_root)}")
                 removed_count += 1
             except Exception as e:
-                print(f"✗ Failed to remove {file_path.relative_to(base_dir)}: {e}")
+                print(f"✗ Failed to remove {file_path.relative_to(project_root)}: {e}")
         else:
-            print(f"○ Not found: {file_path.relative_to(base_dir)}")
+            print(f"○ Not found: {file_path.relative_to(project_root)}")
     
     # Clear directories (but keep the directory structure)
     for dir_path in dirs_to_clear:
@@ -91,16 +95,16 @@ def clear_persistent_memory():
                 for file_path in dir_path.glob("*"):
                     if file_path.is_file():
                         file_path.unlink()
-                        print(f"✓ Removed: {file_path.relative_to(base_dir)}")
+                        print(f"✓ Removed: {file_path.relative_to(project_root)}")
                         removed_count += 1
                     elif file_path.is_dir():
                         shutil.rmtree(file_path)
-                        print(f"✓ Removed directory: {file_path.relative_to(base_dir)}")
-                print(f"✓ Cleared directory: {dir_path.relative_to(base_dir)}")
+                        print(f"✓ Removed directory: {file_path.relative_to(project_root)}")
+                print(f"✓ Cleared directory: {dir_path.relative_to(project_root)}")
             except Exception as e:
-                print(f"✗ Failed to clear {dir_path.relative_to(base_dir)}: {e}")
+                print(f"✗ Failed to clear {dir_path.relative_to(project_root)}: {e}")
         else:
-            print(f"○ Directory not found: {dir_path.relative_to(base_dir)}")
+            print(f"○ Directory not found: {dir_path.relative_to(project_root)}")
     
     print("=" * 60)
     print(f"✓ Cleared {removed_count} file(s)")

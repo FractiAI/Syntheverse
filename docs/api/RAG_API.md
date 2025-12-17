@@ -1,10 +1,11 @@
 # RAG API Documentation
 
-REST API for querying the Syntheverse RAG system using local embeddings. No API calls required for processing.
+REST API for querying the Syntheverse RAG system using local embeddings for retrieval and LLM APIs for answer generation.
 
 ## Features
 
-- ✅ **Local Processing**: Uses local embeddings - no external API calls
+- ✅ **Local Retrieval**: Uses local embeddings for fast semantic search
+- ✅ **LLM Integration**: Groq (primary), HuggingFace, and Ollama for answer generation
 - ✅ **Fast Search**: Cosine similarity search on pre-computed embeddings
 - ✅ **REST API**: Standard REST endpoints for easy integration
 - ✅ **Web UI**: Built-in web interface for interactive queries
@@ -196,19 +197,51 @@ Default: `./vectorized/embeddings`
 
 Ensure this directory contains the vectorized JSON files from `vectorize_parsed_chunks_simple.py`.
 
+## LLM Providers
+
+The RAG API supports multiple LLM providers for answer generation:
+
+### Groq (Primary - Recommended)
+- **Fast**: Sub-second response times
+- **Free**: Free tier available
+- **Model**: llama-3.1-8b-instant
+- **Setup**: Set `GROQ_API_KEY` environment variable
+
+### Ollama (Local)
+- **Free**: No API costs
+- **Local**: Runs on your machine
+- **Setup**: Install Ollama and run `ollama pull llama3.1`
+- **Performance**: 2-10 seconds per query
+
+### Hugging Face (Cloud)
+- **Cloud**: Uses Hugging Face Inference API
+- **Setup**: Set `HUGGINGFACE_API_KEY` environment variable
+- **Cost**: Varies by usage
+
+## Syntheverse Whole Brain AI
+
+The API uses a unified **Syntheverse Whole Brain AI** system prompt that integrates:
+- **Gina**: Whole Brain Integrator
+- **Leo**: Hydrogen-Holographic Fractal Engine
+- **Pru**: Outcast Hero Life-Narrative Navigator
+
+This creates a coherent, mythic, scientific, narrative, and resonant AI voice that aligns with the Syntheverse framework.
+
+Custom system prompts can be provided in the query request for specialized tasks.
+
 ## How It Works
 
 1. **Load Embeddings**: On startup, loads all vectorized chunks from JSON files
 2. **Query Embedding**: Converts user query to embedding using local model
 3. **Similarity Search**: Computes cosine similarity with all chunks
 4. **Rank Results**: Returns top-k most similar chunks
-5. **Generate Answer**: Creates answer from top chunks (template-based, no LLM)
+5. **Generate Answer**: Uses LLM (Groq/HuggingFace/Ollama) to generate answer from top chunks
 
 ## Performance
 
-- **Query Processing**: ~100-200ms per query (depends on number of chunks)
+- **Query Processing**: ~1-3 seconds per query (depends on LLM provider and number of chunks)
 - **Memory Usage**: ~500MB-1GB (depends on number of chunks and embedding model)
-- **No API Costs**: All processing is local
+- **API Costs**: Varies by LLM provider (Groq free tier available, others may have costs)
 
 ## Production Deployment
 

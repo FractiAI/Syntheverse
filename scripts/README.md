@@ -32,20 +32,31 @@ Located in `scripts/utilities/`:
 python scripts/startup/start_servers.py
 ```
 
+This starts:
+- PoC API on http://localhost:5001
+- Next.js Frontend on http://localhost:3001
+- Legacy Web UI on http://localhost:5000 (optional)
+
 ### Development
 ```bash
-# Individual component startup
+# Start PoC UI (Next.js + API)
+cd scripts/development
+./start_poc_ui.sh
+
+# Or use simple startup
 python scripts/startup/start_servers_simple.py
 ```
 
 ### Deployment
 ```bash
-# Deploy smart contracts
-python scripts/deployment/deploy_contracts.py
+# Deploy smart contracts to Anvil (local)
+cd scripts/deployment
+python deploy_contracts.py
 ```
 
 ### Maintenance
 ```bash
 # Clear persistent memory/test data
-python scripts/utilities/clear_persistent_memory.py
+cd scripts/utilities
+python clear_persistent_memory.py
 ```

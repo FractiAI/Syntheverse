@@ -1,6 +1,6 @@
 # Documentation
 
-This directory contains comprehensive documentation for the Syntheverse PoC system.
+This directory contains documentation for the Syntheverse PoC system.
 
 ## Directory Structure
 
@@ -8,7 +8,6 @@ This directory contains comprehensive documentation for the Syntheverse PoC syst
 - `architecture/` - System architecture and design documents
 - `contributors/` - Contributor guides and resources
 - `deployment/` - Deployment and configuration guides
-- `user-guides/` - User manuals and tutorials
 
 ## Key Documents
 

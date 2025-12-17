@@ -9,8 +9,12 @@ import os
 import argparse
 from pathlib import Path
 
-# Add paths
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add paths - scripts run from scripts/development/, need to go to project root
+script_dir = Path(__file__).parent
+project_root = script_dir.parent.parent
+sys.path.insert(0, str(project_root / "src" / "blockchain" / "layer1"))
+sys.path.insert(0, str(project_root / "src" / "core" / "layer2"))
+sys.path.insert(0, str(script_dir))
 
 from layer1.node import SyntheverseNode
 from layer2.pod_server import PODServer

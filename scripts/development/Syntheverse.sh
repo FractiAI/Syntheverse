@@ -80,7 +80,8 @@ start_pod_ui() {
         return 0
     fi
     
-    cd "$SCRIPT_DIR/ui_web"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    cd "$PROJECT_ROOT/src/frontend/web-legacy"
     
     # Determine Python command
     if command -v python3 &> /dev/null; then

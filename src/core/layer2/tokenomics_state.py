@@ -109,6 +109,16 @@ class TokenomicsState:
         
         # Load existing state if available
         self.load_state()
+
+    @property
+    def total_supply(self):
+        """Convenience property for accessing total supply."""
+        return self.TOTAL_SUPPLY
+
+    @property
+    def current_epoch(self):
+        """Convenience property for accessing current epoch."""
+        return self.state["current_epoch"]
     
     def load_state(self):
         """Load state from file."""

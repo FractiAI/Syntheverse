@@ -1,0 +1,289 @@
+{
+  "api_urls": {
+    "poc_api": "http://localhost:5001",
+    "rag_api": "http://localhost:8000",
+    "frontend": "http://localhost:3001",
+    "legacy_ui": "http://localhost:5000",
+    "blockchain": "http://localhost:8545"
+  },
+  "timeouts": {
+    "api_call": 30,
+    "page_load": 10,
+    "test_overall": 300,
+    "service_startup": 60,
+    "health_check": 5,
+    "file_operation": 10,
+    "database_query": 15
+  },
+  "test_data": {
+    "sample_contributor": "test-researcher-001",
+    "sample_category": "scientific",
+    "sample_title": "Fractal Cognitive Chemistry: From Awareness to Generative AI",
+    "test_email": "researcher@example.com",
+    "sample_content": "This paper explores the intersection of fractal mathematics, cognitive processes, and generative artificial intelligence. We demonstrate how fractal patterns in neural networks can enhance both coherence and novelty in AI-generated content.",
+    "complex_query": "Explain the relationship between hydrogen holography, fractal intelligence, and the Syntheverse PoC protocol in detail, including how these concepts interact within the blockchain ecosystem."
+  },
+  "test_categories": {
+    "unit": [
+      "test_core_modules",
+      "test_submission",
+      "test_rag_timeout"
+    ],
+    "integration": [
+      "test_poc_api",
+      "test_rag_api",
+      "test_rag_pod_query",
+      "test_frontend_integration"
+    ],
+    "end_to_end": [
+      "test_submission_flow",
+      "test_full_submission_flow",
+      "test_blockchain"
+    ],
+    "performance": [
+      "test_rag_timeout"
+    ],
+    "security": [
+      "test_poc_api",
+      "test_rag_api"
+    ]
+  },
+  "test_scenarios": {
+    "contribution_scenarios": [
+      {
+        "name": "gold_tier_scientific",
+        "title": "Advanced Fractal Intelligence Research",
+        "category": "scientific",
+        "expected_tier": "gold",
+        "min_coherence": 85,
+        "min_density": 80
+      },
+      {
+        "name": "silver_tier_technological",
+        "title": "Blockchain Consensus Implementation",
+        "category": "technological",
+        "expected_tier": "silver",
+        "min_coherence": 75,
+        "min_density": 70
+      },
+      {
+        "name": "copper_tier_alignment",
+        "title": "AI Safety Guidelines",
+        "category": "alignment",
+        "expected_tier": "copper",
+        "min_coherence": 65,
+        "min_density": 60
+      },
+      {
+        "name": "unqualified_content",
+        "title": "Basic Tutorial",
+        "category": "educational",
+        "expected_tier": "unqualified",
+        "min_coherence": 40,
+        "min_density": 35
+      },
+      {
+        "name": "edge_case_empty_title",
+        "title": "",
+        "category": "scientific",
+        "expected_tier": "unqualified",
+        "min_coherence": 0,
+        "min_density": 0
+      },
+      {
+        "name": "edge_case_very_long_title",
+        "title": "A Very Long Title That Exceeds Normal Length Limits And Should Be Handled Gracefully By The System Without Causing Errors Or Performance Issues When Processed Through The Evaluation Pipeline",
+        "category": "scientific",
+        "expected_tier": "copper",
+        "min_coherence": 60,
+        "min_density": 55
+      },
+      {
+        "name": "edge_case_special_characters",
+        "title": "Research on π ≈ 3.14159 & Fractal ∞ Patterns",
+        "category": "scientific",
+        "expected_tier": "silver",
+        "min_coherence": 70,
+        "min_density": 65
+      }
+    ],
+    "api_error_scenarios": [
+      {"endpoint": "/api/submit", "method": "POST", "error_type": "missing_file", "expected_status": 400, "description": "Missing PDF file in submission"},
+      {"endpoint": "/api/submit", "method": "POST", "error_type": "invalid_data", "expected_status": 422, "description": "Invalid form data structure"},
+      {"endpoint": "/api/evaluate/invalid_hash", "method": "POST", "error_type": "not_found", "expected_status": 404, "description": "Invalid submission hash"},
+      {"endpoint": "/api/archive/contributions/invalid", "method": "GET", "error_type": "not_found", "expected_status": 404, "description": "Non-existent contribution"},
+      {"endpoint": "/api/submit", "method": "GET", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method"},
+      {"endpoint": "/api/archive/contributions", "method": "POST", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method for archive"},
+      {"endpoint": "/api/evaluate/hash", "method": "GET", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method for evaluation"},
+      {"endpoint": "/api/sandbox-map", "method": "POST", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method for sandbox map"},
+      {"endpoint": "/api/tokenomics/epoch-info", "method": "POST", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method for epoch info"},
+      {"endpoint": "/api/health", "method": "POST", "error_type": "method_not_allowed", "expected_status": 405, "description": "Wrong HTTP method for health check"},
+      {"endpoint": "/api/nonexistent", "method": "GET", "error_type": "not_found", "expected_status": 404, "description": "Non-existent endpoint"},
+      {"endpoint": "/api/archive/contributions/123", "method": "GET", "error_type": "not_found", "expected_status": 404, "description": "Invalid contribution ID format"},
+      {"endpoint": "/api/submit", "method": "POST", "error_type": "too_large", "expected_status": 413, "description": "File too large"},
+      {"endpoint": "/api/submit", "method": "POST", "error_type": "unsupported_format", "expected_status": 415, "description": "Unsupported file format"}
+    ],
+    "performance_thresholds": {
+      "health_check_max_time": 2.0,
+      "api_call_max_time": 25.0,
+      "page_load_max_time": 10.0,
+      "file_operation_max_time": 5.0,
+      "database_query_max_time": 10.0,
+      "evaluation_max_time": 45.0,
+      "submission_max_time": 30.0,
+      "archive_query_max_time": 5.0,
+      "certificate_generation_max_time": 15.0,
+      "parallel_test_overhead": 2.0,
+      "retry_delay_max": 5.0
+    },
+    "load_test_scenarios": [
+      {
+        "name": "concurrent_submissions",
+        "description": "Test multiple simultaneous submissions",
+        "concurrent_users": 5,
+        "duration_seconds": 30,
+        "expected_success_rate": 0.95
+      },
+      {
+        "name": "high_frequency_health_checks",
+        "description": "Test rapid health check requests",
+        "requests_per_second": 10,
+        "duration_seconds": 60,
+        "expected_success_rate": 0.99
+      },
+      {
+        "name": "large_file_submissions",
+        "description": "Test submissions with large PDF files",
+        "file_sizes_mb": [1, 5, 10, 25],
+        "expected_success_rate": 0.90
+      }
+    ],
+    "security_test_scenarios": [
+      {
+        "name": "sql_injection_attempt",
+        "description": "Test SQL injection prevention",
+        "payload": "'; DROP TABLE contributions; --",
+        "expected_behavior": "sanitized"
+      },
+      {
+        "name": "path_traversal_attempt",
+        "description": "Test path traversal prevention",
+        "payload": "../../../etc/passwd",
+        "expected_behavior": "blocked"
+      },
+      {
+        "name": "large_payload_attack",
+        "description": "Test handling of extremely large payloads",
+        "payload_size_mb": 100,
+        "expected_behavior": "rejected"
+      },
+      {
+        "name": "rate_limit_bypass_attempt",
+        "description": "Test rate limiting effectiveness",
+        "requests_per_second": 100,
+        "expected_behavior": "throttled"
+      }
+    ]
+  },
+  "mock_responses": {
+    "rag_api_success": {
+      "query": "test query",
+      "answer": "Mock comprehensive answer about Syntheverse concepts including fractal intelligence and hydrogen holography.",
+      "sources": [
+        {"title": "Fractal Intelligence Paper", "score": 0.87, "pdf_filename": "fractal.pdf"},
+        {"title": "Hydrogen Holography Study", "score": 0.82, "pdf_filename": "hydrogen.pdf"}
+      ],
+      "processing_time": 0.15,
+      "num_sources": 2
+    },
+    "evaluation_success": {
+      "success": true,
+      "evaluation": {
+        "coherence": 87,
+        "density": 83,
+        "novelty": 79,
+        "tier": "gold",
+        "status": "approved",
+        "reasoning": "Excellent coherence and novel contribution to the field"
+      }
+    },
+    "poc_api_stats": {
+      "total_contributions": 42,
+      "contributions_by_status": {"approved": 38, "pending": 4, "rejected": 0},
+      "contributions_by_metal": {"gold": 12, "silver": 15, "copper": 11, "unqualified": 4}
+    }
+  },
+  "reporting": {
+    "save_results": true,
+    "results_dir": "results",
+    "include_metrics": true,
+    "include_logs": true,
+    "generate_html_report": true,
+    "export_json": true,
+    "export_xml": true,
+    "retention_days": 30,
+    "compress_old_results": true,
+    "include_timestamps": true,
+    "generate_charts": false
+  },
+  "execution": {
+    "parallel_workers": 4,
+    "default_timeout": 300,
+    "retry_enabled": true,
+    "max_retry_attempts": 3,
+    "retry_delay": 1.0,
+    "fail_fast": false,
+    "randomize_order": false,
+    "capture_output": true,
+    "verbose_output": true
+  },
+  "environment": {
+    "required_python_version": "3.8",
+    "required_node_version": "18",
+    "required_services": ["poc_api", "rag_api", "frontend"],
+    "optional_services": ["legacy_ui", "blockchain"],
+    "check_dependencies": true,
+    "auto_install_deps": false,
+    "validate_environment": true,
+    "create_virtual_env": false,
+    "isolate_tests": true
+  },
+  "debug": {
+    "verbose_logging": false,
+    "save_request_responses": false,
+    "mock_external_calls": false,
+    "trace_exceptions": true,
+    "debug_mode": false,
+    "profile_performance": false,
+    "log_level": "INFO",
+    "save_screenshots": false
+  },
+  "coverage": {
+    "minimum_coverage": 90,
+    "include_patterns": ["src/**/*.py"],
+    "exclude_patterns": ["*/tests/*", "*/__pycache__/*", "*/migrations/*"],
+    "generate_html_report": true,
+    "generate_xml_report": true,
+    "fail_under_threshold": true,
+    "show_missing_lines": true,
+    "branch_coverage": false
+  },
+  "test_filters": {
+    "include_categories": ["unit", "integration", "end_to_end"],
+    "exclude_categories": [],
+    "include_markers": [],
+    "exclude_markers": ["slow", "flaky"],
+    "include_files": [],
+    "exclude_files": [],
+    "run_only_failed": false,
+    "run_only_new": false
+  },
+  "validation": {
+    "strict_mode": true,
+    "validate_test_structure": true,
+    "check_docstrings": true,
+    "validate_imports": true,
+    "check_naming_conventions": true,
+    "validate_assertions": true
+  }
+}

@@ -92,7 +92,8 @@ start_rag_api() {
         return 0
     fi
     
-    cd "$SCRIPT_DIR/rag-api/api"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    cd "$PROJECT_ROOT/src/api/rag-api/api"
     
     # Determine Python command
     if command -v python3 &> /dev/null; then
@@ -105,10 +106,10 @@ start_rag_api() {
     fi
     
     # Load environment variables from .env if it exists
-    if [ -f "$SCRIPT_DIR/.env" ]; then
+    if [ -f "$PROJECT_ROOT/.env" ]; then
         echo -e "${YELLOW}Loading environment variables from .env...${NC}"
         set -a
-        source "$SCRIPT_DIR/.env"
+        source "$PROJECT_ROOT/.env"
         set +a
     fi
     
@@ -156,7 +157,7 @@ start_pod_ui() {
         return 0
     fi
     
-    cd "$SCRIPT_DIR/ui_web"
+    cd "$PROJECT_ROOT/src/frontend/web-legacy"
     
     # Determine Python command
     if command -v python3 &> /dev/null; then

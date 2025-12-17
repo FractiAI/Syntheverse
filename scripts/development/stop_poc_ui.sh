@@ -48,10 +48,10 @@ if [ -f "/tmp/poc_frontend.pid" ]; then
     fi
 fi
 
-# Kill any process on port 3000
-if lsof -ti:3000 > /dev/null 2>&1; then
-    echo -e "${YELLOW}Killing processes on port 3000...${NC}"
-    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+# Kill any process on port 3001
+if lsof -ti:3001 > /dev/null 2>&1; then
+    echo -e "${YELLOW}Killing processes on port 3001...${NC}"
+    lsof -ti:3001 | xargs kill -9 2>/dev/null || true
 fi
 
 # Kill any remaining Next.js processes

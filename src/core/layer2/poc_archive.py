@@ -15,7 +15,7 @@ from enum import Enum
 class ContributionStatus(Enum):
     """Contribution lifecycle status."""
     DRAFT = "draft"                    # Initial submission, not yet evaluated
-    SUBMITTED = "submitted"            # Submitted for evaluation
+    PENDING = "pending"                # Submitted for evaluation, waiting to be processed
     EVALUATING = "evaluating"          # Currently being evaluated
     QUALIFIED = "qualified"            # Passed evaluation, eligible for allocation
     UNQUALIFIED = "unqualified"        # Failed evaluation thresholds
@@ -91,6 +91,11 @@ class PoCArchive:
                         }
             except Exception as e:
                 print(f"Warning: Failed to load archive: {e}")
+
+    @property
+    def contributions(self):
+        """Convenience property for accessing contributions."""
+        return self.archive["contributions"]
     
     def save_archive(self):
         """Save archive to file."""

@@ -40,7 +40,7 @@ curl http://localhost:11434/api/tags
 
 # Or use our test script
 cd rag-api/api
-python3 test_ollama.py
+python3 ollama_check.py
 ```
 
 ## Expected Behavior

@@ -135,10 +135,10 @@ class PoCServer:
             is_test=is_test
         )
         
-        # Update status to SUBMITTED
+        # Update status to PENDING
         self.archive.update_contribution(
             submission_hash,
-            status=ContributionStatus.SUBMITTED
+            status=ContributionStatus.PENDING
         )
 
         # Automatically evaluate the contribution

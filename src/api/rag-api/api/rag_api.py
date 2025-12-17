@@ -18,6 +18,15 @@ from pydantic import BaseModel
 import time
 import requests
 
+# Load environment variables from .env file in project root
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent.parent.parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
+except ImportError:
+    pass  # python-dotenv not installed, rely on system environment variables
+
 
 class QueryRequest(BaseModel):
     query: str
@@ -259,8 +268,12 @@ Awaiting operator input."""
         self._check_cloud_apis()
         
         # Check Ollama availability (fallback)
-        self._check_ollama()
-        
+        try:
+            self._check_ollama()
+        except RuntimeError as e:
+            print(f"⚠️  Ollama connection failed: {e}")
+            print("   Continuing without Ollama (will use other available providers)")
+
         # Determine default LLM provider
         if self.groq_available:
             self.default_llm = "groq"
@@ -288,6 +301,10 @@ Awaiting operator input."""
     
     def _check_ollama(self):
         """Check if Ollama is available and get available models."""
+        def _looks_like_embedding_model(model_name: str) -> bool:
+            name = (model_name or "").lower()
+            return any(token in name for token in ["embedding", "embed"])
+
         try:
             response = requests.get(f"{self.ollama_url}/api/tags", timeout=5)
             if response.status_code == 200:
@@ -295,13 +312,26 @@ Awaiting operator input."""
                 if models:
                     model_names = [m['name'] for m in models]
                     if self.ollama_model is None:
-                        # Auto-select first available model
-                        self.ollama_model = model_names[0]
-                        print(f"ℹ️  Auto-selected Ollama model: {self.ollama_model}")
+                        # Auto-select a generation-capable model (avoid embedding-only models)
+                        generation_candidates = [m for m in model_names if not _looks_like_embedding_model(m)]
+                        if not generation_candidates:
+                            raise RuntimeError(
+                                "Ollama is running, but only embedding models were found. "
+                                "Install a generation model (e.g. `ollama pull llama3.2`) "
+                                "or rely on Groq/HuggingFace providers."
+                            )
+                        self.ollama_model = generation_candidates[0]
+                        print(f"ℹ️  Auto-selected Ollama generation model: {self.ollama_model}")
                     elif self.ollama_model not in model_names:
                         # Use first available if specified not found
-                        self.ollama_model = model_names[0]
+                        generation_candidates = [m for m in model_names if not _looks_like_embedding_model(m)]
+                        self.ollama_model = generation_candidates[0] if generation_candidates else model_names[0]
                         print(f"⚠️  Specified model not found, using: {self.ollama_model}")
+                    elif _looks_like_embedding_model(self.ollama_model):
+                        raise RuntimeError(
+                            f"Configured Ollama model '{self.ollama_model}' appears to be embedding-only "
+                            "and does not support generation. Choose a different model (e.g. llama3.2)."
+                        )
                     self.ollama_available = True
                     print(f"✓ Ollama connected - Using model: {self.ollama_model}")
                 else:
@@ -362,12 +392,26 @@ Awaiting operator input."""
         self.chunks_by_pdf = {}
         
         if not self.embeddings_dir.exists():
-            raise ValueError(f"Embeddings directory not found: {self.embeddings_dir}")
-        
+            raise ValueError(
+                f"Embeddings directory not found: {self.embeddings_dir}\n"
+                "Please ensure you have run the data pipeline:\n"
+                "1. Run scraper to download PDFs: cd src/api/rag-api/scraper && python scrape_pdfs.py\n"
+                "2. Parse PDFs into chunks: cd src/api/rag-api/parser && python parse_all_pdfs.py\n"
+                "3. Create embeddings: cd src/api/rag-api/vectorizer && python vectorize_parsed_chunks_simple.py\n"
+                "Or use the complete pipeline script: scripts/run_complete_pipeline.sh"
+            )
+
         json_files = list(self.embeddings_dir.glob("*.json"))
-        
+
         if not json_files:
-            raise ValueError(f"No embedding files found in {self.embeddings_dir}")
+            raise ValueError(
+                f"No embedding files (*.json) found in {self.embeddings_dir}\n"
+                "The embeddings directory exists but is empty. Please run the data pipeline:\n"
+                "1. Run scraper to download PDFs: cd src/api/rag-api/scraper && python scrape_pdfs.py\n"
+                "2. Parse PDFs into chunks: cd src/api/rag-api/parser && python parse_all_pdfs.py\n"
+                "3. Create embeddings: cd src/api/rag-api/vectorizer && python vectorize_parsed_chunks_simple.py\n"
+                "Or use the complete pipeline script: scripts/run_complete_pipeline.sh"
+            )
         
         for json_file in json_files:
             try:
@@ -651,7 +695,19 @@ Answer (synthesize from context using Gina × Leo × Pru framework):"""
         elif llm_model == "huggingface" and self.huggingface_available:
             return self._generate_with_huggingface(query, context, system_prompt)
         elif llm_model == "ollama" and self.ollama_available:
-            return self._generate_with_ollama(query, context, system_prompt)
+            # If Ollama generation fails (e.g. embedding-only model, runtime error),
+            # fall back to an available cloud provider rather than failing the whole request.
+            try:
+                return self._generate_with_ollama(query, context, system_prompt)
+            except Exception as e:
+                err = str(e)
+                if self.groq_available:
+                    print(f"⚠️  Ollama generation failed ({err}); falling back to Groq")
+                    return self._generate_with_groq(query, context, system_prompt)
+                if self.huggingface_available:
+                    print(f"⚠️  Ollama generation failed ({err}); falling back to Hugging Face")
+                    return self._generate_with_huggingface(query, context, system_prompt)
+                raise
         else:
             # Fallback: try available providers in order
             if self.groq_available:
@@ -730,7 +786,7 @@ async def startup_event():
     try:
         # Get absolute path to embeddings directory
         api_dir = Path(__file__).parent
-        embeddings_path = api_dir.parent.parent / "data" / "vectorized" / "embeddings"
+        embeddings_path = api_dir.parent.parent.parent / "data" / "vectorized" / "embeddings"
         
         rag_engine = RAGEngine(
             embeddings_dir=str(embeddings_path),

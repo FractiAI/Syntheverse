@@ -33,16 +33,17 @@ if lsof -ti:5001 > /dev/null 2>&1; then
     echo -e "${YELLOW}Killing processes on port 5001...${NC}"
     kill $(lsof -ti:5001) 2>/dev/null || true
 fi
-if lsof -ti:3000 > /dev/null 2>&1; then
-    echo -e "${YELLOW}Killing processes on port 3000...${NC}"
-    kill $(lsof -ti:3000) 2>/dev/null || true
+if lsof -ti:3001 > /dev/null 2>&1; then
+    echo -e "${YELLOW}Killing processes on port 3001...${NC}"
+    kill $(lsof -ti:3001) 2>/dev/null || true
 fi
 # Wait for ports to be freed
 sleep 2
 echo ""
 
 echo -e "${BLUE}Starting API server...${NC}"
-    cd "$SCRIPT_DIR/ui-poc-api"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    cd "$PROJECT_ROOT/src/api/poc-api"
     
     # Check if virtual environment exists
     if [ ! -d "venv" ]; then
@@ -85,7 +86,7 @@ echo -e "${BLUE}Starting API server...${NC}"
     done
 
 echo -e "${BLUE}Starting Next.js frontend...${NC}"
-    cd "$SCRIPT_DIR/ui-poc"
+    cd "$PROJECT_ROOT/src/frontend/poc-frontend"
     
     # Install dependencies if needed
     if [ ! -d "node_modules" ]; then
@@ -93,13 +94,13 @@ echo -e "${BLUE}Starting Next.js frontend...${NC}"
         npm install
     fi
     
-    # Start frontend in background
-    npm run dev > /tmp/poc_frontend.log 2>&1 &
+    # Start frontend in background (Next.js defaults to 3000, but we'll set PORT env var)
+    PORT=3001 npm run dev > /tmp/poc_frontend.log 2>&1 &
     FRONTEND_PID=$!
     echo $FRONTEND_PID > /tmp/poc_frontend.pid
     
     echo -e "${GREEN}✓ Frontend started (PID: $FRONTEND_PID)${NC}"
-    echo -e "   UI: http://localhost:3000"
+    echo -e "   UI: http://localhost:3001"
     echo -e "   Logs: tail -f /tmp/poc_frontend.log"
     echo ""
     
@@ -107,7 +108,7 @@ echo -e "${BLUE}Starting Next.js frontend...${NC}"
     echo -e "${YELLOW}Waiting for frontend to be ready...${NC}"
     for i in {1..15}; do
         sleep 2
-        if curl -s http://localhost:3000 > /dev/null 2>&1; then
+        if curl -s http://localhost:3001 > /dev/null 2>&1; then
             echo -e "${GREEN}✓ Frontend is ready${NC}"
             break
         fi
@@ -122,7 +123,7 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${GREEN}✅ PoC UI System is running!${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
-echo -e "Frontend: ${GREEN}http://localhost:3000${NC}"
+echo -e "Frontend: ${GREEN}http://localhost:3001${NC}"
 echo -e "API:      ${GREEN}http://localhost:5001${NC}"
 echo ""
 echo -e "To stop:  ${YELLOW}./stop_poc_ui.sh${NC}"

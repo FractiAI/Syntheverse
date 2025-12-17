@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """
-Test script to send a PoD-style evaluation query to the RAG API.
-This simulates what the L2 PoD server sends.
+PoD Evaluation Query Test Suite
+Tests RAG API with PoD-style evaluation queries using standardized framework.
 """
 
-import requests
-import json
 import sys
+import json
+import requests
+import pytest
+from pathlib import Path
 
+# Add test framework to path
+test_dir = Path(__file__).parent
+sys.path.insert(0, str(test_dir))
+
+from test_framework import SyntheverseTestCase, TestUtils, test_config
+
+# RAG API URL for testing
 RAG_API_URL = "http://localhost:8000"
 
 # Simplified version of the PoD evaluation system prompt
@@ -48,11 +57,11 @@ def test_pod_evaluation_query():
         if health_response.status_code == 200:
             print(f"   ✅ Health check passed")
         else:
-            print(f"   ❌ Health check failed")
-            return False
+            print(f"   ❌ Health check failed: {health_response.status_code}")
+            pytest.skip(f"RAG API not available (status: {health_response.status_code})")
     except Exception as e:
         print(f"   ❌ Health check error: {e}")
-        return False
+        pytest.skip("RAG API not available (connection refused)")
     
     # Step 2: PoD evaluation query
     print("\n[2] Sending PoD evaluation query to RAG API...")
@@ -126,26 +135,35 @@ Evaluate this artifact using the HHFE model and provide the required metrics.
                     print(f"   {json.dumps(json_data, indent=2)}")
                 except json.JSONDecodeError:
                     print(f"\n   ⚠️  JSON found but could not parse")
-            
-            return True
+
+            # Test passed successfully
         else:
             print(f"   ❌ Query failed: {response.status_code}")
             print(f"   Response: {response.text[:500]}")
-            return False
+            raise AssertionError(f"Query failed with status {response.status_code}")
             
     except requests.exceptions.Timeout:
         print(f"   ❌ Query timed out after 180 seconds")
-        return False
+        raise AssertionError("Query timed out after 180 seconds")
     except requests.exceptions.ConnectionError:
         print(f"   ❌ Connection error during query")
-        return False
+        raise AssertionError("Connection error during query")
     except Exception as e:
         print(f"   ❌ Query error: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        raise AssertionError(f"Query error: {e}")
 
 if __name__ == "__main__":
-    success = test_pod_evaluation_query()
-    sys.exit(0 if success else 1)
+    try:
+        test_pod_evaluation_query()
+        sys.exit(0)
+    except AssertionError as e:
+        print(f"\n❌ Test failed: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 

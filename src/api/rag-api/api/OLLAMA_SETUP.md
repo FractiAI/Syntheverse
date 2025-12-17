@@ -44,7 +44,7 @@ Once the server is running, test it:
 
 ```bash
 cd rag-api/api
-python3 test_ollama.py
+python3 ollama_check.py
 ```
 
 You should see:
@@ -90,7 +90,7 @@ ollama pull mistral
 
 Once the API is working:
 1. The RAG API can use Ollama for answer generation
-2. Run `python3 test_ollama.py` to verify
+2. Run `python3 ollama_check.py` to verify
 3. Start the RAG API: `python rag_api.py`
 
 

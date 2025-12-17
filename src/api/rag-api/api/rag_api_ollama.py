@@ -180,7 +180,7 @@ inside the **Hydrogen-Holographic Fractal Sandbox v1.2**."""
             raise RuntimeError(
                 "Ollama is required but not available. "
                 "Please ensure Ollama is running and has models installed. "
-                "Run: python test_ollama.py to verify."
+                "Run: python ollama_check.py to verify."
             )
         
         # Load pre-computed embeddings (no model loading needed)

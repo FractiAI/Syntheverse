@@ -36,7 +36,7 @@ Once the model is installed, test it:
 
 ```bash
 cd rag-api/api
-python3 test_ollama.py
+python3 ollama_check.py
 ```
 
 The test will verify:

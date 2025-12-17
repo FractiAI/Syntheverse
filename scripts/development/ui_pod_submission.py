@@ -10,11 +10,21 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
 
-# Add paths for imports
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add paths for imports - scripts run from scripts/development/, need to go to project root
+script_dir = Path(__file__).parent
+project_root = script_dir.parent.parent
+sys.path.insert(0, str(project_root / "src" / "blockchain" / "layer1"))
+sys.path.insert(0, str(project_root / "src" / "core" / "layer2"))
 
-from layer1.node import SyntheverseNode
-from layer2.pod_server import PODServer
+# Import required classes for type hints
+from typing import Optional
+try:
+    from layer1.node import SyntheverseNode
+    from layer2.pod_server import PODServer
+except ImportError:
+    # Fallback for when modules aren't available
+    SyntheverseNode = None
+    PODServer = None
 
 
 class PODSubmissionUI:
@@ -179,18 +189,23 @@ class PODSubmissionUI:
         # Progress callback function - try to get from global scope or module
         progress_callback = None
         try:
-            # Method 1: Try importing from ui_web.app directly
+            # Method 1: Try importing from web-legacy app directly
             try:
-                from ui_web.app import submission_progress
+                from frontend.web_legacy.app import submission_progress
                 progress_dict = submission_progress
             except ImportError:
-                # Method 2: Try to get from sys.modules if already loaded
-                import sys
-                if 'ui_web.app' in sys.modules:
-                    app_module = sys.modules['ui_web.app']
-                    progress_dict = getattr(app_module, 'submission_progress', None)
-                else:
-                    progress_dict = None
+                # Method 2: Try alternative import path
+                try:
+                    sys.path.insert(0, str(project_root / "src" / "frontend" / "web-legacy"))
+                    from app import submission_progress
+                    progress_dict = submission_progress
+                except ImportError:
+                    # Method 3: Try to get from sys.modules if already loaded
+                    if 'app' in sys.modules or 'web_legacy.app' in sys.modules:
+                        app_module = sys.modules.get('app') or sys.modules.get('web_legacy.app')
+                        progress_dict = getattr(app_module, 'submission_progress', None) if app_module else None
+                    else:
+                        progress_dict = None
             
             if progress_dict is not None:
                 # Initialize progress if not already set

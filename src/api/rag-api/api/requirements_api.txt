@@ -9,4 +9,5 @@ requests>=2.31.0
 openai>=1.0.0
 huggingface_hub>=0.20.0
 ollama
+python-dotenv>=1.0.0
 

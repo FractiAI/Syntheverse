@@ -12,11 +12,15 @@ from werkzeug.utils import secure_filename
 import hashlib
 from datetime import datetime
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add parent directory to path (go up to project root)
+# app.py is at src/api/poc-api/app.py, so parents are:
+#   0=poc-api, 1=api, 2=src, 3=project root
+project_root = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(project_root / "src" / "core"))
+sys.path.insert(0, str(project_root / "src"))
 
-# Define base directory
-base_dir = Path(__file__).parent.parent
+# Define base directory (project root)
+base_dir = project_root
 
 from layer2.poc_server import PoCServer
 from layer2.poc_archive import ContributionStatus, MetalType
@@ -31,7 +35,7 @@ try:
     w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 
     # Load contract ABIs and addresses
-    contracts_dir = base_dir / "contracts"
+    contracts_dir = base_dir / "src" / "blockchain" / "contracts"
     synth_artifact_path = contracts_dir / "artifacts" / "src" / "SYNTH.sol" / "SYNTH.json"
     poc_registry_artifact_path = contracts_dir / "artifacts" / "src" / "POCRegistry.sol" / "POCRegistry.json"
 
@@ -191,7 +195,7 @@ app.config['FLASK_SKIP_DOTENV'] = True
 print("Starting PoC API server initialization...")
 try:
     # Use absolute paths for consistent file locations
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parent.parent.parent  # Project root
     groq_key = os.getenv('GROQ_API_KEY')
 
     print(f"Environment check - GROQ_API_KEY: {'set' if groq_key else 'NOT SET'}")
@@ -237,15 +241,20 @@ def get_archive_statistics():
     try:
         if not poc_server:
             # Return mock data when PoC server isn't available
-            return jsonify({
+            stats = {
                 "total_contributions": 0,
                 "status_counts": {"draft": 0, "submitted": 0, "evaluating": 0, "qualified": 0, "unqualified": 0},
                 "metal_counts": {"gold": 0, "silver": 0, "copper": 0},
                 "unique_contributors": 0,
                 "unique_content_hashes": 0,
                 "last_updated": "2025-01-01T00:00:00Z"
-            })
-        stats = poc_server.get_archive_statistics()
+            }
+        else:
+            stats = poc_server.get_archive_statistics()
+
+        # Backwards-compatible aliases expected by tests/clients
+        stats.setdefault("contributions_by_status", stats.get("status_counts", {}))
+        stats.setdefault("contributions_by_metal", stats.get("metal_counts", {}))
         return jsonify(stats)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -256,8 +265,8 @@ def get_contributions():
     """Get contributions with optional filters."""
     try:
         if not poc_server:
-            # Return empty list when PoC server isn't available
-            return jsonify([])
+            # Return empty response in the standard API shape
+            return jsonify({"contributions": [], "count": 0})
 
         status = request.args.get('status')
         contributor = request.args.get('contributor')
@@ -296,9 +305,9 @@ def get_contributions():
                 return obj
 
         # Convert to API format
-        result = []
+        contributions_out = []
         for contrib in contributions:
-            result.append(convert_metals({
+            contributions_out.append(convert_metals({
                 "submission_hash": contrib["submission_hash"],
                 "title": contrib["title"],
                 "contributor": contrib["contributor"],
@@ -312,7 +321,7 @@ def get_contributions():
                 "updated_at": contrib.get("updated_at"),
             }))
 
-        return jsonify(result)
+        return jsonify({"contributions": contributions_out, "count": len(contributions_out)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -384,17 +393,34 @@ def submit_contribution():
 
             # Handle file upload
             pdf_path = None
-            if 'file' in request.files:
-                file = request.files['file']
-                if file and file.filename and file.filename.lower().endswith('.pdf'):
-                    # Save the uploaded file
-                    filename = secure_filename(f"{submission_hash}_{file.filename}")
-                    filepath = os.path.join(UPLOAD_FOLDER, filename)
-                    file.save(filepath)
-                    pdf_path = filepath
+            # Accept both `pdf` (tests) and `file` (legacy)
+            upload = request.files.get('pdf') or request.files.get('file')
+            if upload and upload.filename and upload.filename.lower().endswith('.pdf'):
+                # If submission_hash isn't provided, generate one deterministically enough for tracing.
+                # Prefer a stable hash of (title, contributor, file bytes) when possible.
+                if not submission_hash:
+                    file_bytes = upload.read()
+                    upload.stream.seek(0)
+                    submission_hash = hashlib.sha256(
+                        (title or "").encode("utf-8") + b"\n" +
+                        (contributor or "").encode("utf-8") + b"\n" +
+                        file_bytes
+                    ).hexdigest()
 
-        if not submission_hash or not title or not contributor:
+                filename = secure_filename(f"{submission_hash}_{upload.filename}")
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                upload.save(filepath)
+                pdf_path = filepath
+
+        # Require core fields; submission_hash is optional (can be generated from PDF)
+        if not title or not contributor:
             return jsonify({"error": "Missing required fields"}), 400
+
+        # If submission_hash is still missing (no PDF provided), generate one from content + current time
+        if not submission_hash:
+            submission_hash = hashlib.sha256(
+                f"{title}|{contributor}|{datetime.utcnow().isoformat()}".encode("utf-8")
+            ).hexdigest()
 
         # If we have a PDF but no text content, extract text from PDF
         if pdf_path and not text_content.strip():
@@ -550,6 +576,9 @@ def get_sandbox_map():
         if not poc_server:
             return jsonify({"error": "PoC Server not initialized"}), 503
         map_data = poc_server.get_sandbox_map()
+        # Ensure a stable top-level shape for clients/tests
+        if isinstance(map_data, dict):
+            map_data.setdefault("dimensions", ["contributor", "submission_hash", "status", "metals", "epoch"])
         return jsonify(map_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -595,6 +624,11 @@ def get_epoch_info():
                 }
             })
         epoch_info = poc_server.get_epoch_info()
+        # Backwards-compatible fields expected by tests/clients
+        current_epoch = epoch_info.get("current_epoch")
+        if current_epoch:
+            epoch_info.setdefault("epoch_name", current_epoch.title())
+            epoch_info.setdefault("epoch_description", f"Token distribution epoch: {current_epoch}")
         return jsonify(epoch_info)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -623,6 +657,11 @@ def get_tokenomics_statistics():
                 "total_allocations": 0
             })
         stats = poc_server.get_tokenomics_statistics()
+        # Backwards-compatible aliases expected by tests/clients
+        if isinstance(stats, dict):
+            # Many callers use "allocated" / "rewards" terminology.
+            stats.setdefault("total_allocated", stats.get("total_distributed", stats.get("total_allocations", 0)))
+            stats.setdefault("total_rewards", stats.get("total_distributed", 0))
         return jsonify(stats)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -716,10 +755,13 @@ def debug_tokenomics_state():
         if not poc_server:
             return jsonify({"error": "PoC Server not initialized"}), 503
 
+        state = poc_server.tokenomics.state
         return jsonify({
-            "epoch_balances": poc_server.tokenomics.state["epoch_balances"],
-            "total_coherence_density": poc_server.tokenomics.state["total_coherence_density"],
-            "allocation_history_count": len(poc_server.tokenomics.state["allocation_history"]),
+            "tokenomics_state": state,
+            # Convenience top-level summary fields
+            "epoch_balances": state.get("epoch_balances", {}),
+            "total_coherence_density": state.get("total_coherence_density", 0.0),
+            "allocation_history_count": len(state.get("allocation_history", [])),
             "state_file_path": str(poc_server.tokenomics.state_file),
             "state_file_exists": poc_server.tokenomics.state_file.exists()
         })
@@ -1177,11 +1219,17 @@ def register_poc_blockchain():
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint."""
-    return jsonify({"status": "ok", "service": "poc-api"})
+    return jsonify({
+        "status": "ok",
+        "service": "poc-api",
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    })
 
 
 if __name__ == '__main__':
     print("Starting PoC API Server...")
     print("API will be available at: http://localhost:5001")
     print("Make sure GROQ_API_KEY is set in environment")
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # Debug/reloader should be off by default (test runners spawn processes and expect stable PIDs).
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host='0.0.0.0', port=5001, debug=debug)
