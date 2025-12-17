@@ -2,12 +2,12 @@
 
 ## System Overview
 
-Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Discovery (POD) protocol. The system consists of six main components:
+Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. The system consists of six main components:
 
-1. **RAG API** - Scraper, Parser, Vectorizer with Ollama integration
-2. **Layer 2** - POD Evaluator and Token Allocator
-3. **Layer 1** - Syntheverse Blockchain for POD
-4. **POD Submission UI** - User interface for submitting discoveries
+1. **RAG API** - Scraper, Parser, Vectorizer with Groq API integration
+2. **Layer 2** - PoC Evaluator and Token Allocator
+3. **Layer 1** - Syntheverse Blockchain for PoC
+4. **PoC Submission UI** - User interface for submitting contributions
 5. **Admin UI** - Administrative interface for managing the system
 6. **Documentation** - Supporting documentation and guides
 
@@ -60,7 +60,7 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Di
 
 ## Component Interactions
 
-1. **User submits POD** → Submission UI → Layer 2 Evaluator
+1. **User submits PoC** → Submission UI → Layer 2 Evaluator
 2. **Evaluator processes** → Queries RAG API → Verifies against knowledge base
 3. **Evaluation complete** → Layer 2 Allocator → Calculates token rewards
 4. **Allocation sent** → Layer 1 Blockchain → Records on-chain
@@ -70,24 +70,24 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Di
 
 1. **Scraping**: Zenodo → PDFs → Parser → Chunks
 2. **Vectorization**: Chunks → Embeddings → Vector Store
-3. **Query**: User Query → RAG API → Ollama → Response
-4. **Evaluation**: POD Submission → RAG Verification → Score
+3. **Query**: User Query → RAG API → Groq API → Response
+4. **Evaluation**: PoC Submission → RAG Verification → Score
 5. **Allocation**: Score → Token Calculation → Blockchain
 
 ## Technology Stack
 
-- **RAG API**: Python, FastAPI, LangChain, HuggingFace, Ollama
-- **Layer 2**: Python, FastAPI
-- **Layer 1**: Blockchain framework (TBD)
-- **UIs**: HTML/CSS/JavaScript (React/Vue.js TBD)
+- **RAG API**: Python, FastAPI, LangChain, HuggingFace, Groq API
+- **Layer 2**: Python, Flask/FastAPI
+- **Layer 1**: Solidity, Foundry, Anvil, Base network
+- **UIs**: Next.js, React, HTML/CSS/JavaScript
 - **Storage**: JSON files, Vector DB, Blockchain
 
 ## Security Considerations
 
-- POD submissions are immutable once recorded
+- PoC submissions are immutable once recorded
 - Token allocations are cryptographically verified
 - Admin access requires authentication
-- RAG API uses local processing (no external API calls)
+- RAG API uses Groq API for LLM processing
 
 ## Scalability
 

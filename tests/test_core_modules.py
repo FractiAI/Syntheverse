@@ -629,17 +629,47 @@ class TestTokenomicsState(SyntheverseTestCase):
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch
 
-            tokenomics = TokenomicsState()
+            # Use temporary state file for testing to avoid interference with persistent state
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False) as temp_file:
+                temp_state_file = temp_file.name
 
-            # Test epoch balances
-            founder_balance = tokenomics.get_epoch_balance(Epoch.FOUNDER)
-            pioneer_balance = tokenomics.get_epoch_balance(Epoch.PIONEER)
+            try:
+                # Create fresh tokenomics instance with temporary state
+                tokenomics = TokenomicsState(state_file=temp_state_file)
 
-            self.assertGreater(founder_balance, 0)
-            self.assertGreater(pioneer_balance, 0)
-            self.assertGreater(founder_balance, pioneer_balance)  # Founder should have more
+                # Test epoch balances (should be initial distribution)
+                founder_balance = tokenomics.get_epoch_balance(Epoch.FOUNDER)
+                pioneer_balance = tokenomics.get_epoch_balance(Epoch.PIONEER)
+                community_balance = tokenomics.get_epoch_balance(Epoch.COMMUNITY)
+                ecosystem_balance = tokenomics.get_epoch_balance(Epoch.ECOSYSTEM)
 
-            self.log_info("✅ Epoch balance retrieval working")
+                # Verify all balances are positive
+                self.assertGreater(founder_balance, 0)
+                self.assertGreater(pioneer_balance, 0)
+                self.assertGreater(community_balance, 0)
+                self.assertGreater(ecosystem_balance, 0)
+
+                # Verify founder has more than pioneer (50% > 25%)
+                self.assertGreater(founder_balance, pioneer_balance)
+
+                # Verify pioneer has more than community (25% > 12.5%)
+                self.assertGreater(pioneer_balance, community_balance)
+
+                # Verify total adds up to total supply
+                total_balance = (founder_balance + pioneer_balance +
+                               community_balance + ecosystem_balance)
+                expected_total = tokenomics.TOTAL_SUPPLY
+                self.assertAlmostEqual(total_balance, expected_total, delta=1.0)
+
+                self.log_info("✅ Epoch balance retrieval working")
+
+            finally:
+                # Clean up temporary file
+                try:
+                    os.unlink(temp_state_file)
+                except OSError:
+                    pass
 
         except Exception as e:
             self.fail(f"Epoch balance test failed: {e}")

@@ -9,7 +9,7 @@ System architecture documentation for the Syntheverse platform, describing the t
 ### System Architecture Overview (`README.md`)
 
 - **Three-Layer Design**: L1 Blockchain, L2 Evaluation, UI Layer
-- **Six Main Components**: RAG API, Layer 2, Layer 1, POD UI, Admin UI, Documentation
+- **Six Main Components**: RAG API, Layer 2, Layer 1, PoC UI, Admin UI, Documentation
 - **Architecture Diagram**: Visual representation of component relationships
 - **Component Interactions**: Data flow between system components
 - **Data Flow**: End-to-end processing from scraping to allocation

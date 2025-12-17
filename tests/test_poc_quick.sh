@@ -51,7 +51,7 @@ fi
 
 # Test frontend
 echo -e "${YELLOW}Testing frontend...${NC}"
-if curl -s http://localhost:3000 > /dev/null 2>&1; then
+if curl -s http://localhost:3001 > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Frontend is running${NC}"
 else
     echo -e "${RED}✗ Frontend is not running${NC}"
