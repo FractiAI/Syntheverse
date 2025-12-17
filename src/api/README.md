@@ -17,7 +17,7 @@ Flask REST API server connecting Next.js frontend to Layer 2 backend.
 - Tokenomics statistics and epoch information
 - Blockchain certificate registration
 
-**Status:** ✅ Fully Operational
+**Status:** ✅ Operational
 
 ### RAG API (`rag-api/`)
 
@@ -29,7 +29,7 @@ FastAPI server for document processing and RAG queries.
 - Document scraping, parsing, and vectorization
 - Web UI for interactive queries
 
-**Status:** ✅ Fully Operational
+**Status:** ✅ Operational
 
 ## Integration
 

@@ -24,7 +24,7 @@ from unittest.mock import Mock, patch
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir))
 
-from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures
+from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures, ensure_module_available
 
 class TestPoCArchive(SyntheverseTestCase):
     """Test PoC Archive functionality including contribution storage, retrieval,
@@ -38,20 +38,19 @@ class TestPoCArchive(SyntheverseTestCase):
         """Set up archive tests"""
         super().setUp()
 
+        # Ensure PoC archive modules are available (install if needed)
         try:
+            ensure_module_available("layer2.poc_archive")
             from layer2.poc_archive import ContributionStatus, MetalType, PoCArchive
             self.archive_available = True
-        except ImportError as e:
-            self.log_warning(f"PoC archive modules not available: {e}")
-            self.archive_available = False
+        except RuntimeError as e:
+            self.fail(f"PoC archive modules could not be made available: {e}")
 
     def test_contribution_status_enum(self):
         """Test contribution status enum values"""
         self.log_info("Testing contribution status enum")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
-
+        # Archive availability is ensured in setUp()
         from layer2.poc_archive import ContributionStatus
 
         # Test all expected statuses (use actual enum values from source)
@@ -75,9 +74,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test metal type enum values"""
         self.log_info("Testing metal type enum")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
-
+        # Archive availability is ensured in setUp()
         from layer2.poc_archive import MetalType
 
         # Test all expected metals
@@ -92,8 +89,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test PoC archive initialization"""
         self.log_info("Testing PoC archive initialization")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive
@@ -120,8 +116,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test contribution storage and retrieval"""
         self.log_info("Testing contribution storage and retrieval")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         from layer2.poc_archive import PoCArchive, ContributionStatus
 
@@ -165,8 +160,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test updating existing contributions"""
         self.log_info("Testing contribution updates")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive, ContributionStatus, MetalType
@@ -207,8 +201,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test getting contributions with various filters"""
         self.log_info("Testing contribution filtering")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive, ContributionStatus, MetalType
@@ -259,8 +252,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test content hash history tracking"""
         self.log_info("Testing content hash history")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive
@@ -303,8 +295,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test getting all content for redundancy checking"""
         self.log_info("Testing redundancy check content retrieval")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive
@@ -346,8 +337,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test archive statistics generation"""
         self.log_info("Testing archive statistics")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive, MetalType
@@ -392,8 +382,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test content hash calculation"""
         self.log_info("Testing content hash calculation")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive
@@ -427,8 +416,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test PoC archive error handling scenarios"""
         self.log_info("Testing PoC archive error handling")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive
@@ -500,8 +488,7 @@ class TestPoCArchive(SyntheverseTestCase):
         """Test PoC archive edge cases"""
         self.log_info("Testing PoC archive edge cases")
 
-        if not self.archive_available:
-            self.skipTest("PoC archive not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_archive import PoCArchive, ContributionStatus, MetalType
@@ -551,8 +538,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test epoch enum values"""
         self.log_info("Testing epoch enum")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         from layer2.tokenomics_state import Epoch
 
@@ -568,8 +554,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test tokenomics state initialization"""
         self.log_info("Testing tokenomics state initialization")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         from layer2.tokenomics_state import TokenomicsState
 
@@ -608,8 +593,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test epoch transition logic"""
         self.log_info("Testing epoch transitions")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState
@@ -636,8 +620,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test getting epoch balance"""
         self.log_info("Testing epoch balance retrieval")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch
@@ -661,8 +644,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test epoch qualification based on density scores"""
         self.log_info("Testing epoch qualification")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch
@@ -689,8 +671,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test PoD score calculation"""
         self.log_info("Testing PoD score calculation")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState
@@ -717,8 +698,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test tier availability in different epochs"""
         self.log_info("Testing tier availability")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch, ContributionTier
@@ -748,8 +728,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test coherence density tracking and halving"""
         self.log_info("Testing coherence density updates")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState
@@ -780,8 +759,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test token allocation calculation"""
         self.log_info("Testing allocation calculation")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch, ContributionTier
@@ -815,8 +793,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test allocation recording and state updates"""
         self.log_info("Testing allocation recording")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch, ContributionTier
@@ -854,8 +831,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test tokenomics statistics generation"""
         self.log_info("Testing tokenomics statistics")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState
@@ -886,8 +862,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test epoch information retrieval"""
         self.log_info("Testing epoch info")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState, Epoch
@@ -918,8 +893,7 @@ class TestTokenomicsState(SyntheverseTestCase):
         """Test synchronization with L1 state"""
         self.log_info("Testing L1 synchronization")
 
-        if not self.tokenomics_available:
-            self.skipTest("Tokenomics modules not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.tokenomics_state import TokenomicsState
@@ -971,8 +945,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test sandbox map initialization"""
         self.log_info("Testing sandbox map initialization")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1010,8 +983,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test sandbox map data generation"""
         self.log_info("Testing sandbox map generation")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1045,8 +1017,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test sandbox map generation with various filters"""
         self.log_info("Testing sandbox map generation with filters")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1108,8 +1079,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test redundancy report generation"""
         self.log_info("Testing redundancy report")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1149,8 +1119,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test metal distribution analysis"""
         self.log_info("Testing metal distribution")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1213,8 +1182,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test contributor network analysis"""
         self.log_info("Testing contributor network")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1281,8 +1249,7 @@ class TestSandboxMap(SyntheverseTestCase):
         """Test map export for visualization"""
         self.log_info("Testing map export for visualization")
 
-        if not self.sandbox_available:
-            self.skipTest("Sandbox map not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.sandbox_map import SandboxMap
@@ -1364,8 +1331,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test evaluator initialization"""
         self.log_info("Testing evaluator initialization")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.evaluator.pod_evaluator import PODEvaluator
@@ -1382,8 +1348,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test evaluation scoring logic"""
         self.log_info("Testing evaluation scoring")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.evaluator.pod_evaluator import PODEvaluator
@@ -1439,8 +1404,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test evaluator error handling scenarios"""
         self.log_info("Testing evaluator error handling")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.evaluator.pod_evaluator import PODEvaluator
@@ -1497,8 +1461,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test evaluator edge cases and boundary conditions"""
         self.log_info("Testing evaluator edge cases")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.evaluator.pod_evaluator import PODEvaluator
@@ -1571,8 +1534,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test the evaluate_submission method with complete submission data"""
         self.log_info("Testing evaluate_submission method")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         from layer2.evaluator.pod_evaluator import PODEvaluator
 
@@ -1636,8 +1598,7 @@ class TestPoCEvaluator(SyntheverseTestCase):
         """Test evaluator error handling with invalid inputs"""
         self.log_info("Testing evaluator error handling")
 
-        if not self.evaluator_available:
-            self.skipTest("Evaluator not available")
+        # Module availability ensured in setUp()
 
         from layer2.evaluator.pod_evaluator import PODEvaluator
 
@@ -1692,8 +1653,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test allocator initialization"""
         self.log_info("Testing token allocator initialization")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.allocator.token_allocator import TokenAllocator
@@ -1710,8 +1670,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test token calculation logic"""
         self.log_info("Testing token calculation logic")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.allocator.token_allocator import TokenAllocator
@@ -1754,8 +1713,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test token allocator edge cases and error handling"""
         self.log_info("Testing token allocator edge cases")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.allocator.token_allocator import TokenAllocator
@@ -1813,8 +1771,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test token allocator input validation"""
         self.log_info("Testing token allocator input validation")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.allocator.token_allocator import TokenAllocator
@@ -1848,8 +1805,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test the calculate_reward method with comprehensive evaluation data"""
         self.log_info("Testing calculate_reward method")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         from layer2.allocator.token_allocator import TokenAllocator
 
@@ -1890,8 +1846,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test batch allocation generation"""
         self.log_info("Testing generate_allocation_batch method")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         from layer2.allocator.token_allocator import TokenAllocator
 
@@ -1938,8 +1893,7 @@ class TestTokenAllocator(SyntheverseTestCase):
         """Test private validation and calculation methods"""
         self.log_info("Testing private allocator methods")
 
-        if not self.allocator_available:
-            self.skipTest("Token allocator not available")
+        # Module availability ensured in setUp()
 
         from layer2.allocator.token_allocator import TokenAllocator
 
@@ -2011,8 +1965,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test server initialization"""
         self.log_info("Testing PoC server initialization")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2042,8 +1995,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test server evaluation pipeline"""
         self.log_info("Testing server evaluation pipeline")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2095,8 +2047,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test contribution submission"""
         self.log_info("Testing contribution submission")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2138,8 +2089,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test contribution evaluation with mocked API"""
         self.log_info("Testing contribution evaluation with mocking")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2182,8 +2132,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test sandbox map retrieval"""
         self.log_info("Testing sandbox map retrieval")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2226,8 +2175,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test archive statistics retrieval"""
         self.log_info("Testing archive statistics")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2269,8 +2217,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test epoch information retrieval"""
         self.log_info("Testing epoch info retrieval")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2304,8 +2251,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test tokenomics statistics retrieval"""
         self.log_info("Testing tokenomics statistics")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer
@@ -2338,8 +2284,7 @@ class TestPoCServer(SyntheverseTestCase):
         """Test cleanup of test submissions"""
         self.log_info("Testing test submission cleanup")
 
-        if not self.server_available:
-            self.skipTest("PoC server not available")
+        # Module availability ensured in setUp()
 
         try:
             from layer2.poc_server import PoCServer

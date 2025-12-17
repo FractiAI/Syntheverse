@@ -8,10 +8,10 @@ Test suites for validating system functionality, API endpoints, submission flows
 
 ### Core Test Framework
 
-- **`test_framework.py`**: Standardized test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, and utilities
-- **`test_runner.py`**: Advanced test orchestrator with filtering, caching, parallel execution, and HTML reporting
-- **`run_tests.sh`**: Unified shell script for test execution with colored output
-- **`test_config.json`**: Comprehensive configuration with test scenarios, thresholds, and environment settings
+- **`test_framework.py`**: Test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, and utilities
+- **`test_runner.py`**: Test orchestrator with filtering, caching, parallel execution, and HTML reporting
+- **`run_tests.sh`**: Shell script for test execution with colored output
+- **`test_config.json`**: Configuration with test scenarios, thresholds, and environment settings
 
 ### Unit Test Modules
 

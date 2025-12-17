@@ -12,7 +12,7 @@ This directory contains documentation for the Syntheverse PoC system.
 ## Key Documents
 
 ### System Overview
-- `POC_SYSTEM_SUMMARY.md` - Complete system overview
+- `POC_SYSTEM_SUMMARY.md` - System overview
 - `POC_UPGRADE.md` - System upgrade information
 - `L1_EXPLANATION.md` - Layer 1 blockchain explanation
 

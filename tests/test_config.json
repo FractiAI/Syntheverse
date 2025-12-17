@@ -185,33 +185,65 @@
       }
     ]
   },
-  "mock_responses": {
-    "rag_api_success": {
-      "query": "test query",
-      "answer": "Mock comprehensive answer about Syntheverse concepts including fractal intelligence and hydrogen holography.",
-      "sources": [
-        {"title": "Fractal Intelligence Paper", "score": 0.87, "pdf_filename": "fractal.pdf"},
-        {"title": "Hydrogen Holography Study", "score": 0.82, "pdf_filename": "hydrogen.pdf"}
-      ],
-      "processing_time": 0.15,
-      "num_sources": 2
+  "dependency_requirements": {
+    "critical_python_packages": [
+      "requests",
+      "pytest",
+      "openai",
+      "python-dotenv",
+      "flask",
+      "flask-cors"
+    ],
+    "optional_python_packages": [
+      "numpy",
+      "pandas",
+      "matplotlib",
+      "seaborn"
+    ],
+    "system_requirements": {
+      "python_version_min": "3.8",
+      "node_version_min": "18",
+      "recommended_ram_gb": 8,
+      "recommended_disk_gb": 20
     },
-    "evaluation_success": {
-      "success": true,
-      "evaluation": {
-        "coherence": 87,
-        "density": 83,
-        "novelty": 79,
-        "tier": "gold",
-        "status": "approved",
-        "reasoning": "Excellent coherence and novel contribution to the field"
+    "service_requirements": {
+      "rag_api": {
+        "description": "FastAPI-based RAG API service",
+        "port": 8000,
+        "health_endpoint": "/health",
+        "startup_timeout_seconds": 60,
+        "dependencies": ["python", "fastapi", "uvicorn"]
+      },
+      "poc_api": {
+        "description": "Flask-based PoC API service",
+        "port": 5001,
+        "health_endpoint": "/health",
+        "startup_timeout_seconds": 60,
+        "dependencies": ["python", "flask", "flask-cors"]
+      },
+      "frontend": {
+        "description": "Next.js frontend application",
+        "port": 3001,
+        "health_endpoint": "/",
+        "startup_timeout_seconds": 120,
+        "dependencies": ["node", "npm", "next"]
+      },
+      "blockchain": {
+        "description": "Blockchain node and contracts",
+        "port": 8545,
+        "health_endpoint": "/",
+        "startup_timeout_seconds": 180,
+        "dependencies": ["node", "npm", "hardhat", "anvil"]
       }
     },
-    "poc_api_stats": {
-      "total_contributions": 42,
-      "contributions_by_status": {"approved": 38, "pending": 4, "rejected": 0},
-      "contributions_by_metal": {"gold": 12, "silver": 15, "copper": 11, "unqualified": 4}
-    }
+    "api_keys_required": [
+      {
+        "name": "GROQ_API_KEY",
+        "description": "Required for AI evaluation and RAG API functionality",
+        "provider": "Grok API",
+        "validation_endpoint": "https://api.groq.com/openai/v1/models"
+      }
+    ]
   },
   "reporting": {
     "save_results": true,
@@ -243,7 +275,7 @@
     "required_services": ["poc_api", "rag_api", "frontend"],
     "optional_services": ["legacy_ui", "blockchain"],
     "check_dependencies": true,
-    "auto_install_deps": false,
+    "auto_install_deps": true,
     "validate_environment": true,
     "create_virtual_env": false,
     "isolate_tests": true

@@ -8,7 +8,7 @@ Frontend applications for the Syntheverse system, providing user interfaces for 
 
 ### PoC Frontend (`poc-frontend/`)
 
-Modern Next.js 14 application with App Router.
+Next.js 14 application with App Router.
 
 **Features:**
 - Dashboard with system statistics
@@ -19,7 +19,7 @@ Modern Next.js 14 application with App Router.
 
 **Technology:** Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
 
-**Status:** ✅ Fully Operational
+**Status:** ✅ Operational
 
 ### Legacy Web (`web-legacy/`)
 
@@ -31,7 +31,7 @@ Flask web interface (legacy system).
 - Certificate registration
 - Artifact viewing
 
-**Status:** ✅ Fully Operational (Legacy)
+**Status:** ✅ Operational (Legacy)
 
 ### Submission UI (`submission/`)
 

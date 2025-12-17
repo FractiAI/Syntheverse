@@ -15,7 +15,7 @@ from pathlib import Path
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir))
 
-from test_framework import APITestCase, TestUtils, test_config, TestFixtures
+from test_framework import APITestCase, TestUtils, test_config, TestFixtures, ensure_dependency
 
 @pytest.mark.requires_poc_api
 class TestPoCAPI(APITestCase):
@@ -282,7 +282,14 @@ class TestPoCAPI(APITestCase):
                 self.fail(f"Unexpected response: {response.status_code} - {response.text}")
 
         except ImportError:
-            self.skipTest("PDF generation not available")
+            # Try to install PDF generation dependencies
+            try:
+                ensure_dependency("reportlab")
+                # Retry the import
+                from reportlab.pdfgen import canvas
+                from reportlab.lib.pagesizes import letter
+            except RuntimeError:
+                self.fail("PDF generation dependencies could not be installed")
         except Exception as e:
             self.fail(f"Submission test failed: {e}")
 
@@ -298,7 +305,13 @@ class TestPoCAPI(APITestCase):
         contributions = response.json().get("contributions", [])
 
         if not contributions:
-            self.skipTest("No existing contributions to evaluate")
+            # Ensure test contributions exist
+            self._ensure_test_contributions()
+            # Re-check for contributions
+            response = requests.get(f"{poc_api_url}/api/archive/contributions", timeout=10)
+            contributions = response.json().get("contributions", [])
+            if not contributions:
+                self.fail("Could not create test contributions for evaluation")
 
         # Use the first contribution's hash
         submission_hash = contributions[0]["submission_hash"]
@@ -342,7 +355,13 @@ class TestPoCAPI(APITestCase):
         contributions = response.json().get("contributions", [])
 
         if not contributions:
-            self.skipTest("No contributions available for detail testing")
+            # Ensure test contributions exist
+            self._ensure_test_contributions()
+            # Re-check for contributions
+            response = requests.get(f"{poc_api_url}/api/archive/contributions", timeout=10)
+            contributions = response.json().get("contributions", [])
+            if not contributions:
+                self.fail("Could not create test contributions for detail testing")
 
         # Test details for first contribution
         submission_hash = contributions[0]["submission_hash"]
@@ -383,7 +402,17 @@ class TestPoCAPI(APITestCase):
                 break
 
         if not evaluated_contrib:
-            self.skipTest("No evaluated contributions available for certificate testing")
+            # Ensure test contributions exist and are evaluated
+            self._ensure_test_contributions()
+            # Re-check for evaluated contributions
+            response = requests.get(f"{poc_api_url}/api/archive/contributions", timeout=10)
+            contributions = response.json().get("contributions", [])
+            for contrib in contributions:
+                if contrib.get("status") in ["approved", "gold", "silver", "copper"]:
+                    evaluated_contrib = contrib
+                    break
+            if not evaluated_contrib:
+                self.fail("Could not create evaluated test contributions for certificate testing")
 
         submission_hash = evaluated_contrib["submission_hash"]
 

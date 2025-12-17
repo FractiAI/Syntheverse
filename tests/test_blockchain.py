@@ -15,7 +15,7 @@ from pathlib import Path
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir))
 
-from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures
+from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures, ensure_module_available
 
 @pytest.mark.requires_blockchain
 class TestBlockchainLayer1(SyntheverseTestCase):
@@ -29,26 +29,27 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Set up blockchain tests"""
         super().setUp()
 
-        # Check if we can import blockchain modules
+        # Ensure blockchain modules are available (install if needed)
         try:
+            ensure_module_available("layer1.node")
+            ensure_module_available("layer1.blockchain")
+            ensure_module_available("layer1.epoch_manager")
+            ensure_module_available("layer1.contracts.synth_token")
+
             from layer1.node import SyntheverseNode
             from layer1.blockchain import Blockchain
             from layer1.epoch_manager import EpochManager
             from layer1.contracts.synth_token import SYNTHToken
-            self.node_available = True
 
             # Create helper instances for tests
             self.synth_token = SYNTHToken()
             self.epoch_manager = EpochManager(synth_token=self.synth_token)
-        except ImportError as e:
-            self.log_warning(f"Blockchain modules not available: {e}")
-            self.node_available = False
-            self.synth_token = None
-            self.epoch_manager = None
+        except RuntimeError as e:
+            self.fail(f"Blockchain modules could not be made available: {e}")
 
     def _create_test_node(self, node_id: str = "test-node-001", difficulty: int = 1):
         """Helper method to create properly initialized SyntheverseNode"""
-        if not self.node_available:
+        # Blockchain modules ensured in setUp()
             raise RuntimeError("Blockchain modules not available")
         from layer1.node import SyntheverseNode
         return SyntheverseNode(node_id=node_id, difficulty=difficulty)
@@ -87,8 +88,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test epoch manager initialization and basic functionality"""
         self.log_info("Testing epoch manager initialization")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             epoch_manager = self.epoch_manager
@@ -117,8 +117,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test Syntheverse node initialization"""
         self.log_info("Testing Syntheverse node initialization")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()
@@ -137,8 +136,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test PoD submission workflow"""
         self.log_info("Testing PoD submission workflow")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()
@@ -169,8 +167,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test token allocation calculation logic"""
         self.log_info("Testing token allocation calculation")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()
@@ -218,8 +215,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test block mining simulation"""
         self.log_info("Testing block mining simulation")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()
@@ -321,7 +317,6 @@ class TestBlockchainLayer1(SyntheverseTestCase):
             self.log_info("✅ Contract classes loaded successfully")
 
         except ImportError:
-            self.skipTest("Contract classes not available")
         except Exception as e:
             self.fail(f"Contract class loading test failed: {e}")
 
@@ -329,8 +324,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test blockchain statistics retrieval"""
         self.log_info("Testing blockchain statistics")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()
@@ -356,8 +350,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test epoch threshold validation"""
         self.log_info("Testing epoch thresholds")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             epoch_manager = self.epoch_manager
@@ -386,8 +379,7 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         """Test error handling for invalid submissions"""
         self.log_info("Testing error handling for invalid submissions")
 
-        if not self.node_available:
-            self.skipTest("Blockchain modules not available")
+        # Blockchain modules ensured in setUp()
 
         try:
             node = self._create_test_node()

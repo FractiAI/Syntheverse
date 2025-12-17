@@ -5,7 +5,7 @@ This directory contains scripts for development, deployment, and maintenance of 
 ## Directory Structure
 
 - `development/` - Development and testing scripts
-- `startup/` - Scripts to start the various system components
+- `startup/` - Scripts to start system components
 - `deployment/` - Deployment and contract management scripts
 - `utilities/` - Utility scripts for maintenance and administration
 
@@ -13,9 +13,9 @@ This directory contains scripts for development, deployment, and maintenance of 
 
 Located in `scripts/startup/`:
 
-- `start_servers.py` - Main startup script for the complete system
+- `start_servers.py` - Main startup script for the system
 - `start_servers_simple.py` - Simplified startup script
-- `start_complete_ui.py` - Complete UI startup script
+- `start_complete_ui.py` - UI startup script
 - `start_servers.sh` - Shell script for starting servers
 
 ## Utility Scripts

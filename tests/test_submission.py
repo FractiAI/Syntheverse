@@ -12,7 +12,7 @@ from pathlib import Path
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir))
 
-from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures
+from test_framework import SyntheverseTestCase, TestUtils, test_config, TestFixtures, ensure_module_available
 
 @pytest.mark.requires_blockchain
 class TestPoDSubmission(SyntheverseTestCase):
@@ -26,22 +26,19 @@ class TestPoDSubmission(SyntheverseTestCase):
         """Set up submission tests"""
         super().setUp()
 
-        # Try to import required modules
+        # Ensure PoD submission modules are available
         try:
-            from layer1.node import SyntheverseNode
-            from layer2.pod_server import PODServer
-            from ui_pod_submission import PODSubmissionUI
-            self.modules_available = True
-        except ImportError as e:
-            self.log_warning(f"PoD submission modules not available: {e}")
-            self.modules_available = False
+            ensure_module_available("layer1.node")
+            ensure_module_available("layer2.pod_server")
+            ensure_module_available("ui_pod_submission")
+        except RuntimeError as e:
+            self.fail(f"PoD submission modules could not be made available: {e}")
 
     def test_pod_submission_initialization(self):
         """Test PoD submission UI initialization"""
         self.log_info("Testing PoD submission UI initialization")
 
-        if not self.modules_available:
-            self.skipTest("PoD submission modules not available")
+        # PoD modules ensured in setUp()
 
         try:
             from ui_pod_submission import PODSubmissionUI
@@ -62,8 +59,7 @@ class TestPoDSubmission(SyntheverseTestCase):
         """Test epoch status display functionality"""
         self.log_info("Testing epoch status display")
 
-        if not self.modules_available:
-            self.skipTest("PoD submission modules not available")
+        # PoD modules ensured in setUp()
 
         try:
             from ui_pod_submission import PODSubmissionUI
@@ -98,8 +94,7 @@ class TestPoDSubmission(SyntheverseTestCase):
         """Test complete submission workflow"""
         self.log_info("Testing complete submission workflow")
 
-        if not self.modules_available:
-            self.skipTest("PoD submission modules not available")
+        # PoD modules ensured in setUp()
 
         try:
             from ui_pod_submission import PODSubmissionUI
@@ -203,8 +198,7 @@ class TestPoDSubmission(SyntheverseTestCase):
         """Test handling of invalid submissions"""
         self.log_info("Testing invalid submission handling")
 
-        if not self.modules_available:
-            self.skipTest("PoD submission modules not available")
+        # PoD modules ensured in setUp()
 
         try:
             from ui_pod_submission import PODSubmissionUI
@@ -250,8 +244,7 @@ class TestPoDSubmission(SyntheverseTestCase):
         """Test evaluation error scenarios"""
         self.log_info("Testing evaluation error scenarios")
 
-        if not self.modules_available:
-            self.skipTest("PoD submission modules not available")
+        # PoD modules ensured in setUp()
 
         try:
             from ui_pod_submission import PODSubmissionUI

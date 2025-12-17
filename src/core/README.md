@@ -19,7 +19,7 @@ PoC evaluation engine with archive-first redundancy detection.
 **Features:**
 - Multi-metal evaluation (Gold, Silver, Copper)
 - Archive-first redundancy detection
-- Direct Grok API integration
+- Grok API integration
 - Token allocation based on PoC scores
 - Sandbox map generation
 

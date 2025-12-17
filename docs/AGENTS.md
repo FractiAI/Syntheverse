@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Comprehensive documentation for the Syntheverse system including architecture, API documentation, user guides, and contributor resources.
+Documentation for the Syntheverse system including architecture, API documentation, user guides, and contributor resources.
 
 ## Key Modules
 
@@ -25,7 +25,7 @@ Comprehensive documentation for the Syntheverse system including architecture, A
 
 ### Main Documentation
 
-- **`POC_SYSTEM_SUMMARY.md`**: Complete system overview
+- **`POC_SYSTEM_SUMMARY.md`**: System overview
 - **`POC_UPGRADE.md`**: System upgrade information
 - **`POC_SUBMISSION_TO_ALLOCATION_FLOW.md`**: End-to-end flow documentation
 - **`L1_EXPLANATION.md`**: Layer 1 blockchain explanation

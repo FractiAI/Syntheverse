@@ -8,9 +8,9 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 
 ### Startup (`startup/`)
 
-- **`start_servers.py`**: Main startup script for complete system
+- **`start_servers.py`**: Main startup script for system
 - **`start_servers_simple.py`**: Simplified startup script
-- **`start_complete_ui.py`**: Complete UI startup script
+- **`start_complete_ui.py`**: UI startup script
 - **`start_servers.sh`**: Shell script for starting servers
 
 ### Development (`development/`)

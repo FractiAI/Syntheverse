@@ -2,21 +2,21 @@
 
 ## Purpose
 
-Comprehensive test suites for validating system functionality, API endpoints, submission flows, and integration testing. Features standardized test framework with unified execution, reporting, caching, and advanced analytics.
+Test suites for validating system functionality, API endpoints, submission flows, and integration testing. Features test framework with execution, reporting, caching, and analytics.
 
 ## Test Framework
 
 ### Core Components
 
-- **`test_framework.py`** - Standardized test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, enhanced error reporting, and utilities
-- **`test_runner.py`** - Advanced Python test orchestrator with discovery, filtering, caching, parallel execution, and HTML reporting
-- **`run_tests.sh`** - Unified shell script for test execution with colored output and comprehensive reporting
-- **`test_config.json`** - Comprehensive configuration file for test settings, scenarios, thresholds, and mock responses
+- **`test_framework.py`** - Test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, error reporting, and utilities
+- **`test_runner.py`** - Python test orchestrator with discovery, filtering, caching, parallel execution, and HTML reporting
+- **`run_tests.sh`** - Shell script for test execution with colored output and reporting
+- **`test_config.json`** - Configuration file for test settings, scenarios, thresholds, and mock responses
 - **`conftest.py`** - Pytest configuration for proper test discovery and marker definitions
 
 ### Test Categories
 
-Tests are organized into multiple categories for comprehensive coverage:
+Tests are organized into categories for coverage:
 
 #### **Unit Tests** - Individual Component Testing
 - `test_core_modules.py` - Core business logic (archive, tokenomics, evaluator, allocator)
