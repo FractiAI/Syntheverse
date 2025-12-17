@@ -318,6 +318,89 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         except Exception as e:
             self.fail(f"Contract class loading test failed: {e}")
 
+    def test_solidity_contract_structure_validation(self):
+        """Test Solidity contract structure and compilation readiness"""
+        self.log_info("Testing Solidity contract structure validation")
+
+        try:
+            import os
+            from pathlib import Path
+
+            contracts_dir = Path(__file__).parent.parent / "src" / "blockchain" / "contracts"
+            self.assertTrue(contracts_dir.exists(), "Contracts directory should exist")
+
+            # Find all .sol files (excluding test files and ensuring they are actual files)
+            sol_files = [f for f in contracts_dir.glob("**/*.sol")
+                        if not f.name.endswith('.t.sol') and f.is_file()]
+            self.assertGreater(len(sol_files), 0, "Should have Solidity contract files")
+
+            # Test SYNTH token contract exists and has basic structure
+            synth_found = False
+            poc_found = False
+
+            for sol_file in sol_files:
+                content = sol_file.read_text()
+
+                # Check for SYNTH token contract
+                if "contract SYNTH" in content or "contract SYNTHToken" in content:
+                    synth_found = True
+                    self._validate_token_contract(content, sol_file.name)
+
+                # Check for POC contract
+                if "contract POC" in content or "contract POCRegistry" in content:
+                    poc_found = True
+                    self._validate_poc_contract(content, sol_file.name)
+
+            self.assertTrue(synth_found, "SYNTH token contract should exist")
+            self.assertTrue(poc_found, "POC registry contract should exist")
+
+            self.log_info("✅ Solidity contract structure validation completed")
+
+        except Exception as e:
+            self.fail(f"Solidity contract structure validation failed: {e}")
+
+    def _validate_token_contract(self, content: str, filename: str):
+        """Validate SYNTH token contract structure"""
+        # Check for ERC-20 inheritance (functions are inherited from ERC20)
+        self.assertIn("ERC20", content, f"SYNTH contract {filename} should inherit from ERC20")
+
+        # Check for SYNTH-specific functions that should be explicitly defined
+        required_functions = ["allocatePOC", "getEpochBalance", "transitionEpoch"]
+        for func in required_functions:
+            self.assertIn(f"function {func}", content,
+                         f"SYNTH contract {filename} should have {func} function")
+
+        # Check for SYNTH-specific events (ERC20 events are inherited)
+        synth_events = ["TokensAllocated", "EpochTransition", "POCContribution"]
+        for event in synth_events:
+            self.assertIn(f"event {event}", content,
+                         f"SYNTH contract {filename} should have {event} event")
+
+        # Check for constructor or initializer
+        has_constructor = "constructor" in content or "function initialize" in content
+        self.assertTrue(has_constructor,
+                       f"SYNTH contract {filename} should have constructor or initializer")
+
+    def _validate_poc_contract(self, content: str, filename: str):
+        """Validate POC registry contract structure"""
+        # Check for submission-related functions
+        submission_functions = ["submitContribution", "registerContribution"]
+        has_submission = any(func in content for func in submission_functions)
+        self.assertTrue(has_submission,
+                       f"POC contract {filename} should have submission functions")
+
+        # Check for evaluation and qualification functions (actual functions in contract)
+        eval_functions = ["recordEvaluation", "isQualified"]
+        has_evaluation = any(func in content for func in eval_functions)
+        self.assertTrue(has_evaluation,
+                       f"POC contract {filename} should have evaluation/qualification functions")
+
+        # Check for registration functionality
+        registration_terms = ["registerCertificate", "registrationFee"]
+        has_registration = any(term in content for term in registration_terms)
+        self.assertTrue(has_registration,
+                       f"POC contract {filename} should have registration functionality")
+
     def test_blockchain_statistics(self):
         """Test blockchain statistics retrieval"""
         self.log_info("Testing blockchain statistics")

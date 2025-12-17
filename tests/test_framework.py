@@ -122,7 +122,7 @@ def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
     return False
 
 def ensure_service_running(service_name: str, startup_command: list = None, health_url: str = None,
-                          startup_timeout: int = 60, health_check_interval: float = 2.0) -> bool:
+                          startup_timeout: int = 60, health_check_interval: float = 2.0, startup_cwd: str = None) -> bool:
     """
     Ensure a service is running, starting it if necessary.
 
@@ -163,9 +163,10 @@ def ensure_service_running(service_name: str, startup_command: list = None, heal
     try:
         # Start the service
         project_root = Path(__file__).parent.parent
+        working_dir = startup_cwd if startup_cwd else project_root
         process = subprocess.Popen(
             startup_command,
-            cwd=project_root,
+            cwd=working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             start_new_session=True

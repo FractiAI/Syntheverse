@@ -39,25 +39,36 @@ class TestServerManager(SyntheverseTestCase):
 
     def test_load_environment_success(self):
         """Test successful environment loading"""
-        # Create a temporary .env file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
-            f.write("GROQ_API_KEY=gsk_test_key\n")
-            temp_env_file = f.name
+        # Save original environment
+        original_groq_key = os.environ.get('GROQ_API_KEY')
 
-        try:
-            # Temporarily change the project root to the temp directory
-            original_root = self.manager.project_root
-            temp_dir = Path(temp_env_file).parent
-            self.manager.project_root = temp_dir
+        # Create a temporary directory with a .env file
+        with tempfile.TemporaryDirectory() as temp_dir:
+            env_file_path = Path(temp_dir) / ".env"
+            with open(env_file_path, 'w') as f:
+                f.write("GROQ_API_KEY=gsk_test_key\n")
 
-            result = self.manager.load_environment()
+            try:
+                # Clear the existing GROQ_API_KEY to test loading from file
+                if 'GROQ_API_KEY' in os.environ:
+                    del os.environ['GROQ_API_KEY']
 
-            self.assertTrue(result)
-            self.assertEqual(os.environ.get('GROQ_API_KEY'), 'gsk_test_key')
-        finally:
-            # Restore original project root and clean up
-            self.manager.project_root = original_root
-            os.unlink(temp_env_file)
+                # Temporarily change the project root to the temp directory
+                original_root = self.manager.project_root
+                self.manager.project_root = Path(temp_dir)
+
+                result = self.manager.load_environment()
+
+                self.assertTrue(result)
+                self.assertEqual(os.environ.get('GROQ_API_KEY'), 'gsk_test_key')
+            finally:
+                # Restore original environment and project root
+                if original_groq_key is not None:
+                    os.environ['GROQ_API_KEY'] = original_groq_key
+                elif 'GROQ_API_KEY' in os.environ:
+                    del os.environ['GROQ_API_KEY']
+
+                self.manager.project_root = original_root
 
     def test_load_environment_missing_file(self):
         """Test environment loading when .env file doesn't exist"""
@@ -80,45 +91,55 @@ class TestServerManager(SyntheverseTestCase):
 
     def test_load_environment_malformed_file(self):
         """Test environment loading with malformed .env file"""
-        # Create a temporary .env file with invalid content
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
-            f.write("INVALID_LINE\nGROQ_API_KEY=\n")
-            temp_env_file = f.name
+        # Save original environment
+        original_groq_key = os.environ.get('GROQ_API_KEY')
 
-        try:
-            # Temporarily change the project root to the temp directory
-            original_root = self.manager.project_root
-            temp_dir = Path(temp_env_file).parent
-            self.manager.project_root = temp_dir
+        # Create a temporary directory with a malformed .env file
+        with tempfile.TemporaryDirectory() as temp_dir:
+            env_file_path = Path(temp_dir) / ".env"
+            with open(env_file_path, 'w') as f:
+                f.write("INVALID_LINE\nGROQ_API_KEY=\n")
 
-            result = self.manager.load_environment()
+            try:
+                # Clear the existing GROQ_API_KEY to test loading from file
+                if 'GROQ_API_KEY' in os.environ:
+                    del os.environ['GROQ_API_KEY']
 
-            self.assertFalse(result)
-        finally:
-            # Restore original project root and clean up
-            self.manager.project_root = original_root
-            os.unlink(temp_env_file)
+                # Temporarily change the project root to the temp directory
+                original_root = self.manager.project_root
+                self.manager.project_root = Path(temp_dir)
+
+                result = self.manager.load_environment()
+
+                # The method should return False because GROQ_API_KEY is empty/invalid
+                self.assertFalse(result)
+            finally:
+                # Restore original environment and project root
+                if original_groq_key is not None:
+                    os.environ['GROQ_API_KEY'] = original_groq_key
+                elif 'GROQ_API_KEY' in os.environ:
+                    del os.environ['GROQ_API_KEY']
+
+                self.manager.project_root = original_root
 
     def test_load_environment_empty_key(self):
         """Test environment loading with empty API key"""
-        # Create a temporary .env file with empty API key
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
-            f.write("GROQ_API_KEY=   \n")
-            temp_env_file = f.name
+        # Create a temporary directory with a .env file containing empty API key
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_env_file = Path(temp_dir) / ".env"
+            with open(temp_env_file, 'w') as f:
+                f.write("GROQ_API_KEY=   \n")
 
-        try:
             # Temporarily change the project root to the temp directory
             original_root = self.manager.project_root
-            temp_dir = Path(temp_env_file).parent
-            self.manager.project_root = temp_dir
+            self.manager.project_root = Path(temp_dir)
 
-            result = self.manager.load_environment()
-
-            self.assertFalse(result)
-        finally:
-            # Restore original project root and clean up
-            self.manager.project_root = original_root
-            os.unlink(temp_env_file)
+            try:
+                result = self.manager.load_environment()
+                self.assertFalse(result)
+            finally:
+                # Restore original project root
+                self.manager.project_root = original_root
 
     def test_validate_dependencies_success(self):
         """Test successful dependency validation"""

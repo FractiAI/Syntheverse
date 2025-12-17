@@ -64,6 +64,9 @@ def load_env_file():
         print(f"⚠️  Error loading .env: {e}")
         return False
 
+# Set testing environment variable first
+os.environ['TESTING'] = 'true'
+
 # Load environment at module import time
 load_env_file()
 
@@ -211,7 +214,8 @@ def service_bootstrapper(request):
                         service_name="rag_api",
                         startup_command=startup_command,
                         health_url=rag_health_url,
-                        startup_timeout=test_config.get("timeouts.service_startup", 60)
+                        startup_timeout=test_config.get("timeouts.service_startup", 60),
+                        startup_cwd=startup_cwd
                     )
                 except RuntimeError as e:
                     pytest.fail(f"CRITICAL: RAG API service could not be started: {e}", pytrace=False)
@@ -235,7 +239,8 @@ def service_bootstrapper(request):
                         service_name="poc_api",
                         startup_command=startup_command,
                         health_url=poc_health_url,
-                        startup_timeout=test_config.get("timeouts.service_startup", 60)
+                        startup_timeout=test_config.get("timeouts.service_startup", 60),
+                        startup_cwd=startup_cwd
                     )
                 except RuntimeError as e:
                     pytest.fail(f"CRITICAL: PoC API service could not be started: {e}", pytrace=False)

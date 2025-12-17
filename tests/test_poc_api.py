@@ -388,7 +388,7 @@ class TestPoCAPI(APITestCase):
         # Verify it's the correct contribution
         self.assertEqual(data["submission_hash"], submission_hash)
 
-        self.log_info(f"✅ Retrieved details for contribution: {contrib['title']}")
+        self.log_info(f"✅ Retrieved details for contribution: {data['title']}")
 
     def test_certificate_generation(self):
         """Test /api/certificate/<submission_hash> endpoint"""
@@ -466,6 +466,70 @@ class TestPoCAPI(APITestCase):
             self.log_info("⚠️  Certificate generation not available (PDF generator not installed)")
         else:
             self.fail(f"Certificate generation failed with unexpected status: {response.status_code}")
+
+    def test_api_response_format_validation(self):
+        """Test API response format validation for consistency"""
+        self.log_info("Testing API response format validation")
+
+        import requests
+        poc_api_url = test_config.get("api_urls.poc_api")
+
+        # Test archive statistics endpoint format
+        response = requests.get(f"{poc_api_url}/api/archive/statistics", timeout=10)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn("total_contributions", data)
+        self.assertIn("status_counts", data)
+        self.assertIn("metal_counts", data)
+
+        # Check for qualified contributions (should be in status_counts)
+        self.assertIn("qualified", data["status_counts"])
+        qualified_contributions = data["status_counts"]["qualified"]
+
+        # Verify data types
+        self.assertIsInstance(data["total_contributions"], int)
+        self.assertIsInstance(qualified_contributions, int)
+        self.assertIsInstance(data["status_counts"], dict)
+        self.assertIsInstance(data["metal_counts"], dict)
+
+        # Note: 'epochs' and 'metals' fields are not present in current API response
+        # This test validates the actual API response structure
+
+        # Test contributions endpoint format
+        response = requests.get(f"{poc_api_url}/api/archive/contributions", timeout=10)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn("contributions", data)
+        self.assertIn("count", data)
+
+        # Verify contributions is a list
+        self.assertIsInstance(data["contributions"], list)
+        self.assertIsInstance(data["count"], int)
+
+        # If there are contributions, verify their structure
+        if data["contributions"]:
+            contrib = data["contributions"][0]
+            required_fields = ["submission_hash", "title", "contributor", "status"]
+            for field in required_fields:
+                self.assertIn(field, contrib)
+
+        # Test sandbox map endpoint format
+        response = requests.get(f"{poc_api_url}/api/sandbox-map", timeout=10)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn("nodes", data)
+        self.assertIn("edges", data)
+        self.assertIn("metadata", data)
+
+        # Verify data types
+        self.assertIsInstance(data["nodes"], list)
+        self.assertIsInstance(data["edges"], list)
+        self.assertIsInstance(data["metadata"], dict)
+
+        self.log_info("✅ API response format validation completed")
 
     def test_admin_cleanup(self):
         """Test admin cleanup endpoints"""

@@ -674,6 +674,76 @@ class TestTokenomicsState(SyntheverseTestCase):
         except Exception as e:
             self.fail(f"Epoch balance test failed: {e}")
 
+    def test_tokenomics_real_data_validation(self):
+        """Test tokenomics with real data validation and edge cases"""
+        self.log_info("Testing tokenomics real data validation")
+
+        # Module availability ensured in setUp()
+
+        try:
+            from layer2.tokenomics_state import TokenomicsState, Epoch, ContributionTier
+
+            # Use temporary state file for testing to avoid interference
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False) as temp_file:
+                temp_state_file = temp_file.name
+
+            try:
+                tokenomics = TokenomicsState(state_file=temp_state_file)
+
+                # Test total supply constant
+                self.assertEqual(tokenomics.TOTAL_SUPPLY, 90_000_000_000_000)
+                self.assertIsInstance(tokenomics.TOTAL_SUPPLY, int)
+
+                # Test epoch distribution adds up to 100%
+                total_percentage = sum(tokenomics.EPOCH_DISTRIBUTION.values())
+                self.assertAlmostEqual(total_percentage, 1.0, places=5)
+
+                # Test tier multipliers are reasonable
+                self.assertGreater(tokenomics.TIER_MULTIPLIERS[ContributionTier.GOLD], 500)
+                self.assertGreater(tokenomics.TIER_MULTIPLIERS[ContributionTier.SILVER], 50)
+                self.assertEqual(tokenomics.TIER_MULTIPLIERS[ContributionTier.COPPER], 1.0)
+
+                # Test epoch qualification thresholds are ordered correctly
+                thresholds = tokenomics.EPOCH_THRESHOLDS
+                self.assertGreater(thresholds[Epoch.FOUNDER], thresholds[Epoch.PIONEER])
+                self.assertGreater(thresholds[Epoch.PIONEER], thresholds[Epoch.COMMUNITY])
+                self.assertGreater(thresholds[Epoch.COMMUNITY], thresholds[Epoch.ECOSYSTEM])
+                self.assertGreaterEqual(thresholds[Epoch.ECOSYSTEM], 0)
+
+                # Test PoC score calculation with edge cases
+                # High coherence, high density, high novelty = high score
+                score1 = tokenomics.calculate_pod_score(8000, 7000, 9000)
+                self.assertGreater(score1, 3000)
+
+                # Low coherence, low density, low novelty = low score
+                score2 = tokenomics.calculate_pod_score(2000, 2000, 1000)
+                self.assertLess(score2, 100)
+
+                # Verify score increases with better metrics
+                self.assertGreater(score1, score2)
+
+                # Test epoch qualification with real scores
+                self.assertEqual(tokenomics.qualify_epoch(9000), Epoch.FOUNDER)
+                self.assertEqual(tokenomics.qualify_epoch(7000), Epoch.PIONEER)
+                self.assertEqual(tokenomics.qualify_epoch(5000), Epoch.COMMUNITY)
+                self.assertEqual(tokenomics.qualify_epoch(1000), Epoch.ECOSYSTEM)
+
+                # Test that very low positive scores still qualify for ecosystem
+                self.assertEqual(tokenomics.qualify_epoch(1), Epoch.ECOSYSTEM)
+
+                self.log_info("✅ Tokenomics real data validation completed")
+
+            finally:
+                # Clean up temporary file
+                try:
+                    os.unlink(temp_state_file)
+                except OSError:
+                    pass
+
+        except Exception as e:
+            self.fail(f"Tokenomics real data validation test failed: {e}")
+
     def test_epoch_qualification(self):
         """Test epoch qualification based on density scores"""
         self.log_info("Testing epoch qualification")
