@@ -379,13 +379,14 @@ class TestPoCAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         data = response.json()
-        self.assertIn("contribution", data)
-        self.assertIn("evaluation", data)
 
-        contrib = data["contribution"]
-        required_fields = ["submission_hash", "title", "contributor", "status"]
+        # API returns contribution data directly, not wrapped in "contribution" key
+        required_fields = ["submission_hash", "title", "contributor", "status", "content_hash", "text_content"]
         for field in required_fields:
-            self.assertIn(field, contrib)
+            self.assertIn(field, data)
+
+        # Verify it's the correct contribution
+        self.assertEqual(data["submission_hash"], submission_hash)
 
         self.log_info(f"✅ Retrieved details for contribution: {contrib['title']}")
 
