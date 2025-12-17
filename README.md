@@ -1,4 +1,4 @@
-# 🚀 **Syntheverse PoC System v2.0 - FULLY FUNCTIONING**
+# 🚀 **Syntheverse PoC System v0.2 - FULLY FUNCTIONING**
 
 ## **🎯 CURRENT STATUS: COMPLETE WORKING SYSTEM READY FOR TESTING**
 
