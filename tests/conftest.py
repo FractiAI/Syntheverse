@@ -56,6 +56,7 @@ def pytest_sessionstart(session):
     sys.path.insert(0, str(project_root / "src" / "core"))
     sys.path.insert(0, str(project_root / "src" / "blockchain"))
     sys.path.insert(0, str(project_root / "src"))
+    sys.path.insert(0, str(project_root / "scripts" / "development"))
 
     # Validate GROQ_API_KEY
     groq_key = os.getenv('GROQ_API_KEY')
@@ -153,8 +154,16 @@ def poc_api_available(check_service_availability):
 @pytest.fixture(scope="session")
 def frontend_available(check_service_availability):
     """Check if frontend is available"""
+    def _check_frontend(url, timeout=5):
+        """Check if frontend is available (accepts redirects for Next.js)"""
+        import requests
+        try:
+            response = requests.get(url, timeout=timeout, allow_redirects=False)
+            return response.status_code in [200, 301, 302, 307, 308]  # Accept redirects
+        except:
+            return False
     frontend_url = test_config.get("api_urls.frontend")
-    return check_service_availability(frontend_url)
+    return _check_frontend(frontend_url)
 
 
 @pytest.fixture(scope="session")

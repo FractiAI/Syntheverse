@@ -506,11 +506,15 @@ class TestUtils:
         """Check if a service is healthy with retry mechanism"""
         import time
 
+        # For frontend (Next.js), check root URL; for APIs, check /health
+        check_url = url if "localhost:3001" in url else f"{url}/health"
+
         for attempt in range(retries + 1):
             try:
                 import requests
-                response = requests.get(f"{url}/health", timeout=timeout)
-                if response.status_code == 200:
+                response = requests.get(check_url, timeout=timeout, allow_redirects=True)
+                # Accept 200 for APIs, and redirects (3xx) for Next.js frontend
+                if response.status_code == 200 or (response.status_code >= 300 and response.status_code < 400):
                     return True, "Service is healthy"
                 else:
                     status_msg = f"Service returned status {response.status_code}"

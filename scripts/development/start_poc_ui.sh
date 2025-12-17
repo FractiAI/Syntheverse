@@ -6,6 +6,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$SCRIPT_DIR"
 
 # Colors
@@ -20,6 +21,17 @@ echo -e "${BLUE}Starting Syntheverse PoC UI System${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
+# Load GROQ_API_KEY from .env file if it exists
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    GROQ_API_KEY=$(grep '^GROQ_API_KEY=' "$PROJECT_ROOT/.env" | cut -d'=' -f2)
+    if [ ! -z "$GROQ_API_KEY" ]; then
+        export GROQ_API_KEY
+        echo -e "${GREEN}✓ Loaded GROQ_API_KEY from .env file${NC}"
+    else
+        echo -e "${YELLOW}⚠️  GROQ_API_KEY not found in .env file${NC}"
+    fi
+fi
+
 # Check for GROQ_API_KEY
 if [ -z "$GROQ_API_KEY" ]; then
     echo -e "${YELLOW}⚠️  GROQ_API_KEY not set${NC}"
@@ -27,7 +39,6 @@ if [ -z "$GROQ_API_KEY" ]; then
     echo ""
 fi
 
-# Kill any existing processes before starting
 echo -e "${BLUE}Killing any existing processes...${NC}"
 if lsof -ti:5001 > /dev/null 2>&1; then
     echo -e "${YELLOW}Killing processes on port 5001...${NC}"
@@ -42,26 +53,19 @@ sleep 2
 echo ""
 
 echo -e "${BLUE}Starting API server...${NC}"
-    PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
     cd "$PROJECT_ROOT/src/api/poc-api"
     
-    # Check if virtual environment exists
-    if [ ! -d "venv" ]; then
-        echo -e "${YELLOW}Creating virtual environment...${NC}"
-        python3 -m venv venv
+    # Use the project-level virtual environment
+    if [ -f "$PROJECT_ROOT/syntheverse_test_env/bin/activate" ]; then
+        source "$PROJECT_ROOT/syntheverse_test_env/bin/activate"
+        echo -e "${GREEN}✓ Using project virtual environment${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Project venv not found, using system Python${NC}"
     fi
     
-    source venv/bin/activate
-    
-    # Install dependencies if needed
-    if [ ! -f ".deps_installed" ]; then
-        echo -e "${YELLOW}Installing API dependencies...${NC}"
-        pip install -r requirements.txt
-        touch .deps_installed
-    fi
-    
-    # Start API server in background
-    python app.py > /tmp/poc_api.log 2>&1 &
+    # Start API server in background with environment variables
+    echo -e "${GREEN}✓ Starting API with GROQ_API_KEY (length: ${#GROQ_API_KEY})${NC}"
+    GROQ_API_KEY="$GROQ_API_KEY" python app.py > /tmp/poc_api.log 2>&1 &
     API_PID=$!
     echo $API_PID > /tmp/poc_api.pid
     

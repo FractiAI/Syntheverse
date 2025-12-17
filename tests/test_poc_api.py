@@ -26,10 +26,86 @@ class TestPoCAPI(APITestCase):
         return "integration"
 
     def setUp(self):
-        """Set up test with service availability check"""
+        """Set up test with service availability check and test data"""
         super().setUp()
         # Require PoC API to be available
         self.require_service("poc_api")
+
+        # Create test data for tests that need existing contributions
+        self._ensure_test_contributions()
+
+    def _ensure_test_contributions(self):
+        """Ensure at least one test contribution exists for tests that need it"""
+        import requests
+        poc_api_url = test_config.get("api_urls.poc_api")
+
+        # Check if any contributions already exist
+        try:
+            response = requests.get(f"{poc_api_url}/api/archive/contributions", timeout=10)
+            if response.status_code == 200:
+                contributions = response.json().get("contributions", [])
+                if contributions:
+                    self.log_info(f"Found {len(contributions)} existing contributions")
+                    return  # Already have data
+        except Exception as e:
+            self.log_warning(f"Could not check existing contributions: {e}")
+
+        # Create a test contribution if none exist
+        try:
+            self.log_info("Creating test contribution for subsequent tests...")
+
+            # Create test contribution data
+            test_contrib = self.create_test_contribution()
+
+            # Create a temporary PDF file
+            pdf_path = TestFixtures.generate_test_pdf()
+
+            # Submit the contribution
+            with open(pdf_path, 'rb') as pdf_file:
+                files = {'pdf': ('test.pdf', pdf_file, 'application/pdf')}
+                data = {
+                    'title': test_contrib['title'],
+                    'category': test_contrib['category'],
+                    'contributor': test_contrib['contributor']
+                }
+
+                response = requests.post(
+                    f"{poc_api_url}/api/submit",
+                    files=files,
+                    data=data,
+                    timeout=30
+                )
+
+            if response.status_code == 200:
+                result = response.json()
+                submission_hash = result.get("submission_hash")
+                self.log_info(f"✅ Test contribution created: {submission_hash}")
+
+                # Try to evaluate it so certificate tests have data too
+                try:
+                    eval_response = requests.post(
+                        f"{poc_api_url}/api/evaluate/{submission_hash}",
+                        timeout=60
+                    )
+                    if eval_response.status_code == 200:
+                        self.log_info(f"✅ Test contribution evaluated: {submission_hash}")
+                    else:
+                        self.log_warning(f"Could not evaluate test contribution: {eval_response.status_code}")
+                except Exception as e:
+                    self.log_warning(f"Could not evaluate test contribution: {e}")
+
+            elif response.status_code == 429:
+                self.log_info("⚠️  Rate limited when creating test data (acceptable)")
+            else:
+                self.log_warning(f"Could not create test contribution: {response.status_code}")
+
+            # Clean up temp file
+            TestFixtures.cleanup_test_files([pdf_path])
+
+        except ImportError:
+            self.log_warning("PDF generation not available, cannot create test contributions")
+        except Exception as e:
+            self.log_warning(f"Could not create test contribution: {e}")
 
     def test_health_endpoint(self):
         """Test /health endpoint"""

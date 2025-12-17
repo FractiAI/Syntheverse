@@ -297,11 +297,11 @@ class TestBlockchainLayer1(SyntheverseTestCase):
         self.log_info("Testing contract class loading")
 
         try:
-            from layer1.contracts.synth_token import SynthToken
+            from layer1.contracts.synth_token import SYNTHToken
             from layer1.contracts.poc_contract import POCContract
 
             # Test contract class instantiation
-            synth_contract = SynthToken()
+            synth_contract = SYNTHToken()
             poc_contract = POCContract()
 
             self.assertIsNotNone(synth_contract)

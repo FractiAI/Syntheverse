@@ -605,5 +605,6 @@
   "deployedLinkReferences": {},
   "immutableReferences": {},
   "inputSourceName": "project/src/SYNTH.sol",
-  "buildInfoId": "solc-0_8_19-70ee08f008830854016c04da4bc47e5aaf5bca18"
+  "buildInfoId": "solc-0_8_19-70ee08f008830854016c04da4bc47e5aaf5bca18",
+  "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
 }

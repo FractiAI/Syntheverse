@@ -621,5 +621,6 @@
   "deployedLinkReferences": {},
   "immutableReferences": {},
   "inputSourceName": "project/src/POCRegistry.sol",
-  "buildInfoId": "solc-0_8_19-beda35edfcc5b229c5898fc9ec154e8ddd967932"
+  "buildInfoId": "solc-0_8_19-beda35edfcc5b229c5898fc9ec154e8ddd967932",
+  "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
 }

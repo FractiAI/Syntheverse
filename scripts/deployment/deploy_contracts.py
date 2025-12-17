@@ -281,16 +281,15 @@ def deploy_contracts(max_retries: int = 3, anvil_accounts: int = 10):
             bytecode=poc_registry_artifact['bytecode']
         )
 
-        # Constructor params: synthAddress, pocEvaluator, treasury
+        # Constructor params: synthAddress, pocEvaluator
         print(f"   SYNTH Address: {synth_address}")
         print(f"   PoC Evaluator: {deployer}")
-        print(f"   Treasury: {deployer}")
-        logger.info(f"POCRegistry constructor params: synth={synth_address}, evaluator={deployer}, treasury={deployer}")
+        logger.info(f"POCRegistry constructor params: synth={synth_address}, evaluator={deployer}")
 
         # Estimate gas
         try:
             gas_estimate = poc_registry_contract.constructor(
-                synth_address, deployer, deployer
+                synth_address, deployer
             ).estimate_gas({
                 'from': deployer
             })
@@ -305,8 +304,7 @@ def deploy_contracts(max_retries: int = 3, anvil_accounts: int = 10):
         print("   📤 Sending deployment transaction...")
         tx_hash = poc_registry_contract.constructor(
             synth_address,  # SYNTH token address
-            deployer,       # PoC evaluator (deployer for now)
-            deployer        # Treasury (deployer for now)
+            deployer        # PoC evaluator (deployer for now)
         ).transact({
             'from': deployer,
             'gas': gas_limit
