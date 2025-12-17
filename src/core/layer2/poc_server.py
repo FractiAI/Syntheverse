@@ -650,7 +650,11 @@ EVALUATION REQUIREMENTS:
     def get_archive_statistics(self) -> Dict:
         """Get archive statistics."""
         return self.archive.get_statistics()
-    
+
+    def get_contributor_submission_count(self, contributor: str) -> int:
+        """Get the number of submissions by a contributor."""
+        return self.archive.get_contributor_submission_count(contributor)
+
     def get_epoch_info(self) -> Dict:
         """Get epoch information."""
         return self.tokenomics.get_epoch_info()

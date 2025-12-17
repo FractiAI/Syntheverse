@@ -130,3 +130,5 @@ Contributors will be recognized in:
 - Potential future governance participation
 
 Thank you for contributing to Syntheverse! Your work helps advance the frontier of AI, crypto, and scientific discovery. 🚀
+
+

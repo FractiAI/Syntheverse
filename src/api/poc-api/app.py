@@ -347,6 +347,10 @@ def get_contribution(submission_hash):
             else:
                 return obj
 
+        # Get contributor submission count for fee calculation
+        contributor = contrib["contributor"]
+        submission_count = poc_server.get_contributor_submission_count(contributor)
+
         response_data = {
             "submission_hash": contrib["submission_hash"],
             "title": contrib["title"],
@@ -359,6 +363,11 @@ def get_contribution(submission_hash):
             "metadata": contrib.get("metadata", {}),
             "created_at": contrib.get("created_at"),
             "updated_at": contrib.get("updated_at"),
+            "contributor_stats": {
+                "submission_count": submission_count,
+                "free_submissions_remaining": max(0, 3 - submission_count),
+                "fee_required": submission_count >= 3
+            }
         }
 
         return jsonify(convert_metals(response_data))
@@ -663,6 +672,24 @@ def get_tokenomics_statistics():
             stats.setdefault("total_allocated", stats.get("total_distributed", stats.get("total_allocations", 0)))
             stats.setdefault("total_rewards", stats.get("total_distributed", 0))
         return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/contributor/<contributor>/submission-count', methods=['GET'])
+def get_contributor_submission_count(contributor):
+    """Get the number of submissions by a contributor."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        count = poc_server.get_contributor_submission_count(contributor)
+        return jsonify({
+            "contributor": contributor,
+            "submission_count": count,
+            "free_submissions_remaining": max(0, 3 - count),
+            "fee_required": count >= 3
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

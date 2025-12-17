@@ -284,7 +284,19 @@ class PoCArchive:
             hashes &= metal_hashes
         
         return [self.archive["contributions"][h] for h in hashes]
-    
+
+    def get_contributor_submission_count(self, contributor: str) -> int:
+        """
+        Get the number of submissions by a contributor.
+
+        Args:
+            contributor: Contributor address/hash
+
+        Returns:
+            Number of submissions by this contributor
+        """
+        return len(self.archive["by_contributor"].get(contributor, []))
+
     def get_content_hash_history(self, content_hash: str) -> List[Dict]:
         """
         Get all contributions with the same content hash.

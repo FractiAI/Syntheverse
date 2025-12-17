@@ -38,3 +38,5 @@ When adding new documentation:
 2. Use clear, descriptive filenames
 3. Include table of contents for longer documents
 4. Update this README if adding new sections
+
+

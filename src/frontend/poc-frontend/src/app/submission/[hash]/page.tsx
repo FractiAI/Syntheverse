@@ -333,7 +333,10 @@ export default function SubmissionDetailPage() {
                   <div>
                     <label className="text-muted-foreground">Registration Fee</label>
                     <p className="font-medium">
-                      {contribution.metals && contribution.metals.length > 3 ? '$50.00 USD' : 'FREE (First 3)'}
+                      {contribution.contributor_stats?.fee_required ? '$50.00 USD' : 'FREE (First 3)'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {contribution.contributor_stats?.free_submissions_remaining || 3} free submissions remaining
                     </p>
                   </div>
                   <div>

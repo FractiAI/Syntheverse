@@ -113,8 +113,8 @@ forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast 
 
 ## 🎯 Fee Structure
 
-- **First 3 submissions**: FREE
-- **4+ submissions**: $50 per certificate
+- **PoC Submissions**: First 3 FREE, then $50 per submission
+- **Blockchain Registration**: $200 per qualified contribution
 - **Gas fees**: Minimal on Base (~$0.005)
 - **Token rewards**: SYNTH allocations for qualified contributions
 

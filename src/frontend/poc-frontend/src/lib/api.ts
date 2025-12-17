@@ -20,6 +20,11 @@ export interface Contribution {
   }
   created_at: string
   updated_at: string
+  contributor_stats?: {
+    submission_count: number
+    free_submissions_remaining: number
+    fee_required: boolean
+  }
 }
 
 export interface EvaluationResult {

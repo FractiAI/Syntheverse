@@ -17,7 +17,7 @@ contract POCRegistry is Ownable, ReentrancyGuard {
     address public pocEvaluator;
 
     // Fee structure
-    uint256 public constant REGISTRATION_FEE = 50 ether; // $50 in wei (for gas calculations)
+    uint256 public constant REGISTRATION_FEE = 200 ether; // $200 in wei (for gas calculations)
     uint256 public constant FREE_SUBMISSIONS = 3; // First 3 submissions are free
 
     // Contribution structure

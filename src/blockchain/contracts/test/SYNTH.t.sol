@@ -118,16 +118,16 @@ contract SYNTHTest is Test {
 
         // Check that 5th submission requires payment
         uint256 fee = registry.getRegistrationFee(contributor);
-        assertEq(fee, 50 ether);
+        assertEq(fee, 200 ether);
 
         // Register 4th certificate (should cost 50 ETH)
         bytes32 fourthHash = keccak256(abi.encodePacked("submission", uint256(3)));
         vm.prank(contributor);
-        registry.registerCertificate{value: 50 ether}(fourthHash);
+        registry.registerCertificate{value: 200 ether}(fourthHash);
 
         POCRegistry.Contribution memory contrib = registry.getContribution(fourthHash);
         assertTrue(contrib.registered);
-        assertEq(contrib.registrationFee, 50 ether);
+        assertEq(contrib.registrationFee, 200 ether);
     }
 
     function testTokenAllocation() public {

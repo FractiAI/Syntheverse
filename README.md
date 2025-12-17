@@ -8,7 +8,7 @@
 - **Multi-Metal PoC Evaluation**: AI-powered evaluation with Grok API
 - **Interactive Sandbox Map**: Real-time network visualization with 16 knowledge dimensions
 - **Blockchain Integration**: Foundry + Anvil + Hardhat smart contracts
-- **Tiered Fee System**: First 3 submissions FREE, then $50 per certificate
+- **Tiered Fee System**: First 3 submissions FREE, then $50 per submission + $200 blockchain registration
 - **Modern UI**: Next.js dashboard with real-time updates
 - **Archive-First Redundancy**: Comprehensive duplicate detection
 - **Live Tokenomics**: SYNTH token allocation and epoch management
@@ -105,7 +105,7 @@ Solidity contracts for Syntheverse Blockmine L1 on Base blockchain
 	•	**POCRegistry.sol**: Contribution management and certificate registration
 	•	**Technology**: Foundry + Anvil for development, Hardhat for deployment
 	•	**Networks**: Local Anvil → Base Sepolia (testnet) → Base Mainnet
-	•	**Fee Structure**: First 3 submissions FREE, then $50 per certificate
+	•	**Fee Structure**: First 3 submissions FREE, then $50 per submission + $200 blockchain registration
 	•	Status: ✅ Under Development (Foundry + Anvil)
 
 See src/blockchain/contracts/README.md for detailed documentation.
@@ -254,7 +254,7 @@ python3 scripts/startup/start_servers_simple.py
 | **Submit PoC** | http://localhost:3001/submission | Upload PDFs, get AI evaluation |
 | **Sandbox Map** | http://localhost:3001/sandbox-map | Interactive knowledge network |
 | **Registry** | http://localhost:3001/registry | Contribution timeline |
-| **Blockchain Registration** | http://localhost:5000 | Register PoC certificates ($50 after first 3 free) |
+| **Blockchain Registration** | http://localhost:5000 | Register PoC certificates ($200 registration fee) |
 | **PoC API** | http://localhost:5001 | Backend REST API |
 | **Local Blockchain** | http://localhost:8545 | Anvil Ethereum node |
 
@@ -263,7 +263,7 @@ python3 scripts/startup/start_servers_simple.py
 1. **Visit Dashboard** - See live tokenomics and system stats
 2. **Submit a Contribution** - Upload PDF → Wait for Grok AI evaluation → See scores
 3. **View Sandbox Map** - Explore contribution relationships
-4. **Register on Blockchain** - First 3 submissions FREE, then $50 per certificate
+4. **Register on Blockchain** - $200 registration fee for qualified contributions
 
 ⸻
 
@@ -280,8 +280,17 @@ Metrics: coherence, density, novelty, redundancy (0–10000)
 Archive-first redundancy detection prevents duplicates
 
 ### **Fee Structure**
-- **First 3 PoC Submissions**: FREE (no registration fee)
-- **4+ PoC Submissions**: $50 per certificate registration
+
+#### **PoC Submission Fees**
+- **First 3 PoC Submissions**: FREE (no submission fee)
+- **4+ PoC Submissions**: $50 per submission (covers evaluation and processing)
+
+#### **Syntheverse Blockmine Registration Fees**
+- **Blockchain Certificate Registration**: $200 per qualified contribution
+- **Purpose**: Covers blockchain transaction costs and permanent certificate minting
+- **Payment**: Required when registering qualified contributions on the blockchain
+
+#### **Additional Costs**
 - **Blockchain Transactions**: Gas fees only (~$0.005 on Base)
 - **Testnet**: All fees are test transactions with no real value
 
@@ -327,7 +336,7 @@ Contribution Registry
 - **⚡ Live Dashboard**: Real-time statistics, tokenomics, and system metrics
 - **🔄 Archive-First Redundancy**: Comprehensive duplicate detection across entire history
 - **⛓️ Blockchain Integration**: Foundry + Anvil + Hardhat smart contracts deployed locally
-- **💰 Tiered Fee Structure**: First 3 submissions FREE, then $50 per certificate registration
+- **💰 Fee Structure**: First 3 submissions FREE, then $50 per submission + $200 blockchain registration
 - **📊 Token Allocation**: Automatic SYNTH reward distribution (90T total supply)
 - **🎨 Modern UI**: Next.js 14 with TypeScript, Tailwind CSS, and shadcn/ui
 - **🔄 Real-Time Updates**: Live polling for evaluation results and progress tracking
