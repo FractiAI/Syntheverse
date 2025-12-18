@@ -179,7 +179,9 @@ class PoCApi {
     metal?: string
   }): Promise<Contribution[]> {
     const query = new URLSearchParams(params as any).toString()
-    return this.fetch(`/api/archive/contributions?${query}`)
+    const response = await this.fetch(`/api/archive/contributions?${query}`)
+    // API returns {contributions: [...], count: N} - extract the array
+    return response.contributions || response || []
   }
 
   async getContribution(submissionHash: string): Promise<Contribution> {

@@ -44,6 +44,7 @@ Test suites for validating system functionality, API endpoints, submission flows
 ### Infrastructure Test Modules
 
 - **`test_startup_scripts.py`**: Service startup validation and environment configuration
+- **`test_main_menu.py`**: ScriptMenu class testing (init, validation, execution, navigation, errors, performance)
 - **`test_deployment.py`**: Smart contract deployment and validation
 - **`test_fixtures.py`**: Test data generators and environment management utilities
 

@@ -23,9 +23,9 @@ sys.path.insert(0, str(project_root / "src"))
 # Define base directory (project root)
 base_dir = project_root
 
-from layer2.poc_server import PoCServer
-from layer2.poc_archive import ContributionStatus, MetalType
-from layer2.tokenomics_state import Epoch
+from core.layer2.poc_server import PoCServer
+from core.layer2.poc_archive import ContributionStatus, MetalType
+from core.layer2.tokenomics_state import Epoch
 
 # Load GROQ_API_KEY using centralized utility
 from core.utils import load_groq_api_key

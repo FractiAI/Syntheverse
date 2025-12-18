@@ -1,0 +1,107 @@
+{
+  "timestamp": 1766083751.7425768,
+  "mode": "full",
+  "profile": "dev",
+  "services": {
+    "service_0": {
+      "name": "service_0",
+      "pid": 10000,
+      "port": 5000,
+      "start_time": 1766083751.74257,
+      "command": "service_0 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_1": {
+      "name": "service_1",
+      "pid": 10001,
+      "port": 5001,
+      "start_time": 1766083751.742572,
+      "command": "service_1 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_2": {
+      "name": "service_2",
+      "pid": 10002,
+      "port": 5002,
+      "start_time": 1766083751.742573,
+      "command": "service_2 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_3": {
+      "name": "service_3",
+      "pid": 10003,
+      "port": 5003,
+      "start_time": 1766083751.742573,
+      "command": "service_3 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_4": {
+      "name": "service_4",
+      "pid": 10004,
+      "port": 5004,
+      "start_time": 1766083751.742574,
+      "command": "service_4 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_5": {
+      "name": "service_5",
+      "pid": 10005,
+      "port": 5005,
+      "start_time": 1766083751.742574,
+      "command": "service_5 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_6": {
+      "name": "service_6",
+      "pid": 10006,
+      "port": 5006,
+      "start_time": 1766083751.7425752,
+      "command": "service_6 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_7": {
+      "name": "service_7",
+      "pid": 10007,
+      "port": 5007,
+      "start_time": 1766083751.7425752,
+      "command": "service_7 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_8": {
+      "name": "service_8",
+      "pid": 10008,
+      "port": 5008,
+      "start_time": 1766083751.7425761,
+      "command": "service_8 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    },
+    "service_9": {
+      "name": "service_9",
+      "pid": 10009,
+      "port": 5009,
+      "start_time": 1766083751.7425761,
+      "command": "service_9 command",
+      "status": "running",
+      "restart_count": 0,
+      "last_restart": null
+    }
+  }
+}

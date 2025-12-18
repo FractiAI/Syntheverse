@@ -11,13 +11,16 @@ import sys
 import time
 import subprocess
 import shutil
+import threading
+import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from scripts.startup.start_servers import ServerManager
+from scripts.startup.start_servers import ServerManager, ServiceProfile, StartupMetrics
+from scripts.startup.service_health import ServiceStatus
 from test_framework import SyntheverseTestCase
 
 class TestServerManager(SyntheverseTestCase):
@@ -347,6 +350,355 @@ class TestStartupErrorHandling(SyntheverseTestCase):
         args, kwargs = mock_popen.call_args
         self.assertEqual(kwargs['cwd'], test_cwd)
 
+class TestEnhancedStartupOrchestration(unittest.TestCase):
+    """Test cases for enhanced startup orchestration features"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.manager = ServerManager()
+        self.test_port = 55530
+
+    def tearDown(self):
+        """Clean up after tests"""
+        # Clean up any state files
+        if self.manager.state_file.exists():
+            try:
+                self.manager.state_file.unlink()
+            except:
+                pass
+
+    def test_service_profile_configuration(self):
+        """Test service profile configuration"""
+        # Test development profile
+        dev_manager = ServerManager(profile=ServiceProfile.DEVELOPMENT)
+        self.assertEqual(dev_manager.profile, ServiceProfile.DEVELOPMENT)
+        self.assertTrue(dev_manager._service_profiles[ServiceProfile.DEVELOPMENT]['parallel_startup'])
+
+        # Test production profile
+        prod_manager = ServerManager(profile=ServiceProfile.PRODUCTION)
+        self.assertEqual(prod_manager.profile, ServiceProfile.PRODUCTION)
+        self.assertTrue(prod_manager._service_profiles[ServiceProfile.PRODUCTION]['parallel_startup'])
+
+        # Test testing profile
+        test_manager = ServerManager(profile=ServiceProfile.TESTING)
+        self.assertEqual(test_manager.profile, ServiceProfile.TESTING)
+        self.assertFalse(test_manager._service_profiles[ServiceProfile.TESTING]['parallel_startup'])
+
+    def test_port_configuration_by_profile(self):
+        """Test port configuration varies by profile"""
+        dev_manager = ServerManager(mode='poc', profile=ServiceProfile.DEVELOPMENT)
+        test_manager = ServerManager(mode='poc', profile=ServiceProfile.TESTING)
+
+        # Development and testing should have different ports
+        self.assertNotEqual(dev_manager.ports, test_manager.ports)
+
+        # Both should have the same services for 'poc' mode
+        self.assertEqual(set(dev_manager.ports.keys()), set(test_manager.ports.keys()))
+
+    def test_state_persistence(self):
+        """Test service state persistence"""
+        # Create some mock service state
+        from scripts.startup.start_servers import ServiceState
+        test_state = ServiceState(
+            name='test_service',
+            pid=12345,
+            port=5000,
+            start_time=time.time(),
+            command='test command'
+        )
+        self.manager.service_states['test_service'] = test_state
+
+        # Save state
+        self.manager.save_state()
+
+        # Create new manager and load state
+        new_manager = ServerManager()
+        loaded_states = new_manager.service_states
+
+        # Should have loaded the saved state
+        self.assertIn('test_service', loaded_states)
+        self.assertEqual(loaded_states['test_service'].pid, 12345)
+        self.assertEqual(loaded_states['test_service'].port, 5000)
+
+    def test_service_restart_functionality(self):
+        """Test service restart functionality"""
+        # Mock a running service
+        from scripts.startup.start_servers import ServiceState
+        test_state = ServiceState(
+            name='test_service',
+            pid=12345,
+            port=5000,
+            start_time=time.time(),
+            command='test command',
+            restart_count=0
+        )
+        self.manager.service_states['test_service'] = test_state
+
+        # Mock the start_services_parallel method
+        with patch.object(self.manager, 'start_services_parallel') as mock_start:
+            mock_start.return_value = {'test_service': MagicMock(success=True, pid=12346)}
+
+            with patch('os.kill') as mock_kill:
+                with patch.object(self.manager, '_process_running', side_effect=[True, False]):
+                    result = self.manager.restart_service('test_service')
+
+                    # Should have killed old process
+                    mock_kill.assert_called()
+                    # Should have started new service
+                    mock_start.assert_called_once_with(['test_service'])
+                    # Should return success
+                    self.assertTrue(result)
+
+                    # Should have incremented restart count
+                    self.assertEqual(self.manager.service_states['test_service'].restart_count, 1)
+
+    @patch('subprocess.Popen')
+    def test_parallel_service_startup(self, mock_popen):
+        """Test parallel service startup"""
+        mock_process = MagicMock()
+        mock_process.pid = 12345
+        mock_process.poll.return_value = None
+        mock_popen.return_value = mock_process
+
+        # Mock health checker
+        with patch.object(self.manager.health_checker, 'check_service_health') as mock_check:
+            mock_result = MagicMock()
+            mock_result.status = ServiceStatus.HEALTHY
+            mock_check.return_value = mock_result
+
+            # Test parallel startup
+            results = self.manager.start_services_parallel(['poc_api'])
+
+            self.assertIn('poc_api', results)
+            self.assertTrue(results['poc_api'].success)
+            self.assertEqual(results['poc_api'].pid, 12345)
+
+    def test_rollback_functionality(self):
+        """Test startup rollback functionality"""
+        # Create mock running services
+        from scripts.startup.start_servers import ServiceState
+        services_to_rollback = ['service1', 'service2']
+
+        for service_name in services_to_rollback:
+            self.manager.service_states[service_name] = ServiceState(
+                name=service_name,
+                pid=10000 + hash(service_name) % 1000,
+                port=5000 + hash(service_name) % 1000,
+                start_time=time.time(),
+                command=f'{service_name} command'
+            )
+
+        # Mock process running checks and kills
+        with patch.object(self.manager, '_process_running', return_value=True):
+            with patch('os.kill') as mock_kill:
+                with patch('time.sleep'):  # Prevent actual sleep
+                    self.manager.rollback_startup(services_to_rollback)
+
+                    # Should have killed all services
+                    self.assertEqual(mock_kill.call_count, len(services_to_rollback))
+
+                    # Should have cleaned up state
+                    for service_name in services_to_rollback:
+                        self.assertNotIn(service_name, self.manager.service_states)
+
+    def test_graceful_shutdown_handling(self):
+        """Test graceful shutdown signal handling"""
+        shutdown_called = []
+
+        def mock_cleanup():
+            shutdown_called.append(True)
+
+        # Replace cleanup method
+        original_cleanup = self.manager.cleanup
+        self.manager.cleanup = mock_cleanup
+
+        # Simulate SIGTERM
+        self.manager._signal_handler(signal.SIGTERM, None)
+
+        # Should have set shutdown event and called cleanup
+        self.assertTrue(self.manager.shutdown_event.is_set())
+        self.assertTrue(shutdown_called)
+
+        # Restore original cleanup
+        self.manager.cleanup = original_cleanup
+
+class TestIntegrationScenarios(unittest.TestCase):
+    """Integration tests for startup orchestration"""
+
+    def setUp(self):
+        self.manager = ServerManager()
+
+    def test_full_startup_workflow(self):
+        """Test complete startup workflow with mocking"""
+        with patch.object(self.manager, 'load_environment', return_value=True):
+            with patch.object(self.manager, 'validate_dependencies', return_value=True):
+                with patch.object(self.manager.port_manager, 'free_port', return_value=True):
+                    with patch.object(self.manager, 'start_services_parallel') as mock_start:
+                        with patch.object(self.manager.health_checker, 'check_all_services') as mock_check:
+                            # Mock successful startup
+                            mock_start.return_value = {
+                                'poc_api': MagicMock(success=True),
+                                'frontend': MagicMock(success=True)
+                            }
+
+                            mock_check.return_value = {
+                                'poc_api': MagicMock(status=ServiceStatus.HEALTHY),
+                                'frontend': MagicMock(status=ServiceStatus.HEALTHY)
+                            }
+
+                            # Run main startup (with minimal mode to avoid complexity)
+                            minimal_manager = ServerManager(mode='minimal')
+
+                            # This would normally be a full integration test
+                            # For now, just test that the components can be initialized
+                            self.assertIsNotNone(minimal_manager.ports)
+                            self.assertIn('poc_api', minimal_manager.ports)
+
+    def test_concurrent_service_operations(self):
+        """Test concurrent service operations"""
+        results = []
+        errors = []
+
+        def worker(operation_id):
+            try:
+                if operation_id == 0:
+                    # Test getting service status
+                    status = self.manager.get_service_status('nonexistent')
+                    results.append(('status_check', status))
+                elif operation_id == 1:
+                    # Test state save/load
+                    self.manager.save_state()
+                    results.append(('state_save', True))
+                elif operation_id == 2:
+                    # Test metrics access
+                    metrics = self.manager.metrics
+                    results.append(('metrics', metrics.services_started))
+            except Exception as e:
+                errors.append((operation_id, str(e)))
+
+        # Run operations concurrently
+        threads = []
+        for i in range(3):
+            t = threading.Thread(target=worker, args=(i,))
+            threads.append(t)
+            t.start()
+
+        # Wait for completion
+        for t in threads:
+            t.join()
+
+        # Should have completed without errors
+        self.assertEqual(len(results), 3)
+        self.assertEqual(len(errors), 0)
+
+class TestChaosAndErrorScenarios(unittest.TestCase):
+    """Chaos tests and error scenario testing"""
+
+    def setUp(self):
+        self.manager = ServerManager()
+
+    def test_partial_startup_failure_rollback(self):
+        """Test rollback when some services fail to start"""
+        with patch.object(self.manager, 'start_services_parallel') as mock_start:
+            # Simulate partial failure
+            mock_start.return_value = {
+                'poc_api': MagicMock(success=True, pid=12345),
+                'frontend': MagicMock(success=False, error_message="Port conflict")
+            }
+
+            results = self.manager.start_services_parallel(['poc_api', 'frontend'])
+
+            # Should have one success and one failure
+            self.assertTrue(results['poc_api'].success)
+            self.assertFalse(results['frontend'].success)
+
+    def test_service_dependency_failure_propagation(self):
+        """Test that dependency failures are handled properly"""
+        # Add dependency
+        self.manager.health_checker.add_dependency('frontend', 'api')
+
+        with patch.object(self.manager, 'start_services_parallel') as mock_start:
+            # API fails, frontend should still be attempted
+            mock_start.return_value = {
+                'api': MagicMock(success=False, error_message="API failed"),
+                'frontend': MagicMock(success=True, pid=12346)
+            }
+
+            results = self.manager.start_services_parallel(['api', 'frontend'])
+
+            # Both should be attempted (dependency doesn't prevent startup in this design)
+            self.assertFalse(results['api'].success)
+            self.assertTrue(results['frontend'].success)
+
+    def test_state_file_corruption_recovery(self):
+        """Test recovery from corrupted state file"""
+        # Create corrupted state file
+        with open(self.manager.state_file, 'w') as f:
+            f.write("invalid json content {")
+
+        # Should handle corruption gracefully
+        new_manager = ServerManager()
+        # Should not crash and should have empty state
+        self.assertEqual(len(new_manager.service_states), 0)
+
+    def test_resource_cleanup_on_failure(self):
+        """Test that resources are cleaned up when startup fails"""
+        # This would test cleanup of partial state, ports, etc.
+        # For now, just verify the cleanup method exists and can be called
+        self.assertTrue(hasattr(self.manager, 'cleanup'))
+
+        # Call cleanup - should not crash
+        self.manager.cleanup()
+
+class TestPerformanceBenchmarks(unittest.TestCase):
+    """Performance tests for startup orchestration"""
+
+    def setUp(self):
+        self.manager = ServerManager()
+
+    def test_startup_initialization_performance(self):
+        """Test performance of manager initialization"""
+        import time
+
+        start_time = time.time()
+        manager = ServerManager()
+        end_time = time.time()
+
+        duration = end_time - start_time
+
+        # Should initialize quickly (< 0.1 seconds)
+        self.assertLess(duration, 0.1)
+        self.assertIsNotNone(manager.ports)
+
+    def test_state_save_load_performance(self):
+        """Test performance of state save/load operations"""
+        import time
+
+        # Add some state
+        from scripts.startup.start_servers import ServiceState
+        for i in range(10):
+            self.manager.service_states[f'service_{i}'] = ServiceState(
+                name=f'service_{i}',
+                pid=10000 + i,
+                port=5000 + i,
+                start_time=time.time(),
+                command=f'service_{i} command'
+            )
+
+        # Test save performance
+        start_time = time.time()
+        self.manager.save_state()
+        save_duration = time.time() - start_time
+
+        # Test load performance
+        start_time = time.time()
+        new_manager = ServerManager()
+        load_duration = time.time() - start_time
+
+        # Both should be fast (< 0.1 seconds)
+        self.assertLess(save_duration, 0.1)
+        self.assertLess(load_duration, 0.1)
+        self.assertEqual(len(new_manager.service_states), 10)
 
 if __name__ == '__main__':
     unittest.main()

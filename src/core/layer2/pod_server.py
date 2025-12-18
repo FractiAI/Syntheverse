@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 from .tokenomics_state import TokenomicsState, Epoch, ContributionTier
 
 # Load GROQ_API_KEY using centralized utility
-from ..utils import load_groq_api_key
+from core.utils import load_groq_api_key
 
 # Set up logger
 logger = logging.getLogger(__name__)

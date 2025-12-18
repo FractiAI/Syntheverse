@@ -26,11 +26,12 @@ logger = logging.getLogger(__name__)
 # Load GROQ_API_KEY using centralized utility
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 from core.utils import load_groq_api_key
 
 # Import analysis modules
 try:
-    from ..analysis import EmbeddingSearch, EmbeddingAnalyzer
+    from rag_api.analysis import EmbeddingSearch, EmbeddingAnalyzer
     ANALYSIS_AVAILABLE = True
 except ImportError:
     ANALYSIS_AVAILABLE = False
@@ -617,7 +618,7 @@ Awaiting operator input."""
 
         try:
             # Use the validator from the analysis module
-            from ..analysis import EmbeddingValidator
+            from rag_api.analysis import EmbeddingValidator
             validator = EmbeddingValidator()
             return validator.generate_validation_report_from_data(self.chunks)
         except Exception as e:

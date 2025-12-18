@@ -1,305 +1,433 @@
-# Startup Scripts
+# Syntheverse Startup Scripts
 
-## Purpose
+A production-grade service orchestration platform for the Syntheverse platform, featuring intelligent port management, comprehensive health monitoring, parallel startup orchestration, and blockchain state management.
 
-Scripts to start the complete Syntheverse system, orchestrating all services and components.
+## Quick Start
 
-## Scripts
-
-- **`start_servers.py`**: Main startup script with multiple modes
-  - `full`: All services (default)
-  - `poc`: PoC API + Frontend
-  - `minimal`: PoC API only
-- **`port_manager.py`**: Port conflict resolution and management
-- **`anvil_manager.py`**: Anvil blockchain node management
-- **`service_health.py`**: Service health monitoring
-
-## Usage
-
-### Startup with Different Modes
+### Basic Usage
 
 ```bash
-# Start all services (default)
-python scripts/startup/start_servers.py
+# Start all services in development mode
+python start_servers.py
 
-# Start only PoC system (API + Frontend)
-python scripts/startup/start_servers.py --mode poc
+# Start PoC system only (API + Frontend)
+python start_servers.py --mode poc
 
 # Start minimal system (PoC API only)
-python scripts/startup/start_servers.py --mode minimal
-
-# Start without opening browser
-python scripts/startup/start_servers.py --no-browser
+python start_servers.py --mode minimal
 ```
 
-## Services Started
-
-- PoC API (Flask) on port 5001
-- PoC Frontend (Next.js) on port 3001
-- Legacy Web UI (Flask) on port 5000 (optional)
-- Local Blockchain (Anvil) on port 8545 (if running)
-
-## Prerequisites
-
-### Required Software
-
-- **Python 3.8+** with pip
-- **Node.js 18+** with npm (required for Next.js frontend)
-- **GROQ API Key** configured
-
-### Environment Setup
-
-Create a `.env` file in the project root:
+### Advanced Usage
 
 ```bash
-# Syntheverse Environment Configuration
+# Production deployment
+python start_servers.py --mode full --profile prod
 
-# GROQ API Configuration
-GROQ_API_KEY=gsk_your-api-key-here
+# Testing environment
+python start_servers.py --mode poc --profile test
 
-# Optional: Other API keys and configuration can go here
-# OPENAI_API_KEY=your-openai-key-here
-# ANVIL_RPC_URL=http://localhost:8545
+# Restart specific services
+python start_servers.py --restart poc_api frontend
+
+# Headless operation (no browser auto-open)
+python start_servers.py --no-browser
 ```
 
-Or set environment variables directly:
+## Service Profiles
 
-```bash
-export GROQ_API_KEY=your-api-key-here
+### Development Profile (`--profile dev`)
+- **Best for**: Local development and debugging
+- **Features**: Parallel startup, fast health checks, auto-restart enabled
+- **Timeouts**: 30 seconds for health checks
+- **Ports**: Standard development ports
+
+### Testing Profile (`--profile test`)
+- **Best for**: Automated testing and CI/CD
+- **Features**: Sequential startup for predictability, auto-restart disabled
+- **Timeouts**: 60 seconds for health checks
+- **Ports**: Offset ports (+1000) to avoid conflicts
+
+### Production Profile (`--profile prod`)
+- **Best for**: Live deployments
+- **Features**: Parallel startup with dependency ordering, robust error handling
+- **Timeouts**: 120 seconds for health checks
+- **Ports**: Standard production ports
+
+### Minimal Profile (`--profile minimal`)
+- **Best for**: Resource-constrained environments
+- **Features**: Sequential startup, minimal services
+- **Timeouts**: 15 seconds for health checks
+- **Ports**: Only essential services
+
+## Service Architecture
+
+```
+🌐 SYNTHVERSE SERVERS RUNNING:
+┌─────────────────────────────────────┐
+│ PoC API          http://127.0.0.1:5001 │
+│ API Health       http://127.0.0.1:5001/health │
+│ RAG API          http://127.0.0.1:8000 │
+│ RAG Docs         http://127.0.0.1:8000/docs │
+│ Next.js UI       http://127.0.0.1:3001 │
+│ Anvil Node       http://127.0.0.1:8545 │
+└─────────────────────────────────────┘
 ```
 
-### Python Dependencies
+### Service Dependencies
 
-Install required Python packages:
-
-```bash
-pip install flask flask-cors werkzeug requests
+```
+frontend → poc_api    (UI needs API data)
+poc_api  → rag_api    (PoC may use RAG for evaluation)
 ```
 
-### Node.js Dependencies (for Next.js frontend)
+## Environment Setup
+
+### Required Environment Variables
 
 ```bash
-cd src/frontend/poc-frontend
-npm install
+# Copy and edit .env file
+cp .env.example .env
+
+# Required for all modes
+GROQ_API_KEY=gsk_your-groq-api-key-here
+```
+
+### Optional Environment Variables
+
+```bash
+# Flask environment
+FLASK_ENV=development|testing|production
+
+# Node.js environment
+NODE_ENV=development|production
+
+# Custom port assignments (overrides defaults)
+POC_API_PORT=5001
+RAG_API_PORT=8000
+FRONTEND_PORT=3001
+ANVIL_PORT=8545
 ```
 
 ## Port Management
 
-### Port Cleanup Behavior
+### Automatic Port Resolution
 
-All startup scripts use a shared `port_manager.py` module that provides intelligent port management:
+The system automatically handles port conflicts:
 
-- **Automatic Port Detection**: Uses `lsof` to identify processes using target ports
-- **Smart Process Killing**: Attempts to kill processes gracefully with SIGTERM, then SIGKILL if needed
-- **System Service Protection**: Detects and warns about system services (like macOS AirPlay Receiver) without killing them
-- **Retry Logic**: Implements exponential backoff retry (up to 5 attempts) for stubborn port conflicts
-- **Multiple PID Handling**: Can handle multiple processes using the same port
-
-### macOS AirPlay Receiver Workaround
-
-On macOS, you may encounter conflicts with the AirPlay Receiver service on port 5000:
-
-```
-⚠️ Port 5000 (Web UI) in use - attempting force cleanup
-⚠️ Not killing system service AirPlay (PID: 12345) on port 5000
-⚠️ Left 1 system services running on port 5000
-```
-
-**Solutions:**
-1. **Use different port**: Modify the `ports` dictionary in startup scripts to use port 5002 instead
-2. **Disable AirPlay Receiver**: System Preferences → Sharing → Uncheck "AirPlay Receiver"
-3. **Manual port change**: The script will continue and use a different port if configured
-
-## Testing
-
-### Unit Tests
-
-Run port management tests:
 ```bash
-cd tests
-python -m pytest test_port_manager.py -v
+# Check port status
+python -c "
+from scripts.startup.port_manager import get_port_status
+status = get_port_status(5001, 'poc_api')
+print(f'Port 5001: {status[\"available\"]}, Process: {status[\"process_count\"]}')
+"
 ```
 
-### Startup Script Tests
+### Manual Port Management
 
-Run comprehensive startup script tests:
+```python
+from scripts.startup.port_manager import port_manager
+
+# Reserve a port for your service
+port_manager.reserve_port(5001, "my_service", os.getpid())
+
+# Check multiple ports simultaneously
+results = port_manager.check_ports_batch([5001, 8000, 3001])
+print(f"Available ports: {[p for p, avail in results.items() if avail]}")
+
+# Get performance metrics
+metrics = port_manager.get_metrics(port=5001)
+for metric in metrics:
+    print(f"Cleanup took {metric.cleanup_duration:.2f}s, {metric.processes_killed} processes killed")
+```
+
+## Health Monitoring
+
+### Real-time Health Checks
+
+```python
+from scripts.startup.service_health import health_checker
+
+# Check all services
+results = health_checker.check_all_services()
+for service, result in results.items():
+    status = "✅" if result.status.name == "HEALTHY" else "❌"
+    print(f"{status} {service}: {result.response_time:.2f}s")
+
+# Get detailed service metrics
+metrics = health_checker.get_service_metrics('poc_api')
+print(f"Uptime: {metrics.uptime_percentage:.1%}, Avg response: {metrics.average_response_time:.2f}s")
+```
+
+### Service Dependencies
+
+```python
+# Add custom service dependency
+health_checker.add_dependency('my_service', 'poc_api')
+
+# Get optimal startup order
+order = health_checker.get_startup_order()
+print(f"Start services in order: {order}")
+```
+
+## Blockchain Management
+
+### Anvil Node Operations
+
+```python
+from scripts.startup.anvil_manager import anvil_manager
+
+# Start with custom configuration
+anvil_manager.start_anvil(
+    accounts=5,
+    block_time=2,  # 2 second blocks
+    gas_limit="10000000"
+)
+
+# Create blockchain snapshot
+snapshot_id = anvil_manager.create_snapshot("before_deployment")
+
+# Enable mainnet fork for testing
+anvil_manager.enable_fork_mode(
+    "https://mainnet.infura.io/v3/YOUR_PROJECT_ID",
+    fork_mode="mainnet"
+)
+
+# Monitor gas usage
+metrics = anvil_manager.get_gas_metrics()
+print(f"Current gas price: {metrics.average_gas_price}")
+```
+
+### Snapshot Management
+
+```python
+# List all snapshots
+snapshots = anvil_manager.list_snapshots()
+for snap in snapshots:
+    print(f"{snap['id']}: Block {snap['block_number']} ({snap['created']})")
+
+# Restore previous state
+success = anvil_manager.restore_snapshot("before_deployment")
+```
+
+## Monitoring and Debugging
+
+### Performance Metrics
+
 ```bash
-cd tests
-python -m pytest test_startup_scripts.py -v
+# View startup performance
+python -c "
+from scripts.startup.start_servers import ServerManager
+import json
+manager = ServerManager()
+print('Startup Metrics:')
+print(f'  Total time: {manager.metrics.total_startup_time:.2f}s')
+print(f'  Port cleanup: {manager.metrics.port_cleanup_time:.2f}s')
+print(f'  Health checks: {manager.metrics.health_check_time:.2f}s')
+print(f'  Services started: {manager.metrics.services_started}')
+"
 ```
 
-### Test Coverage
+### Service State Inspection
 
-Tests cover:
-- Port availability checking
-- Process detection and killing
-- System service identification
-- Environment variable loading
-- Dependency validation
-- Service health checks
-- Error handling and recovery
-
-## Architecture
-
-### Startup Flow Diagram
-
-```mermaid
-graph TD
-    A[Start Script] --> B[Load Environment]
-    B --> C{Environment Valid?}
-    C -->|No| D[Exit with Error]
-    C -->|Yes| E[Validate Dependencies]
-    E --> F{Dependencies OK?}
-    F -->|No| G[Exit with Error]
-    F -->|Yes| H[Port Cleanup]
-    H --> I[Start Services]
-    I --> J[Health Checks]
-    J --> K{Services Ready?}
-    K -->|No| L[Retry/Exit]
-    K -->|Yes| M[System Ready]
+```bash
+# Check running services
+python -c "
+from scripts.startup.start_servers import ServerManager
+manager = ServerManager()
+for name, state in manager.service_states.items():
+    uptime = time.time() - state.start_time
+    print(f'{name}: PID {state.pid}, port {state.port}, {uptime:.1f}s uptime')
+"
 ```
 
-### Port Management Flow
+### Log Analysis
 
-```mermaid
-graph TD
-    A[Check Port] --> B{Port Free?}
-    B -->|Yes| C[Continue Startup]
-    B -->|No| D[Get Process Info]
-    D --> E{System Service?}
-    E -->|Yes| F[Warn & Continue]
-    E -->|No| G[Kill Process]
-    G --> H[Wait & Retry]
-    H --> I{Port Free Now?}
-    I -->|Yes| C
-    I -->|No| J[Retry/Exponential Backoff]
-    J --> K{Max Retries?}
-    K -->|No| H
-    K -->|Yes| L[Fail with Error]
+```bash
+# View recent logs
+tail -f ~/.syntheverse/logs/startup.log
+
+# Filter by service
+grep "poc_api" ~/.syntheverse/logs/startup.log
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### "Required file not found" errors
-
-The startup scripts validate that required files exist before starting services. If you see:
-
-```
-❌ Required file not found: /path/to/file
-```
-
-This indicates a file is missing. Ensure you're running the script from the project root directory.
-
-#### "Missing required environment variables"
-
-```
-❌ Missing required environment variables: GROQ_API_KEY
-```
-
-Set the GROQ_API_KEY in your `.env` file or environment variables.
-
-#### "Port X is still in use" warnings
-
-The scripts use intelligent port management with retry logic and system service detection. If automatic cleanup fails:
-
-**Manual Intervention:**
-```bash
-# Find process using the port
-lsof -i :5000
-
-# Kill the process (replace PID)
-kill -9 PID
-```
-
-**Alternative Solutions:**
-- Use a different port by modifying the `ports` dictionary in the startup script
-- Restart your computer to clear system services
-- Check for background processes: `ps aux | grep -E "(python|node|flask)"`
-
-**Common macOS Issues:**
-- AirPlay Receiver on port 5000: Disable in System Preferences → Sharing
-- Control Center processes: May require restart or different port selection
-
-#### Next.js frontend not starting
-
-```
-❌ Node.js not available - Next.js frontend cannot start
-```
-
-Ensure Node.js 18+ is installed and available in PATH.
-
-#### Python packages missing
-
-```
-❌ Missing Python packages: flask, flask_cors
-```
-
-Install missing packages:
+#### Services Won't Start
 
 ```bash
-pip install flask flask-cors werkzeug requests
+# Check port availability
+lsof -i :5001
+
+# Force cleanup
+python -c "from scripts.startup.port_manager import free_port; free_port(5001, 'poc_api')"
+
+# Check environment
+echo $GROQ_API_KEY
 ```
 
-### Service Health Checks
+#### Slow Startup
 
-The startup scripts perform health checks after starting services. If a service fails:
+```bash
+# Use minimal profile for faster startup
+python start_servers.py --mode minimal --profile minimal
 
-1. Check the service logs (displayed in terminal)
-2. Verify the service is running: `ps aux | grep python`
-3. Check service endpoints manually:
-   - PoC API: `curl http://localhost:5001/health`
-   - Web UI: `curl http://localhost:5000/`
-   - Next.js: `curl http://localhost:3001/`
+# Check what's slowing down startup
+python -c "
+import time
+start = time.time()
+from scripts.startup.start_servers import ServerManager
+manager = ServerManager()
+print(f'Initialization: {time.time() - start:.2f}s')
+"
+```
 
-### Port Conflicts
+#### Health Check Failures
 
-Default ports used:
-- PoC API (Flask): 5001
-- Legacy Web UI (Flask): 5000
-- Next.js Frontend: 3001
-- Anvil (blockchain): 8545
+```bash
+# Get detailed health status
+python -c "
+from scripts.startup.service_health import get_service_status
+status = get_service_status('poc_api')
+print(f'Status: {status[\"status\"]}')
+print(f'Error: {status.get(\"error_message\", \"None\")}')
+print(f'Uptime: {status[\"uptime_percentage\"]:.1%}')
+"
+```
 
-To use different ports, modify the `ports` dictionary in the startup scripts.
+#### Blockchain Connection Issues
 
-## Integration
+```bash
+# Reset Anvil
+python -c "
+from scripts.startup.anvil_manager import anvil_manager
+anvil_manager.stop_anvil()
+anvil_manager.start_anvil()
+"
 
-- Orchestrates system services: Manages Flask API, Next.js frontend, and RAG API
-- Port management: Shared `port_manager.py` handles conflicts across all scripts
-- Service lifecycle management: Startup, monitoring, and shutdown
-- Error handling: Logging and actionable error messages
-- Health checks with retry logic: Exponential backoff for service availability
-- Dependency validation: Pre-flight checks prevent startup failures
-- Cross-platform compatibility: Works on macOS, Linux, and Windows
-- Testing: Test coverage for reliability
+# Check Anvil status
+curl -X POST -H "Content-Type: application/json" \
+     --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' \
+     http://127.0.0.1:8545
+```
+
+### Recovery Procedures
+
+#### Complete System Reset
+
+```bash
+# Stop all services
+pkill -f "python.*start_servers.py"
+pkill -f "anvil"
+pkill -f "next"
+
+# Clear state
+rm -f ~/.syntheverse/startup_state.json
+rm -rf ~/.syntheverse/anvil/snapshots/
+
+# Clean ports
+for port in 5001 8000 3001 8545; do
+    lsof -ti:$port | xargs kill -9 2>/dev/null || true
+done
+
+# Restart
+python start_servers.py --mode full --profile dev
+```
+
+#### Emergency Port Cleanup
+
+```bash
+#!/bin/bash
+# emergency_port_cleanup.sh
+
+PORTS=(5001 8000 3001 8545)
+
+for port in "${PORTS[@]}"; do
+    echo "Cleaning port $port..."
+    # Kill all processes on port
+    lsof -ti:$port | xargs kill -9 2>/dev/null || true
+    sleep 1
+    # Verify port is free
+    if lsof -i:$port >/dev/null 2>&1; then
+        echo "WARNING: Port $port still in use"
+    else
+        echo "✓ Port $port cleaned"
+    fi
+done
+```
 
 ## Development
 
-### Adding New Startup Scripts
+### Running Tests
 
-1. Import the shared `PortManager` class
-2. Use `port_manager.free_port()` instead of manual port checking
-3. Implement proper logging with the test framework
-4. Add comprehensive error handling
-5. Include health checks with retry logic
+```bash
+# Run all startup tests
+python -m pytest tests/test_startup_scripts.py -v
 
-### Port Configuration
+# Run port manager tests
+python -m pytest tests/test_port_manager.py -v
 
-Modify the `ports` dictionary in startup scripts to change default ports:
+# Run service health tests
+python -m pytest tests/test_service_health.py -v
 
-```python
-self.ports = {
-    'api': 5001,      # Flask PoC API
-    'frontend': 3001  # Next.js frontend
-}
+# Run anvil manager tests
+python -m pytest tests/test_anvil_manager.py -v
+
+# Run with coverage
+python -m pytest tests/ --cov=scripts/startup --cov-report=html
 ```
 
-### Testing New Scripts
+### Adding New Services
 
-Add tests to `test_startup_scripts.py` following the existing patterns:
-- Test environment loading
-- Test dependency validation
-- Test service startup with mocks
-- Test error conditions
+```python
+# 1. Define service in ServerManager.__init__
+self.services['my_service'] = ServiceInfo(
+    name='My Service',
+    port=6001,
+    endpoint='/health',
+    dependencies=['poc_api']  # Optional
+)
 
+# 2. Add startup logic in start_services_parallel
+elif service_name == 'my_service':
+    success = self.start_server("python my_service.py", "My Service", 6001)
+
+# 3. Add to ports dict
+self.ports['my_service'] = 6001
+```
+
+### Custom Health Checks
+
+```python
+from scripts.startup.service_health import ServiceInfo, HealthCheckType
+
+# Add custom service with WebSocket health check
+health_checker.services['websocket_service'] = ServiceInfo(
+    name='WebSocket Service',
+    port=8080,
+    endpoint='/ws',
+    check_type=HealthCheckType.WEBSOCKET
+)
+```
+
+## API Reference
+
+See [`AGENTS.md`](AGENTS.md) for comprehensive API documentation including:
+- All public methods and their parameters
+- Return types and error conditions
+- Integration examples
+- Performance characteristics
+
+## Contributing
+
+1. **Code Standards**: Follow existing patterns and add comprehensive tests
+2. **Documentation**: Update both `README.md` and `AGENTS.md` for new features
+3. **Testing**: Maintain 90%+ test coverage, add integration tests for new features
+4. **Performance**: Ensure new features don't degrade startup performance
+5. **Compatibility**: Maintain backward compatibility with existing configurations
+
+## License
+
+See project root [`LICENSE`](../../LICENSE) file.
