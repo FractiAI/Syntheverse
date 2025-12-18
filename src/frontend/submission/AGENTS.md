@@ -40,6 +40,24 @@ User interface for submitting Proof-of-Contribution (PoC) and Proof-of-Discovery
 - Status notification systems
 - Certificate generation and display
 
+## File Structure
+
+```
+submission/
+├── src/
+│   └── index.html            # Submission interface scaffold
+├── README.md                 # Submission documentation
+└── AGENTS.md                 # This documentation
+```
+
+## Cross-References
+
+- **Parent**: [frontend/AGENTS.md](../AGENTS.md) - Frontend overview
+- **Related**:
+  - [poc-frontend/AGENTS.md](../poc-frontend/AGENTS.md) - Main dashboard submission
+  - [api/poc-api/AGENTS.md](../../api/poc-api/AGENTS.md) - Submission API
+  - [core/layer2/AGENTS.md](../../core/layer2/AGENTS.md) - Evaluation integration
+
 
 
 

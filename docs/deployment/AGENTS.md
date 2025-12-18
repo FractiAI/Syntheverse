@@ -39,3 +39,19 @@ Deployment guides and configuration documentation for the Syntheverse system, co
 - Environment variable configuration
 - Production hardening procedures
 - Security and monitoring setup
+
+## File Structure
+
+```
+deployment/
+├── README.md                 # Deployment guide
+└── AGENTS.md                 # This documentation
+```
+
+## Cross-References
+
+- **Parent**: [docs/AGENTS.md](../AGENTS.md) - Documentation overview
+- **Related**:
+  - [scripts/deployment/AGENTS.md](../../scripts/deployment/AGENTS.md) - Deployment scripts
+  - [scripts/startup/AGENTS.md](../../scripts/startup/AGENTS.md) - Startup orchestration
+  - [config/AGENTS.md](../../config/AGENTS.md) - Configuration setup

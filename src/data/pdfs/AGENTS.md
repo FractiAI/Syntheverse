@@ -22,8 +22,8 @@ Storage and management of PDF documents downloaded from Zenodo repositories for 
 
 ## Integration Points
 
-- PDF files downloaded by RAG scraper in `src/api/rag-api/scraper/`
-- Input for RAG parser in `src/api/rag-api/parser/`
+- PDF files downloaded by RAG scraper in `src/api/rag_api/scraper/`
+- Input for RAG parser in `src/api/rag_api/parser/`
 - Referenced by metadata files in `src/data/metadata/`
 - Used by RAG API for document retrieval and display
 
@@ -42,6 +42,14 @@ Storage and management of PDF documents downloaded from Zenodo repositories for 
 - Duplicate download prevention
 - Batch processing workflows
 - Repository integration patterns
+
+## Cross-References
+
+- **Parent**: [data/AGENTS.md](../AGENTS.md) - Data management
+- **Related**:
+  - [api/rag_api/scraper/AGENTS.md](../../api/rag_api/scraper/AGENTS.md) - PDF scraping
+  - [parsed/AGENTS.md](../parsed/AGENTS.md) - Parsed content output
+  - [metadata/AGENTS.md](../metadata/AGENTS.md) - Download metadata
 
 
 

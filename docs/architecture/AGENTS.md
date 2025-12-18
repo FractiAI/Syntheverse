@@ -40,3 +40,19 @@ System architecture documentation for the Syntheverse platform, describing the t
 - Data flow diagrams
 - Technology stack descriptions
 - Security and scalability considerations
+
+## File Structure
+
+```
+architecture/
+├── README.md                 # System architecture overview
+└── AGENTS.md                 # This documentation
+```
+
+## Cross-References
+
+- **Parent**: [docs/AGENTS.md](../AGENTS.md) - Documentation overview
+- **Blueprint**: [Blueprint for Syntheverse](../Blueprint for Syntheverse) - Central vision
+- **Related**:
+  - [src/AGENTS.md](../../src/AGENTS.md) - Source code organization
+  - [docs/BLUEPRINT_IMPLEMENTATION_STATUS.md](../BLUEPRINT_IMPLEMENTATION_STATUS.md) - Implementation tracking

@@ -41,6 +41,24 @@ Administrative interface for managing Syntheverse PoD submissions, evaluations, 
 - Real-time statistics displays
 - Audit and logging systems
 
+## File Structure
+
+```
+admin/
+├── src/
+│   └── index.html            # Admin interface scaffold
+├── README.md                 # Admin documentation
+└── AGENTS.md                 # This documentation
+```
+
+## Cross-References
+
+- **Parent**: [frontend/AGENTS.md](../AGENTS.md) - Frontend overview
+- **Related**:
+  - [poc-frontend/AGENTS.md](../poc-frontend/AGENTS.md) - Main dashboard
+  - [api/poc-api/AGENTS.md](../../api/poc-api/AGENTS.md) - API integration
+  - [core/layer2/AGENTS.md](../../core/layer2/AGENTS.md) - Layer 2 integration
+
 
 
 

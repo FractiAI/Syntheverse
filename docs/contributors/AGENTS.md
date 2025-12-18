@@ -39,6 +39,23 @@ Contributor resources and documentation for the Syntheverse ecosystem, including
 - Community contribution guidelines
 - Ecosystem participation pathways
 
+## File Structure
+
+```
+contributors/
+├── SYNTH_Pitch.md            # SYNTH token pitch document
+├── README.md                 # Contributor overview
+└── AGENTS.md                 # This documentation
+```
+
+## Cross-References
+
+- **Parent**: [docs/AGENTS.md](../AGENTS.md) - Documentation overview
+- **Blueprint**: [Blueprint for Syntheverse](../Blueprint for Syntheverse) - Central vision (§4, §6)
+- **Related**:
+  - [src/core/layer2/AGENTS.md](../../src/core/layer2/AGENTS.md) - Tokenomics implementation
+  - [docs/L2_TOKENOMICS.md](../L2_TOKENOMICS.md) - Tokenomics documentation
+
 
 
 

@@ -60,6 +60,92 @@ Documentation for the Syntheverse system including architecture, API documentati
 - Architecture docs describe system design
 - API docs describe endpoints
 
+## Responsibilities
+
+### Documentation Management
+- Maintain comprehensive system documentation
+- Ensure all code changes are reflected in documentation
+- Provide clear guidance for developers and users
+- Keep API documentation synchronized with implementations
+
+### Knowledge Transfer
+- Document architectural decisions and design rationale
+- Provide onboarding guides for new contributors
+- Maintain historical context for system evolution
+- Support troubleshooting and debugging efforts
+
+### Quality Assurance
+- Validate documentation accuracy against code
+- Ensure consistent terminology across all docs
+- Remove outdated information promptly
+- Maintain documentation standards and conventions
+
+## Interfaces
+
+### Internal Documentation Links
+- **Blueprint Document**: Central system vision and specifications
+- **API Documentation**: Endpoint specifications and usage examples
+- **Architecture Docs**: System design and component relationships
+- **Setup Guides**: Installation and configuration procedures
+
+### External References
+- **GROQ API**: LLM service documentation and integration guides
+- **Base Blockchain**: Network documentation and development resources
+- **Open Source Libraries**: Dependency documentation and usage
+
+### Cross-References
+- **Code Components**: Link to source code from documentation
+- **Configuration Files**: Reference setup and environment files
+- **Test Documentation**: Link to testing procedures and examples
+
+## Dependencies
+
+### Documentation Tools
+- **Markdown**: Primary documentation format
+- **Git**: Version control for documentation changes
+- **GitHub**: Hosting and collaboration platform
+- **Draw.io/Mermaid**: Diagram creation tools
+
+### Content Dependencies
+- **Source Code**: All documentation must reflect current implementations
+- **Blueprint Document**: Central reference for system vision
+- **API Specifications**: Must match actual endpoint implementations
+- **Configuration Files**: Must reference current setup procedures
+
+## Development
+
+### Documentation Workflow
+- **Change Tracking**: Update docs with every code change
+- **Review Process**: Documentation changes require review
+- **Version Control**: All docs tracked in Git with meaningful commit messages
+- **Accessibility**: Ensure docs are readable and well-structured
+
+### Standards and Conventions
+- **Language**: Clear, professional, understated English
+- **Structure**: Consistent heading hierarchy and formatting
+- **Naming**: Remove unnecessary adjectives, use precise terminology
+- **Examples**: Include practical code examples where helpful
+
+### Maintenance Procedures
+- **Regular Reviews**: Quarterly documentation audits
+- **User Feedback**: Incorporate feedback from developers and users
+- **Blueprint Alignment**: Ensure docs match current blueprint vision
+- **Link Validation**: Regularly check and fix broken cross-references
+
+## Testing
+
+### Documentation Validation
+- **Link Checking**: Validate all internal and external links
+- **Content Accuracy**: Verify examples work with current code
+- **Readability**: Ensure documentation is clear and accessible
+- **Completeness**: Check that all features are documented
+
+### Quality Assurance
+- **Consistency Checks**: Ensure terminology is consistent across docs
+- **Blueprint Compliance**: Validate alignment with system blueprint
+- **Technical Accuracy**: Verify technical information is correct
+- **User Testing**: Get feedback from new users on documentation clarity
+
 ## Development Guidelines
 
 - Keep documentation up-to-date with code
