@@ -10,6 +10,7 @@ The `src/` directory contains all source code for the Syntheverse system, organi
 
 - **`poc-api/`**: Flask API server connecting Next.js frontend to Layer 2 backend
 - **`rag_api/`**: FastAPI server for document processing and RAG queries
+- **`rag-api/`**: Alternative FastAPI RAG implementation with extended analysis
 
 ### Blockchain (`blockchain/`)
 
@@ -23,7 +24,7 @@ The `src/` directory contains all source code for the Syntheverse system, organi
 ### Frontend (`frontend/`)
 
 - **`poc-frontend/`**: Next.js 14 application (main PoC dashboard)
-- **`web-legacy/`**: Legacy Flask web interface
+- **`ui_web/`**: Legacy Flask web interface
 - **`submission/`**: Basic submission interface
 - **`admin/`**: Administrative interface
 
@@ -33,6 +34,7 @@ The `src/` directory contains all source code for the Syntheverse system, organi
 - **`parsed/`**: Parsed text chunks
 - **`vectorized/`**: Embeddings and metadata
 - **`metadata/`**: Scraping metadata
+- **`blockchain/`**: Runtime blockchain state (see `data/blockchain/`)
 
 ## Integration Points
 
@@ -156,13 +158,6 @@ cd src/frontend/poc-frontend && npm test
 - **Blockchain**: Contract and interaction tests
 - **API**: Endpoint and error scenario tests
 
-## Development Guidelines
-
-- Maintain clear separation between components
-- Use environment variables for configuration
-- Follow component-specific coding standards
-- Update documentation when making changes
-
 ## Blueprint Alignment
 
 ### Core Architecture Mapping ([Blueprint §3](docs/Blueprint for Syntheverse))
@@ -216,7 +211,8 @@ cd src/frontend/poc-frontend && npm test
 src/
 ├── api/                    # API services and bridges
 │   ├── poc-api/           # Flask API for PoC submissions
-│   └── rag_api/           # FastAPI for RAG document processing
+│   ├── rag_api/           # FastAPI for RAG document processing
+│   └── rag-api/           # Alternative RAG implementation
 ├── blockchain/            # Layer 1 blockchain implementation
 │   ├── contracts/         # Solidity smart contracts
 │   └── layer1/            # Python blockchain integration
@@ -226,10 +222,11 @@ src/
 │   ├── pdfs/             # Raw PDF documents
 │   ├── parsed/           # Parsed text chunks
 │   ├── vectorized/       # Embeddings and vectors
-│   └── metadata/         # Scraping metadata
+│   ├── metadata/         # Scraping metadata
+│   └── blockchain/       # Runtime blockchain state
 ├── frontend/              # User interface applications
 │   ├── poc-frontend/     # Next.js main dashboard
-│   ├── web-legacy/       # Legacy Flask interface
+│   ├── ui_web/           # Legacy Flask interface
 │   ├── submission/       # Basic submission interface
 │   └── admin/            # Administrative interface
 └── test_outputs/          # Test result storage

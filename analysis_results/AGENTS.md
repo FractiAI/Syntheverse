@@ -54,9 +54,28 @@ python -m src.api.rag_api.analysis.cli.validate_embeddings \
 - Use consistent naming conventions for outputs
 - Update analysis when embedding model changes
 
+## Blueprint Alignment
+
+### AI Integration Analysis ([Blueprint §5](docs/Blueprint for Syntheverse))
+- **Embedding Quality**: Statistical analysis and validation of vectorized document representations
+- **Similarity Detection**: Duplicate detection and redundancy analysis for archive-first evaluation
+- **Visualization Support**: Dimensionality reduction and clustering analysis for understanding document relationships
+
+### Archive Training Data ([Blueprint §5](docs/Blueprint for Syntheverse))
+- **Document Embeddings**: Vector representations of all PoC submissions for AI training
+- **Quality Metrics**: Statistical validation ensures high-quality training data for evolving Syntheverse AI
+- **Redundancy Detection**: Similarity analysis supports duplicate prevention in PoC evaluation
+
+### RAG Pipeline Validation ([Blueprint §3.2](docs/Blueprint for Syntheverse))
+- **Vector Quality**: PCA analysis and variance explanation validate embedding effectiveness
+- **Search Optimization**: Similarity heatmaps and distributions inform RAG retrieval accuracy
+- **Performance Monitoring**: Statistical dashboards track embedding pipeline health
+
 ## Cross-References
 
+- **Blueprint Document**: [docs/Blueprint for Syntheverse](../docs/Blueprint for Syntheverse) - Central system vision
 - **Source**: [src/api/rag_api/analysis/AGENTS.md](src/api/rag_api/analysis/AGENTS.md) - Analysis pipeline
 - **Input**: [src/data/vectorized/AGENTS.md](src/data/vectorized/AGENTS.md) - Source embeddings
-- **Related**: [docs/api/RAG_API.md](docs/api/RAG_API.md) - RAG API documentation
+- **Related**: [docs/api/RAG_API.md](../docs/api/RAG_API.md) - RAG API documentation
+- [config/environment/SETUP_GROQ.md](../config/environment/SETUP_GROQ.md) - AI integration setup
 

@@ -45,10 +45,34 @@ data/
     └── synth_token.json     # SYNTH token allocations
 ```
 
+## Blueprint Alignment
+
+### Blockchain State Management ([Blueprint §1.4](docs/Blueprint for Syntheverse))
+- **Layer 1 Implementation**: Persistent storage for Syntheverse Blockmine L1 blockchain operations
+- **Registration Records**: On-chain PoC registration with $200 fees and "I was here first" recognition
+- **Token Allocations**: SYNTH token distribution tracking and epoch-based management
+
+### Archive-First Redundancy ([Blueprint §3.2](docs/Blueprint for Syntheverse))
+- **State Persistence**: Blockchain state survives system restarts for continuity
+- **Audit Trail**: Complete transaction history for transparency and governance
+- **Recovery Support**: State files enable system restoration and integrity validation
+
+### Tokenomics Engine ([Blueprint §3.3](docs/Blueprint for Syntheverse))
+- **SYNTH Balances**: Real-time tracking of token allocations and metallic amplifications
+- **Epoch Management**: Distribution tracking across contribution evaluation cycles
+- **Threshold Scaling**: Core/leaf contribution scaling from high-impact to supporting work
+
+### Complete Workflow Support ([Blueprint §7](docs/Blueprint for Syntheverse))
+- **Registration → Allocation**: Blockchain state tracks the complete PoC to SYNTH workflow
+- **On-Chain Transparency**: All allocations auditable and verifiable through state files
+- **System Continuity**: Persistent state ensures workflow completion across system restarts
+
 ## Cross-References
 
+- **Blueprint Document**: [docs/Blueprint for Syntheverse](../docs/Blueprint for Syntheverse) - Central system vision
 - **Related**:
   - [src/blockchain/layer1/AGENTS.md](src/blockchain/layer1/AGENTS.md) - Layer 1 implementation
   - [test_outputs/AGENTS.md](test_outputs/AGENTS.md) - Test state storage
   - [scripts/utilities/AGENTS.md](scripts/utilities/AGENTS.md) - State management
+  - [docs/L1_EXPLANATION.md](../docs/L1_EXPLANATION.md) - Blockchain explanation
 

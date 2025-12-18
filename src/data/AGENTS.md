@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The `data/` directory manages all data files including PDFs, parsed content, embeddings, and metadata.
+The `data/` directory manages all persistent data for the Syntheverse system, including PoC archives, RAG document processing, and AI training data. Implements the archive-first principle where all contributions are immediately stored for redundancy detection and AI training.
 
 ## Key Modules
 
@@ -74,8 +74,35 @@ data/
 3. **Vectorization**: Embedding generation → Vectors (`vectorized/`)
 4. **Search**: Semantic queries → Results via RAG API
 
+## Blueprint Alignment
+
+### Archive-First Data Management ([Blueprint §3.1](docs/Blueprint for Syntheverse))
+- **PoC Archive**: All contributions immediately stored in `core/layer2/poc_archive.py` for redundancy detection
+- **AI Training Data**: Stored contributions train and evolve the Syntheverse AI ([Blueprint §5](docs/Blueprint for Syntheverse))
+- **Redundancy Detection**: Complete archive enables duplicate prevention and quality validation
+- **Ecosystem Evolution**: Data accumulation supports recursive AI improvement and fractal expansion
+
+### RAG Pipeline Data Processing ([Blueprint §5](docs/Blueprint for Syntheverse))
+- **Document Scraping**: `pdfs/` stores research papers from Zenodo communities for AI training
+- **Content Parsing**: `parsed/` contains processed text chunks for semantic analysis
+- **Vector Embeddings**: `vectorized/` enables hydrogen holographic document understanding
+- **Metadata Tracking**: `metadata/` maintains scraping results and processing statistics
+
+### Data Flow Integration ([Blueprint §7](docs/Blueprint for Syntheverse))
+1. **PoC Storage**: All contributions immediately archived for redundancy and AI training
+2. **Document Processing**: RAG pipeline processes external research for enhanced evaluation context
+3. **Vector Generation**: Embeddings created for semantic search and fractal pattern recognition
+4. **AI Training**: Accumulated data continuously improves Syntheverse evaluation capabilities
+
+### Implementation Status
+- **✅ Operational**: Archive-first storage and RAG pipeline fully functional
+- **🟡 Enhanced**: Ongoing improvements to embedding quality and metadata tracking
+- **📋 Blueprint Aligned**: Data management supports complete AI integration workflow
+
 ## Cross-References
 
+- **Blueprint Document**: [docs/Blueprint for Syntheverse](../../docs/Blueprint for Syntheverse) - Central system vision
+- **Archive System**: [docs/DUPLICATE_PREVENTION.md](../../docs/DUPLICATE_PREVENTION.md) - Redundancy detection
 - **Parent**: [src/AGENTS.md](../AGENTS.md) - Source code organization
 - **Children**:
   - [pdfs/AGENTS.md](pdfs/AGENTS.md) - PDF storage
@@ -85,4 +112,5 @@ data/
 - **Related**:
   - [api/rag_api/AGENTS.md](../api/rag_api/AGENTS.md) - RAG pipeline
   - [core/layer2/AGENTS.md](../core/layer2/AGENTS.md) - PoC archive storage
+  - [config/environment/SETUP_GROQ.md](../../config/environment/SETUP_GROQ.md) - AI configuration
 

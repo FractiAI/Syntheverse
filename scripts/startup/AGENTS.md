@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Syntheverse startup system is a production-grade service orchestration platform that provides intelligent port management, comprehensive service health monitoring, parallel startup orchestration, and blockchain state management. This system ensures reliable, scalable, and maintainable deployment of the entire Syntheverse platform.
+The Syntheverse startup system is a service orchestration platform that provides port management, service health monitoring, parallel startup orchestration, and blockchain state management. This system ensures reliable deployment of the Syntheverse platform.
 
 ## Architecture
 

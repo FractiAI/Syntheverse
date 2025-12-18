@@ -32,6 +32,21 @@ FastAPI server for document processing:
 - `parser/`: PDF parsing into text chunks
 - `vectorizer/`: Embedding generation
 
+### Alternative RAG API (`rag-api/`)
+
+Extended FastAPI implementation with advanced analysis:
+- Enhanced embedding analysis and visualization
+- Word analysis and semantic clustering
+- Interactive analysis tools and dashboards
+- Alternative API implementation with expanded features
+
+**Key Components:**
+- `api/`: Main API server with extended endpoints
+- `analysis/`: Comprehensive embedding analysis suite
+- `scraper/`: PDF scraping with metadata extraction
+- `parser/`: Advanced PDF parsing with layout preservation
+- `vectorizer/`: Enhanced embedding generation pipeline
+
 ## Integration Points
 
 - PoC API connects to Layer 2 PoC Server
@@ -194,13 +209,19 @@ api/
 │   ├── requirements.txt # Python dependencies
 │   ├── uploads/         # File upload storage
 │   └── venv/            # Virtual environment
-└── rag_api/              # FastAPI for RAG processing
-    ├── api/
-    │   └── rag_api.py   # Main FastAPI server
-    ├── scraper/         # PDF scraping utilities
-    ├── parser/          # PDF parsing pipeline
-    ├── vectorizer/      # Embedding generation
-    └── analysis/        # Embedding analysis tools
+├── rag_api/              # FastAPI for RAG processing
+│   ├── api/
+│   │   └── rag_api.py   # Main FastAPI server
+│   ├── scraper/         # PDF scraping utilities
+│   ├── parser/          # PDF parsing pipeline
+│   ├── vectorizer/      # Embedding generation
+│   └── analysis/        # Embedding analysis tools
+└── rag-api/              # Alternative RAG implementation
+    ├── api/             # Extended API server
+    ├── analysis/        # Advanced analysis suite
+    ├── scraper/         # Enhanced PDF scraping
+    ├── parser/          # Advanced PDF parsing
+    └── vectorizer/      # Enhanced vectorization
 ```
 
 ## Ports & Endpoints
@@ -259,6 +280,7 @@ api/
 - **Children**:
   - [poc-api/AGENTS.md](poc-api/AGENTS.md) - PoC API implementation
   - [rag_api/AGENTS.md](rag_api/AGENTS.md) - RAG API implementation
+  - [rag-api/AGENTS.md](rag-api/AGENTS.md) - Alternative RAG API implementation
 - **Related**:
   - [core/layer2/AGENTS.md](../core/layer2/AGENTS.md) - Layer 2 backend integration
   - [config/environment/AGENTS.md](../../config/environment/AGENTS.md) - API configuration

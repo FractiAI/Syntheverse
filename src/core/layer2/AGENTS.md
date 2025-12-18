@@ -2,7 +2,7 @@
 
 ## Purpose
 
-PoC evaluation engine with archive-first redundancy detection, multi-metal qualification, and token allocation. Orchestrates the complete contribution lifecycle.
+PoC evaluation engine with archive-first redundancy detection, multi-metal qualification, and token allocation. Orchestrates the contribution lifecycle.
 
 ## Key Modules
 
@@ -37,7 +37,7 @@ PoC evaluation engine with archive-first redundancy detection, multi-metal quali
 
 ### Evaluation Process
 
-- Direct Grok API calls with comprehensive HHFE system prompt
+- Direct Grok API calls with HHFE system prompt
 - Parse markdown + JSON response format
 - Calculate scores: coherence, density, redundancy
 - Determine metal qualifications: Gold, Silver, Copper
@@ -62,7 +62,7 @@ PoC evaluation engine with archive-first redundancy detection, multi-metal quali
 ## Blueprint Alignment
 
 ### Core Implementation Mapping
-- **Blueprint §1.3**: PoC Evaluation → `poc_server.py` + `poc_archive.py` complete evaluation system
+- **Blueprint §1.3**: PoC Evaluation → `poc_server.py` + `poc_archive.py` evaluation system
 - **Blueprint §3.2**: Contribution Classes & Scoring → HHFE metrics (coherence, density, novelty)
 - **Blueprint §3.3**: Token Allocation & Epochs → `tokenomics_state.py` epoch-based distribution
 - **Blueprint §3.4**: Metallic Combination Amplifications → Multi-metal qualification system
@@ -113,6 +113,59 @@ layer2/
 4. **Qualification** → Metal assignment (Gold/Silver/Copper)
 5. **Allocation** → Token calculation and distribution
 6. **Registration** → Blockchain certificate creation
+
+## Responsibilities
+
+### Evaluation Orchestration
+- Coordinate complete PoC evaluation pipeline from submission to allocation
+- Manage archive-first storage and redundancy detection
+- Execute hydrogen holographic fractal evaluation (HHFE) scoring
+- Determine multi-metal qualifications (Gold, Silver, Copper)
+
+### Tokenomics Management
+- Calculate and apply epoch-based token allocations
+- Apply metal multipliers and qualification thresholds
+- Maintain persistent tokenomics state across system restarts
+- Track epoch progression and availability
+
+### Archive Management
+- Ensure all contributions are immediately archived as DRAFT status
+- Provide redundancy detection across entire contribution history
+- Support status lifecycle management (DRAFT → EVALUATING → QUALIFIED/UNQUALIFIED → ARCHIVED)
+- Generate sandbox map visualizations from archive data
+
+## Interfaces
+
+### Input Interfaces
+- **PoC API**: Receives contribution submissions with metadata and file uploads
+- **Grok API**: Direct LLM integration for evaluation scoring
+- **File System**: Persistent storage for archive and tokenomics state
+
+### Output Interfaces
+- **Blockchain Layer**: Sends qualified contributions for on-chain registration
+- **Frontend**: Provides sandbox map data and contribution status
+- **Archive**: Complete contribution history for redundancy detection
+
+### Internal Interfaces
+- **Archive System**: Complete contribution storage and retrieval
+- **Tokenomics Engine**: Epoch management and allocation calculations
+- **Evaluation Engine**: HHFE scoring and metal qualification logic
+
+## Dependencies
+
+### Core Dependencies
+- **Python Libraries**: requests, json, pathlib, datetime
+- **Grok API**: Required for all evaluation operations
+- **File System**: JSON-based persistent state storage
+
+### External Services
+- **Grok API**: LLM evaluation service (primary provider)
+- **File Storage**: Local filesystem for archive and state persistence
+
+### Configuration Requirements
+- **GROQ_API_KEY**: Environment variable for API authentication
+- **Archive Path**: Configurable archive storage location
+- **Tokenomics State**: Persistent state file path
 
 ## Cross-References
 

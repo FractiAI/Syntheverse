@@ -47,6 +47,63 @@ Flask REST API server that connects the Next.js frontend to the Layer 2 PoC back
 - Error handling with consistent structure
 - Integration with PoC Server for business logic
 
+## Responsibilities
+
+### API Gateway
+- Provide RESTful interface between frontend and backend systems
+- Handle contribution submissions with file upload validation
+- Route evaluation requests to Layer 2 PoC Server
+- Serve archive, sandbox map, and tokenomics data to frontend
+
+### Data Management
+- Manage secure file uploads and storage
+- Validate contribution metadata and file formats
+- Provide archive access and statistics endpoints
+- Support sandbox map data generation and retrieval
+
+### Blockchain Integration
+- Handle certificate registration requests
+- Integrate with Web3 for blockchain transactions
+- Process registration fees and transaction confirmations
+- Provide registration status and history
+
+## Interfaces
+
+### External Interfaces
+- **Frontend API**: REST endpoints for Next.js application
+- **File Uploads**: HTTP multipart form data handling
+- **Blockchain**: Web3 integration for certificate registration
+
+### Internal Interfaces
+- **PoC Server**: Direct calls to Layer 2 evaluation engine
+- **Archive System**: Access to contribution storage and retrieval
+- **Tokenomics**: Integration with allocation and epoch management
+- **File System**: Local storage for uploads and logs
+
+### Data Interfaces
+- **JSON API**: Consistent request/response format
+- **File Storage**: Secure handling of PDF uploads
+- **Logging**: Application logs for monitoring and debugging
+
+## Dependencies
+
+### Core Dependencies
+- **Flask**: Web framework for API server
+- **Flask-CORS**: Cross-origin resource sharing
+- **Werkzeug**: File upload security utilities
+- **Python Standard Library**: JSON, OS, pathlib
+
+### External Services
+- **PoC Server**: Layer 2 evaluation engine
+- **Blockchain Network**: Web3 provider for registration
+- **File System**: Local storage for uploads
+
+### Configuration Requirements
+- **PORT**: Server port configuration (default: 5001)
+- **UPLOAD_FOLDER**: File upload directory path
+- **CORS_ORIGINS**: Allowed frontend origins
+- **LOG_FILE**: Application logging destination
+
 ## File Structure
 
 ```
