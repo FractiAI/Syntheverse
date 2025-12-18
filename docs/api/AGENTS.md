@@ -48,7 +48,27 @@ API documentation for the Syntheverse system, covering both the RAG API and PoC 
 - Configuration and troubleshooting sections
 - Performance and scaling considerations
 
+## File Structure
 
+```
+api/
+├── RAG_API.md                   # RAG API documentation
+├── README.md                    # PoC API documentation
+└── AGENTS.md                    # This technical documentation
+```
 
+## API Overview
+
+| API | Port | Purpose | Documentation |
+|-----|------|---------|---------------|
+| RAG API | 8000 | Document search and Q&A | `RAG_API.md` |
+| PoC API | 5001 | Contribution management | `README.md` |
+
+## Cross-References
+
+- **Parent**: [docs/AGENTS.md](../AGENTS.md) - Documentation overview
+- **Related**:
+  - [src/api/AGENTS.md](../../src/api/AGENTS.md) - API implementation
+  - [config/environment/AGENTS.md](../../config/environment/AGENTS.md) - API configuration
 
 

@@ -19,7 +19,7 @@ Processes PDFs into searchable text chunks:
 
 ### 3. Vectorizer (`vectorizer/`)
 Creates embeddings from parsed chunks:
-- **vectorize_parsed_chunks_simple.py**: Creates embeddings from parsed chunks
+- **vectorize_parsed_chunks.py**: Creates embeddings from parsed chunks
 - Uses local HuggingFace embeddings (no API calls)
 - Saves vectorized embeddings as JSON files
 
@@ -91,7 +91,7 @@ Parsed chunks are saved to `data/parsed/`
 
 ```bash
 cd src/api/rag_api/vectorizer
-python vectorize_parsed_chunks_simple.py --parsed-dir ../../data/parsed
+python vectorize_parsed_chunks.py --parsed-dir ../../data/parsed
 ```
 
 Embeddings are saved to `data/vectorized/embeddings/`
@@ -201,7 +201,7 @@ src/api/rag_api/
 │   ├── AGENTS.md             # Parser agents
 │   └── README.md             # Parser docs
 ├── vectorizer/
-│   ├── vectorize_parsed_chunks_simple.py
+│   ├── vectorize_parsed_chunks.py
 │   ├── AGENTS.md             # Vectorizer agents
 │   └── README.md             # Vectorizer docs
 ├── analysis/

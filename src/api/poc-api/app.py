@@ -707,6 +707,336 @@ def get_tokenomics_statistics():
         return jsonify({"error": str(e)}), 500
 
 
+# Contributor Tier Endpoints (Blueprint §4.2)
+
+@app.route('/api/tiers/validate-contribution', methods=['POST'])
+def validate_tier_contribution():
+    """Validate a contribution amount for tier eligibility per Blueprint §4.2."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        data = request.get_json()
+        if not data or 'contribution_amount' not in data:
+            return jsonify({"error": "contribution_amount required"}), 400
+
+        contribution_amount = float(data['contribution_amount'])
+        result = poc_server.validate_tier_contribution(contribution_amount)
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tiers/eligible', methods=['GET'])
+def get_eligible_tiers():
+    """Get all eligible tiers for a contribution amount."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        contribution_amount = request.args.get('amount')
+        if not contribution_amount:
+            return jsonify({"error": "amount parameter required"}), 400
+
+        amount = float(contribution_amount)
+        result = poc_server.get_eligible_tiers(amount)
+
+        return jsonify({"eligible_tiers": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tiers/register-contribution', methods=['POST'])
+def register_tier_contribution():
+    """Register a tier contribution per Blueprint §4.2."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body required"}), 400
+
+        required_fields = ['contributor_address', 'contribution_amount']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"{field} required"}), 400
+
+        contributor_address = data['contributor_address']
+        contribution_amount = float(data['contribution_amount'])
+        transaction_hash = data.get('transaction_hash')
+
+        result = poc_server.register_tier_contribution(
+            contributor_address, contribution_amount, transaction_hash
+        )
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tiers/statistics', methods=['GET'])
+def get_tier_statistics():
+    """Get comprehensive tier system statistics per Blueprint §4.2."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        stats = poc_server.get_tier_statistics()
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tiers/contributor/<contributor_address>', methods=['GET'])
+def get_contributor_tier_info(contributor_address):
+    """Get tier information for a specific contributor."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        info = poc_server.get_contributor_tier_info(contributor_address)
+        if info:
+            return jsonify(info)
+        else:
+            return jsonify({"error": "Contributor not found in tier system"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tiers/benefits/<tier_name>', methods=['GET'])
+def get_tier_benefits(tier_name):
+    """Get benefits for a specific tier per Blueprint §4.2."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        benefits = poc_server.get_tier_benefits(tier_name.lower())
+        if benefits:
+            return jsonify({
+                "tier": tier_name.lower(),
+                "benefits": benefits
+            })
+        else:
+            return jsonify({"error": f"Tier '{tier_name}' not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Zenodo Community Integration Endpoints (Blueprint §1.1)
+
+@app.route('/api/zenodo/communities', methods=['GET'])
+def get_syntheverse_communities():
+    """Get all Syntheverse Zenodo communities per Blueprint §1.1."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        communities = poc_server.get_syntheverse_communities()
+        return jsonify({"communities": communities})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/communities/search', methods=['GET'])
+def search_community_records():
+    """Search for records in a specific Syntheverse community."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        community_id = request.args.get('community_id')
+        query = request.args.get('query', '')
+        limit = int(request.args.get('limit', 20))
+
+        if not community_id:
+            return jsonify({"error": "community_id parameter required"}), 400
+
+        records = poc_server.search_community_records(community_id, query, limit)
+        return jsonify({"records": records})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/communities/<community_id>/statistics', methods=['GET'])
+def get_community_statistics(community_id):
+    """Get statistics for a specific community."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        stats = poc_server.get_community_statistics(community_id)
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/communities/<community_id>/feed', methods=['GET'])
+def get_community_feed(community_id):
+    """Get recent submissions feed for a community."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        limit = int(request.args.get('limit', 10))
+        feed = poc_server.get_community_feed(community_id, limit)
+        return jsonify({"feed": feed})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/communities/popular', methods=['GET'])
+def get_popular_communities():
+    """Get most popular Syntheverse communities by activity."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        limit = int(request.args.get('limit', 5))
+        communities = poc_server.get_popular_communities(limit)
+        return jsonify({"communities": communities})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/communities/discover', methods=['GET'])
+def discover_relevant_communities():
+    """Discover communities relevant to given keywords."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        keywords = request.args.get('keywords', '').split(',')
+        keywords = [k.strip() for k in keywords if k.strip()]
+        limit = int(request.args.get('limit', 3))
+
+        if not keywords:
+            return jsonify({"error": "keywords parameter required"}), 400
+
+        communities = poc_server.discover_relevant_communities(keywords, limit)
+        return jsonify({"communities": communities})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/validate-submission', methods=['POST'])
+def validate_community_submission():
+    """Validate that a submission fits a Syntheverse community."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body required"}), 400
+
+        required_fields = ['community_id', 'title', 'description', 'keywords']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"{field} required"}), 400
+
+        result = poc_server.validate_community_submission(
+            data['community_id'],
+            data['title'],
+            data['description'],
+            data['keywords']
+        )
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/zenodo/submit', methods=['POST'])
+def submit_to_community():
+    """Submit a contribution to a Syntheverse community (Blueprint §1.1 workflow)."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body required"}), 400
+
+        required_fields = ['community_id', 'title', 'description', 'keywords', 'file_path', 'contributor']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"{field} required"}), 400
+
+        result = poc_server.submit_to_community(
+            data['community_id'],
+            data['title'],
+            data['description'],
+            data['keywords'],
+            data['file_path'],
+            data['contributor']
+        )
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Recognition System Endpoints (Blueprint §1.4)
+
+@app.route('/api/recognition/contributor/<contributor>', methods=['GET'])
+def get_contributor_recognition(contributor):
+    """Get complete recognition information for a contributor per Blueprint §1.4."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        recognition = poc_server.get_contributor_recognition(contributor)
+        if recognition:
+            return jsonify(recognition)
+        else:
+            return jsonify({"error": "Contributor not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/recognition/leaderboard', methods=['GET'])
+def get_recognition_leaderboard():
+    """Get recognition leaderboard showing top contributors."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        limit = int(request.args.get('limit', 20))
+        leaderboard = poc_server.get_recognition_leaderboard(limit)
+        return jsonify({"leaderboard": leaderboard})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/recognition/statistics', methods=['GET'])
+def get_recognition_statistics():
+    """Get comprehensive recognition system statistics."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        stats = poc_server.get_recognition_statistics()
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/recognition/legacy-contributors', methods=['GET'])
+def get_legacy_contributors():
+    """Get earliest contributors for legacy recognition per Blueprint §1.4."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        limit = int(request.args.get('limit', 10))
+        legacy = poc_server.get_legacy_contributors(limit)
+        return jsonify({"legacy_contributors": legacy})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/api/contributor/<contributor>/submission-count', methods=['GET'])
 def get_contributor_submission_count(contributor):
     """Get the number of submissions by a contributor."""

@@ -92,5 +92,80 @@ Test suites for validating system functionality, API endpoints, submission flows
 - API endpoint testing
 - Error scenario testing
 
+## File Structure
 
+```
+tests/
+├── test_*.py                    # Test modules
+├── *.sh                         # Test execution scripts
+├── results/                     # Test reports and outputs
+├── outputs/                     # Legacy test data
+├── AGENTS.md                    # This documentation
+├── CONTRIBUTING_TESTS.md        # Testing guidelines
+├── test_config.json             # Test configuration
+└── conftest.py                  # Pytest configuration
+```
+
+## Test Categories
+
+| Category | Count | Purpose |
+|----------|-------|---------|
+| Unit Tests | ~15 | Individual component testing |
+| Integration Tests | ~8 | Component interaction testing |
+| End-to-End Tests | ~3 | Complete workflow testing |
+| Performance Tests | ~2 | Load and scalability testing |
+| Security Tests | ~1 | Security validation |
+
+## Blueprint Alignment
+
+### Testing the Complete Workflow ([Blueprint §7](docs/Blueprint for Syntheverse))
+- **End-to-End Validation**: `test_full_submission_flow.py` + `test_submission_flow.py` validate complete PoC pipeline
+- **Component Integration**: `test_poc_api.py` + `test_frontend_integration.py` test API and UI integration
+- **Blockchain Validation**: `test_blockchain.py` verifies Layer 1 registration and token allocation
+- **Archive-First Testing**: All tests validate immediate storage and redundancy detection
+
+### PoC Evaluation Testing ([Blueprint §1.3](docs/Blueprint for Syntheverse))
+- **Hydrogen Holographic Scoring**: `test_core_modules.py` validates 0-10,000 scoring across novelty/density/coherence/alignment
+- **AI Integration Testing**: `test_rag_api.py` + `test_rag_timeout.py` test GROQ API integration
+- **Evaluation Engine**: `test_core_modules.py` tests the complete Layer 2 evaluation pipeline
+
+### Tokenomics Testing ([Blueprint §3.3](docs/Blueprint for Syntheverse))
+- **SYNTH Allocation**: Tests validate epoch-based distribution and metallic amplifications
+- **Threshold Scaling**: Core/leaf contribution scaling from high-impact to supporting work
+- **Operator Control**: Epoch and threshold management testing
+
+### Financial Framework Testing ([Blueprint §4](docs/Blueprint for Syntheverse))
+- **Registration Fees**: $200 per approved PoC validation (submissions free for evaluation)
+- **Tier System**: Copper/Silver/Gold contribution package testing foundation
+
+### Security & Reliability ([Blueprint §6](docs/Blueprint for Syntheverse))
+- **Input Sanitization**: `test_security.py` prevents injection attacks and data exposure
+- **Human Oversight**: Tests validate approval workflow and governance controls
+- **Transparency**: On-chain auditability testing for SYNTH allocations
+
+### AI Integration Testing ([Blueprint §5](docs/Blueprint for Syntheverse))
+- **Archive Training**: All PoCs stored and validated for AI training data
+- **GROQ API**: Required for evaluation services with timeout and error handling
+- **Fractal Evaluation**: Measurable, reproducible hydrogen holographic methodology
+
+### Test-Driven Development ([Blueprint Vision §0](docs/Blueprint for Syntheverse))
+- **TDD Implementation**: Real implementations tested, no mocks (Blueprint compliance)
+- **Real Dependencies**: Tests use actual services, APIs, and blockchain interactions
+- **Continuous Validation**: Complete workflow testing ensures system reliability
+
+### Implementation Status Validation
+- **✅ Fully Tested**: Core evaluation pipeline, API endpoints, blockchain integration
+- **🟡 Phase 2 Testing**: Metallic amplifications, contributor tiers, advanced workflows
+- **📋 Test Coverage**: See `docs/BLUEPRINT_IMPLEMENTATION_STATUS.md` for current validation status
+
+## Cross-References
+
+- **Blueprint Document**: [docs/Blueprint for Syntheverse](../docs/Blueprint for Syntheverse) - Central system vision
+- **Implementation Status**: [docs/BLUEPRINT_IMPLEMENTATION_STATUS.md](../docs/BLUEPRINT_IMPLEMENTATION_STATUS.md)
+- **Test Framework**: [CONTRIBUTING_TESTS.md](CONTRIBUTING_TESTS.md) - Testing guidelines and standards
+- **Parent**: [Root AGENTS.md](../AGENTS.md) - System overview
+- **Related**:
+  - [scripts/startup/AGENTS.md](../scripts/startup/AGENTS.md) - Service startup testing
+  - [src/AGENTS.md](../src/AGENTS.md) - Code under test
+  - [docs/AGENTS.md](../docs/AGENTS.md) - System documentation
 

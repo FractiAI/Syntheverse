@@ -220,7 +220,7 @@ python parse_all_pdfs.py --pdf-dir ../../data/pdfs
 
 # 3. Vectorize chunks
 cd ../vectorizer
-python vectorize_parsed_chunks_simple.py --parsed-dir ../../data/parsed
+python vectorize_parsed_chunks.py --parsed-dir ../../data/parsed
 
 # 4. Start API server
 cd ../api

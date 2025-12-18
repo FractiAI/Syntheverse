@@ -121,3 +121,4 @@ def validate_groq_api_key(api_key: str) -> bool:
     # Should start with 'gsk_' (Groq) or 'sk-' (OpenAI format)
     return api_key.startswith(('gsk_', 'sk-')) and len(api_key.strip()) > 20
 
+

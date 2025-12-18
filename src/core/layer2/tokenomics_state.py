@@ -10,6 +10,8 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from enum import Enum
 
+from .contributor_tiers import TierManager
+
 
 class Epoch(Enum):
     """Epoch types."""
@@ -112,6 +114,9 @@ class TokenomicsState:
         
         # Load existing state if available
         self.load_state()
+
+        # Initialize tier manager for contributor tiers (Blueprint §4.2)
+        self.tier_manager = TierManager()
 
     @property
     def total_supply(self):
@@ -550,6 +555,88 @@ class TokenomicsState:
         # Update current epoch
         if "current_epoch" in l1_state:
             self.state["current_epoch"] = l1_state["current_epoch"]
-        
+
         self.save_state()
+
+    # Contributor Tier Management Methods (Blueprint §4.2)
+
+    def register_tier_contribution(self, contributor_address: str, contribution_amount: float,
+                                  transaction_hash: str = None) -> Dict:
+        """
+        Register a contributor tier contribution per Blueprint §4.2.
+
+        Args:
+            contributor_address: Contributor's address
+            contribution_amount: Contribution amount in USD
+            transaction_hash: Optional blockchain transaction hash
+
+        Returns:
+            Registration result with tier info and SYNTH allocation
+        """
+        return self.tier_manager.register_contribution(
+            contributor_address, contribution_amount, transaction_hash
+        )
+
+    def get_contributor_tier_info(self, contributor_address: str) -> Optional[Dict]:
+        """
+        Get tier information for a contributor.
+
+        Args:
+            contributor_address: Contributor's address
+
+        Returns:
+            Contributor tier info if registered, None otherwise
+        """
+        return self.tier_manager.get_contributor_info(contributor_address)
+
+    def get_tier_statistics(self) -> Dict:
+        """
+        Get comprehensive tier system statistics per Blueprint §4.2.
+
+        Returns:
+            Statistics about contributor tier system
+        """
+        return self.tier_manager.get_tier_statistics()
+
+    def validate_tier_contribution(self, contribution_amount: float) -> Dict:
+        """
+        Validate a contribution amount for tier eligibility per Blueprint §4.2.
+
+        Args:
+            contribution_amount: Contribution amount in USD
+
+        Returns:
+            Validation result with tier eligibility information
+        """
+        return self.tier_manager.validate_contribution_amount(contribution_amount)
+
+    def get_tier_benefits(self, tier_name: str) -> Dict:
+        """
+        Get benefits for a specific tier per Blueprint §4.2.
+
+        Args:
+            tier_name: Name of the tier (copper, silver, gold)
+
+        Returns:
+            Dictionary of tier benefits
+        """
+        from .contributor_tiers import ContributorTier
+
+        try:
+            tier = ContributorTier(tier_name.lower())
+            return self.tier_manager.get_tier_benefits(tier)
+        except ValueError:
+            return {}
+
+    def get_eligible_tiers(self, contribution_amount: float) -> List[Dict]:
+        """
+        Get all tiers eligible for a given contribution amount per Blueprint §4.2.
+
+        Args:
+            contribution_amount: Contribution amount in USD
+
+        Returns:
+            List of eligible tiers with details
+        """
+        return self.tier_manager.get_eligible_tiers(contribution_amount)
 

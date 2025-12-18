@@ -6,7 +6,7 @@ Transforms parsed text chunks into vector embeddings for semantic search capabil
 
 ## Key Modules
 
-### Vectorization Engine (`vectorize_parsed_chunks_simple.py`)
+### Vectorization Engine (`vectorize_parsed_chunks.py`)
 
 Core embedding generation agent:
 
@@ -90,7 +90,7 @@ Machine learning model integration:
 
 ## Key Functions
 
-### vectorize_parsed_chunks_simple.py
+### vectorize_parsed_chunks.py
 
 - `vectorize_parsed_chunks(parsed_dir, output_dir, embedding_model, batch_size, validate_embeddings, generate_statistics)`: Enhanced processing function
 - Model initialization and validation

@@ -133,3 +133,37 @@ Add to `self.categories` in `ScriptMenu.__init__()`:
 | PoC API | 5001 |
 | RAG API | 8000 |
 | Frontend | 3001 |
+
+## Blueprint Alignment
+
+### System Orchestration ([Blueprint §3.1](docs/Blueprint for Syntheverse))
+- **PoC Pipeline Execution**: `startup/` scripts manage the complete submission → evaluation → registration → allocation workflow
+- **Service Lifecycle**: `startup/start_servers.py` orchestrates multi-service startup with dependency management
+- **Health Monitoring**: `startup/service_health.py` ensures system reliability and uptime
+
+### Development Workflow ([Blueprint §7](docs/Blueprint for Syntheverse))
+- **Local Development**: `startup/anvil_manager.py` provides local blockchain environment for development
+- **Testing Integration**: `startup/port_manager.py` handles service coordination and conflict resolution
+- **Deployment Automation**: `deployment/deploy_contracts.py` manages SYNTH and POCRegistry contract deployment
+
+### Complete System Startup ([docs/START_WEB_UI.md](docs/START_WEB_UI.md))
+- **Full System**: `startup/start_servers.py --mode full` starts all services (frontend, APIs, blockchain, Layer 2)
+- **PoC Only**: `startup/start_servers.py --mode poc` starts core PoC evaluation pipeline
+- **Minimal**: `startup/start_servers.py --mode minimal` starts essential services for development
+
+### Service Management Integration
+- **Dependency Management**: Scripts handle automatic installation and version compatibility
+- **Environment Validation**: Pre-flight checks ensure all required components are available
+- **Error Recovery**: Robust error handling and recovery mechanisms for production reliability
+
+### Blueprint Implementation Support
+- **Phase 1 Complete**: Core system startup and service orchestration fully implemented
+- **Phase 2 Ready**: Deployment scripts support production environment setup
+- **Development Workflow**: Complete local development environment with testing integration
+
+## Cross-References
+
+- **Blueprint Document**: [docs/Blueprint for Syntheverse](../docs/Blueprint for Syntheverse) - Central system vision
+- **Implementation Status**: [docs/BLUEPRINT_IMPLEMENTATION_STATUS.md](../docs/BLUEPRINT_IMPLEMENTATION_STATUS.md)
+- **System Startup**: [docs/START_WEB_UI.md](../docs/START_WEB_UI.md) - Complete startup guide
+- **Quick Start**: [docs/QUICK_START_POC_UI.md](../docs/QUICK_START_POC_UI.md) - Getting started guide

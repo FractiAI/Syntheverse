@@ -51,4 +51,40 @@ Smart contract deployment and blockchain management scripts for Syntheverse Laye
 - Environment variable configuration
 - Address management and storage
 
+## File Structure
 
+```
+deployment/
+├── deploy_contracts.py           # Main deployment script
+├── README.md                     # Deployment documentation
+└── AGENTS.md                     # This technical documentation
+```
+
+## Usage Examples
+
+```bash
+# Deploy to Anvil (local)
+python deploy_contracts.py --network anvil
+
+# Deploy to Base Sepolia (testnet)
+python deploy_contracts.py --network base_sepolia
+
+# Deploy to Base Mainnet (production)
+python deploy_contracts.py --network base_mainnet
+```
+
+## Supported Networks
+
+| Network | Chain ID | Purpose | Gas Cost |
+|---------|----------|---------|----------|
+| Anvil | 31337 | Local development | Free |
+| Base Sepolia | 84532 | Testnet | Low |
+| Base Mainnet | 8453 | Production | Variable |
+
+## Cross-References
+
+- **Parent**: [scripts/AGENTS.md](../AGENTS.md) - Scripts overview
+- **Related**:
+  - [src/blockchain/contracts/AGENTS.md](../../src/blockchain/contracts/AGENTS.md) - Smart contracts
+  - [config/wallet/AGENTS.md](../../config/wallet/AGENTS.md) - Wallet configuration
+  - [docs/deployment/AGENTS.md](../../docs/deployment/AGENTS.md) - Deployment guides

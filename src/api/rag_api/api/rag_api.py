@@ -449,7 +449,7 @@ Awaiting operator input."""
                 "Please ensure you have run the data pipeline:\n"
                 "1. Run scraper to download PDFs: cd src/api/rag_api/scraper && python scrape_pdfs.py\n"
                 "2. Parse PDFs into chunks: cd src/api/rag_api/parser && python parse_all_pdfs.py\n"
-                "3. Create embeddings: cd src/api/rag_api/vectorizer && python vectorize_parsed_chunks_simple.py\n"
+                "3. Create embeddings: cd src/api/rag_api/vectorizer && python vectorize_parsed_chunks.py\n"
                 "Or use the complete pipeline script: scripts/run_complete_pipeline.sh"
             )
 
@@ -461,7 +461,7 @@ Awaiting operator input."""
                 "The embeddings directory exists but is empty. Please run the data pipeline:\n"
                 "1. Run scraper to download PDFs: cd src/api/rag_api/scraper && python scrape_pdfs.py\n"
                 "2. Parse PDFs into chunks: cd src/api/rag_api/parser && python parse_all_pdfs.py\n"
-                "3. Create embeddings: cd src/api/rag_api/vectorizer && python vectorize_parsed_chunks_simple.py\n"
+                "3. Create embeddings: cd src/api/rag_api/vectorizer && python vectorize_parsed_chunks.py\n"
                 "Or use the complete pipeline script: scripts/run_complete_pipeline.sh"
             )
         

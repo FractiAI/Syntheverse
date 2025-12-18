@@ -465,4 +465,25 @@ while True:
 - Anvil management
 - Unit test coverage
 
+## File Structure
 
+```
+startup/
+├── start_servers.py              # Main server manager
+├── start_servers_simple.py       # Simplified startup script
+├── anvil_manager.py              # Blockchain node management
+├── port_manager.py               # Port conflict resolution
+├── service_health.py             # Service health monitoring
+├── cleanup_servers.sh            # Server cleanup script
+├── IMPROVEMENTS.md               # Enhancement documentation
+├── README.md                     # Usage documentation
+└── AGENTS.md                     # This technical documentation
+```
+
+## Cross-References
+
+- **Parent**: [scripts/AGENTS.md](../AGENTS.md) - Scripts overview
+- **Related**:
+  - [config/environment/AGENTS.md](../../config/environment/AGENTS.md) - Environment setup
+  - [tests/test_startup_scripts.py](../../tests/test_startup_scripts.py) - Test coverage
+  - [docs/START_WEB_UI.md](../../docs/START_WEB_UI.md) - Web UI startup guide

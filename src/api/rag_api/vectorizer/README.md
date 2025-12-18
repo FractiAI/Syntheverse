@@ -16,7 +16,7 @@ Converts parsed text chunks into vector embeddings for semantic search using loc
 
 ```bash
 cd vectorizer
-python vectorize_parsed_chunks_simple.py --parsed-dir ../../data/parsed
+python vectorize_parsed_chunks.py --parsed-dir ../../data/parsed
 ```
 
 This processes all JSON files from `data/parsed/` and saves embeddings to `data/vectorized/embeddings/`
@@ -25,7 +25,7 @@ This processes all JSON files from `data/parsed/` and saves embeddings to `data/
 
 ```bash
 # Use different embedding model
-python vectorize_parsed_chunks_simple.py \
+python vectorize_parsed_chunks.py \
     --parsed-dir ../../data/parsed \
     --embedding-model "all-mpnet-base-v2" \
     --batch-size 50
@@ -34,14 +34,14 @@ python vectorize_parsed_chunks_simple.py \
 ### Custom Output Directory
 
 ```bash
-python vectorize_parsed_chunks_simple.py \
+python vectorize_parsed_chunks.py \
     --parsed-dir ../../data/parsed \
     --output-dir "../../data/vectorized"
 ```
 
 ## Components
 
-### vectorize_parsed_chunks_simple.py
+### vectorize_parsed_chunks.py
 
 Main vectorization script:
 
@@ -129,7 +129,7 @@ pip install sentence-transformers torch langchain-community
 
 ```
 vectorizer/
-├── vectorize_parsed_chunks_simple.py  # Main vectorization script
+├── vectorize_parsed_chunks.py  # Main vectorization script
 └── README.md                          # This file
 ```
 
@@ -227,7 +227,7 @@ python parse_all_pdfs.py --pdf-dir ../../data/pdfs
 
 # 3. Vectorize chunks
 cd ../vectorizer
-python vectorize_parsed_chunks_simple.py --parsed-dir ../../data/parsed
+python vectorize_parsed_chunks.py --parsed-dir ../../data/parsed
 
 # 4. Start API server
 cd ../api
@@ -238,7 +238,7 @@ python rag_api.py
 
 ```bash
 # Use larger model for better semantic search
-python vectorize_parsed_chunks_simple.py \
+python vectorize_parsed_chunks.py \
     --parsed-dir ../../data/parsed \
     --embedding-model "all-mpnet-base-v2" \
     --batch-size 50
@@ -248,7 +248,7 @@ python vectorize_parsed_chunks_simple.py \
 
 ```bash
 # Minimize memory usage
-python vectorize_parsed_chunks_simple.py \
+python vectorize_parsed_chunks.py \
     --parsed-dir ../../data/parsed \
     --embedding-model "all-MiniLM-L6-v2" \
     --batch-size 10

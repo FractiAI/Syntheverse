@@ -16,7 +16,7 @@ Embeddings are generated here when running:
 
 ```bash
 cd rag-api/vectorizer
-python vectorize_parsed_chunks_simple.py --parsed-dir ../../data/parsed --output-dir ../../data/vectorized
+python vectorize_parsed_chunks.py --parsed-dir ../../data/parsed --output-dir ../../data/vectorized
 ```
 
 ## File Format

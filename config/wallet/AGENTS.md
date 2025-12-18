@@ -50,7 +50,28 @@ Wallet setup and configuration documentation for blockchain operations, testing,
 - Security practices for key management
 - Testnet and mainnet deployment procedures
 
+## File Structure
 
+```
+wallet/
+├── test-wallet-setup.md      # Test wallet configuration
+├── README.md                 # Wallet overview
+└── AGENTS.md                 # This documentation
+```
 
+## Supported Networks
 
+| Network | Purpose | Chain ID |
+|---------|---------|----------|
+| Base Sepolia | Testing | 84532 |
+| Base Mainnet | Production | 8453 |
+| Ethereum Sepolia | Cross-chain testing | 11155111 |
+
+## Cross-References
+
+- **Parent**: [config/AGENTS.md](../AGENTS.md) - Configuration overview
+- **Related**:
+  - [scripts/deployment/AGENTS.md](../../scripts/deployment/AGENTS.md) - Deployment scripts
+  - [src/blockchain/AGENTS.md](../../src/blockchain/AGENTS.md) - Blockchain integration
+  - [docs/deployment/AGENTS.md](../../docs/deployment/AGENTS.md) - Deployment guides
 

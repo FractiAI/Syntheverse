@@ -23,7 +23,7 @@ Embedding files are generated when running the vectorization pipeline:
 
 ```bash
 cd src/api/rag-api/vectorizer
-python vectorize_parsed_chunks_simple.py
+python vectorize_parsed_chunks.py
 ```
 
 ## File Format
@@ -49,6 +49,7 @@ Each JSON file contains an array of chunk objects:
 - RAG API automatically loads all `*.json` files at startup
 - Test framework uses seed corpus for integration tests
 - Generated embeddings are excluded from version control
+
 
 
 

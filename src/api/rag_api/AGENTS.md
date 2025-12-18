@@ -23,7 +23,7 @@ Complete RAG (Retrieval-Augmented Generation) pipeline with Groq integration. Pr
 
 ### Vectorizer (`vectorizer/`)
 
-- **`vectorize_parsed_chunks_simple.py`**: Creates embeddings from parsed chunks with validation and statistics
+- **`vectorize_parsed_chunks.py`**: Creates embeddings from parsed chunks with validation and statistics
 
 ### Analysis (`analysis/`)
 
@@ -62,5 +62,43 @@ Embedding analysis and visualization suite:
 - Web UI for interactive queries
 - Multiple provider support with fallback
 
+## File Structure
 
+```
+rag_api/
+├── api/
+│   ├── rag_api.py              # Main FastAPI server (Groq)
+│   ├── rag_api_ollama.py       # Ollama version
+│   ├── static/index.html       # Web UI
+│   └── requirements_api.txt    # API dependencies
+├── scraper/
+│   └── scrape_pdfs.py          # Zenodo PDF scraping
+├── parser/
+│   ├── parse_all_pdfs.py       # PDF parsing pipeline
+│   └── langchain_pdf_processor.py # LangChain processing
+├── vectorizer/
+│   └── vectorize_parsed_chunks.py # Embedding generation
+├── analysis/                   # Analysis and visualization
+│   ├── cli/                   # Command-line tools
+│   ├── embedding_analyzer.py
+│   ├── embedding_visualizer.py
+│   ├── pca_reducer.py
+│   ├── embedding_validator.py
+│   ├── similarity_analyzer.py
+│   └── embedding_search.py
+└── README.md
+```
+
+## Ports & Configuration
+
+- **Port**: 8000 (default)
+- **LLM Providers**: Groq (primary), Ollama (fallback), HuggingFace (fallback)
+- **Data Pipeline**: Scrape → Parse → Vectorize → Analyze
+
+## Cross-References
+
+- **Parent**: [api/AGENTS.md](../AGENTS.md) - API services overview
+- **Related**:
+  - [data/AGENTS.md](../../data/AGENTS.md) - Data pipeline integration
+  - [config/environment/AGENTS.md](../../../config/environment/AGENTS.md) - Groq API configuration
 

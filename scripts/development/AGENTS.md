@@ -37,4 +37,29 @@ Development workflow scripts for service management, testing, and validation dur
 - Path resolution and navigation
 - Environment configuration handling
 
+## File Structure
 
+```
+development/
+├── manage_services.sh            # Service management script
+├── README.md                     # Usage documentation
+└── AGENTS.md                     # This technical documentation
+```
+
+## Usage Examples
+
+```bash
+# From scripts/development/ directory
+./manage_services.sh poc start    # Start PoC services
+./manage_services.sh poc stop     # Stop PoC services
+./manage_services.sh all start    # Start all services
+./manage_services.sh status       # Check service status
+./manage_services.sh poc restart  # Restart PoC services
+```
+
+## Cross-References
+
+- **Parent**: [scripts/AGENTS.md](../AGENTS.md) - Scripts overview
+- **Related**:
+  - [startup/AGENTS.md](../startup/AGENTS.md) - Advanced service orchestration
+  - [config/environment/AGENTS.md](../../config/environment/AGENTS.md) - Environment setup

@@ -216,7 +216,7 @@ rag_engine = RAGEngine(
 
 Default: `./vectorized/embeddings`
 
-Ensure this directory contains the vectorized JSON files from `vectorize_parsed_chunks_simple.py`.
+Ensure this directory contains the vectorized JSON files from `vectorize_parsed_chunks.py`.
 
 ## LLM Providers
 

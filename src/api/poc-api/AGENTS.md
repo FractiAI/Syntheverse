@@ -47,10 +47,31 @@ Flask REST API server that connects the Next.js frontend to the Layer 2 PoC back
 - Error handling with consistent structure
 - Integration with PoC Server for business logic
 
+## File Structure
 
+```
+poc-api/
+├── app.py              # Main Flask application with routes
+├── server.py           # Server setup and configuration
+├── requirements.txt    # Python dependencies
+├── uploads/            # File upload storage directory
+├── venv/               # Virtual environment
+├── app.log             # Application logs
+└── README.md           # API documentation
+```
 
+## Configuration
 
+- **Port**: 5001 (default)
+- **CORS**: Enabled for frontend access
+- **Uploads**: Configurable upload directory
+- **Logging**: File-based logging to `app.log`
 
+## Cross-References
 
-
+- **Parent**: [api/AGENTS.md](../AGENTS.md) - API services overview
+- **Related**:
+  - [core/layer2/AGENTS.md](../../core/layer2/AGENTS.md) - PoC Server integration
+  - [blockchain/AGENTS.md](../../blockchain/AGENTS.md) - Blockchain registration
+  - [frontend/poc-frontend/AGENTS.md](../../frontend/poc-frontend/AGENTS.md) - Frontend integration
 

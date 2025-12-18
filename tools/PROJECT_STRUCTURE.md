@@ -27,7 +27,7 @@ Syntheverse/
 │   │   ├── parse_all_pdfs.py         # PDF parser
 │   │   └── langchain_pdf_processor.py # PDF processing helper
 │   ├── vectorizer/
-│   │   └── vectorize_parsed_chunks_simple.py # Vectorization
+│   │   └── vectorize_parsed_chunks.py # Vectorization
 │   └── api/
 │       ├── rag_api.py                # FastAPI server
 │       ├── requirements_api.txt      # Python dependencies

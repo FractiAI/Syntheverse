@@ -72,9 +72,44 @@ Modern Next.js 14 application with App Router providing the main PoC dashboard, 
 - Loading states for async operations
 - TypeScript for type safety
 
+## File Structure
 
+```
+poc-frontend/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── dashboard/       # System dashboard
+│   │   ├── submission/      # Contribution submission
+│   │   ├── explorer/        # Contribution browser
+│   │   ├── registry/        # Timeline view
+│   │   └── sandbox-map/     # Network visualization
+│   ├── components/          # Reusable components
+│   │   ├── ui/             # shadcn/ui components
+│   │   └── navigation.tsx
+│   └── lib/                 # Utilities
+│       ├── api.ts          # API client
+│       └── utils.ts        # Helper functions
+├── package.json             # Dependencies
+├── next.config.js           # Next.js configuration
+├── tailwind.config.js       # Tailwind CSS config
+└── tsconfig.json            # TypeScript configuration
+```
 
+## Technology Stack
 
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Visualization**: vis-network
+- **Blockchain**: Web3.js
+
+## Cross-References
+
+- **Parent**: [frontend/AGENTS.md](../AGENTS.md) - Frontend applications
+- **Related**:
+  - [api/poc-api/AGENTS.md](../../api/poc-api/AGENTS.md) - API integration
+  - [core/layer2/AGENTS.md](../../core/layer2/AGENTS.md) - Backend data sources
 
 
 

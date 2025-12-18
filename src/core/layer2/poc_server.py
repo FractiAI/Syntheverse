@@ -13,6 +13,8 @@ from pathlib import Path
 from .tokenomics_state import TokenomicsState, Epoch, ContributionTier
 from .poc_archive import PoCArchive, ContributionStatus, MetalType
 from .sandbox_map import SandboxMap
+from .zenodo_integration import ZenodoIntegration
+from .recognition_system import RecognitionSystem
 
 # Load GROQ_API_KEY using centralized utility
 from core.utils import load_groq_api_key
@@ -68,6 +70,8 @@ class PoCServer:
         self.tokenomics = TokenomicsState(state_file=tokenomics_state_file)
         self.archive = PoCArchive(archive_file=archive_file)
         self.sandbox_map = SandboxMap(self.archive)
+        self.zenodo = ZenodoIntegration()
+        self.recognition = RecognitionSystem()
 
         logger.info("PoC Archive initialized")
         logger.info("Syntheverse Sandbox Map initialized")
@@ -138,6 +142,18 @@ class PoCServer:
             submission_hash,
             status=ContributionStatus.PENDING
         )
+
+        # Record for recognition system (Blueprint §1.4)
+        try:
+            self.recognition.record_contribution_for_recognition(
+                contributor=contributor,
+                submission_hash=submission_hash,
+                category=category or "general",
+                coherence_score=0.0  # Will be updated after evaluation
+            )
+        except Exception as e:
+            # Don't fail submission if recognition recording fails
+            print(f"Warning: Failed to record contribution for recognition: {e}")
 
         # Automatically evaluate the contribution
         if progress_callback:
@@ -747,3 +763,261 @@ EVALUATION REQUIREMENTS:
             "remaining_contributions": len(self.archive.archive["contributions"]),
             "message": f"Cleaned up {cleaned_count} test submissions"
         }
+
+    # Contributor Tier Management Methods (Blueprint §4.2)
+
+    def validate_tier_contribution(self, contribution_amount: float) -> Dict:
+        """
+        Validate a contribution amount for tier eligibility per Blueprint §4.2.
+
+        Args:
+            contribution_amount: Contribution amount in USD
+
+        Returns:
+            Validation result with tier eligibility information
+        """
+        return self.tokenomics.validate_tier_contribution(contribution_amount)
+
+    def register_tier_contribution(self, contributor_address: str, contribution_amount: float,
+                                  transaction_hash: str = None) -> Dict:
+        """
+        Register a contributor tier contribution per Blueprint §4.2.
+
+        Args:
+            contributor_address: Contributor's address
+            contribution_amount: Contribution amount in USD
+            transaction_hash: Optional blockchain transaction hash
+
+        Returns:
+            Registration result with tier info and SYNTH allocation
+        """
+        return self.tokenomics.register_tier_contribution(
+            contributor_address, contribution_amount, transaction_hash
+        )
+
+    def get_contributor_tier_info(self, contributor_address: str) -> Optional[Dict]:
+        """
+        Get tier information for a contributor.
+
+        Args:
+            contributor_address: Contributor's address
+
+        Returns:
+            Contributor tier info if registered, None otherwise
+        """
+        return self.tokenomics.get_contributor_tier_info(contributor_address)
+
+    def get_tier_statistics(self) -> Dict:
+        """
+        Get comprehensive tier system statistics per Blueprint §4.2.
+
+        Returns:
+            Statistics about contributor tier system
+        """
+        return self.tokenomics.get_tier_statistics()
+
+    def get_tier_benefits(self, tier_name: str) -> Dict:
+        """
+        Get benefits for a specific tier per Blueprint §4.2.
+
+        Args:
+            tier_name: Name of the tier (copper, silver, gold)
+
+        Returns:
+            Dictionary of tier benefits
+        """
+        return self.tokenomics.get_tier_benefits(tier_name)
+
+    def get_eligible_tiers(self, contribution_amount: float) -> List[Dict]:
+        """
+        Get all tiers eligible for a given contribution amount per Blueprint §4.2.
+
+        Args:
+            contribution_amount: Contribution amount in USD
+
+        Returns:
+            List of eligible tiers with details
+        """
+        return self.tokenomics.get_eligible_tiers(contribution_amount)
+
+    # Zenodo Community Integration Methods (Blueprint §1.1)
+
+    def get_syntheverse_communities(self) -> List[Dict]:
+        """
+        Get all Syntheverse Zenodo communities per Blueprint §1.1.
+
+        Returns:
+            List of community dictionaries
+        """
+        return self.zenodo.get_syntheverse_communities()
+
+    def search_community_records(self, community_id: str, query: str = "",
+                               limit: int = 20) -> List[Dict]:
+        """
+        Search for records in a specific Syntheverse community.
+
+        Args:
+            community_id: Community ID to search
+            query: Search query (optional)
+            limit: Maximum number of results
+
+        Returns:
+            List of record dictionaries
+        """
+        return self.zenodo.search_community_records(community_id, query, limit)
+
+    def get_community_statistics(self, community_id: str) -> Dict:
+        """
+        Get statistics for a specific community.
+
+        Args:
+            community_id: Community ID
+
+        Returns:
+            Community statistics
+        """
+        return self.zenodo.get_community_statistics(community_id)
+
+    def validate_community_submission(self, community_id: str, title: str,
+                                    description: str, keywords: List[str]) -> Dict:
+        """
+        Validate that a submission fits a Syntheverse community.
+
+        Args:
+            community_id: Target community ID
+            title: Submission title
+            description: Submission description
+            keywords: Submission keywords
+
+        Returns:
+            Validation result
+        """
+        return self.zenodo.validate_community_submission(
+            community_id, title, description, keywords
+        )
+
+    def submit_to_community(self, community_id: str, title: str, description: str,
+                           keywords: List[str], file_path: str,
+                           contributor: str) -> Dict:
+        """
+        Submit a contribution to a Syntheverse community (Blueprint §1.1 workflow).
+
+        Args:
+            community_id: Target community ID
+            title: Submission title
+            description: Submission description
+            keywords: Submission keywords
+            file_path: Path to submission file
+            contributor: Contributor identifier
+
+        Returns:
+            Submission result
+        """
+        return self.zenodo.submit_to_community(
+            community_id, title, description, keywords, file_path, contributor
+        )
+
+    def get_community_feed(self, community_id: str, limit: int = 10) -> List[Dict]:
+        """
+        Get recent submissions feed for a community.
+
+        Args:
+            community_id: Community ID
+            limit: Maximum number of items
+
+        Returns:
+            List of recent submissions
+        """
+        return self.zenodo.get_community_feed(community_id, limit)
+
+    def get_popular_communities(self, limit: int = 5) -> List[Dict]:
+        """
+        Get most popular Syntheverse communities by activity.
+
+        Args:
+            limit: Maximum number of communities
+
+        Returns:
+            List of popular communities with statistics
+        """
+        return self.zenodo.get_popular_communities(limit)
+
+    def discover_relevant_communities(self, keywords: List[str],
+                                     limit: int = 3) -> List[Dict]:
+        """
+        Discover communities relevant to given keywords.
+
+        Args:
+            keywords: List of keywords to match
+            limit: Maximum number of communities
+
+        Returns:
+            List of relevant communities
+        """
+        return self.zenodo.discover_relevant_communities(keywords, limit)
+
+    # Recognition System Methods (Blueprint §1.4)
+
+    def record_contribution_for_recognition(self, contributor: str, submission_hash: str,
+                                          category: str, coherence_score: float) -> Dict:
+        """
+        Record a contribution for recognition tracking per Blueprint §1.4.
+
+        Args:
+            contributor: Contributor identifier
+            submission_hash: Unique submission identifier
+            category: Contribution category
+            coherence_score: Contribution coherence score
+
+        Returns:
+            Recognition update result
+        """
+        submission_date = datetime.now().isoformat()
+        return self.recognition.record_contribution(
+            contributor, submission_hash, category, submission_date, coherence_score
+        )
+
+    def get_contributor_recognition(self, contributor: str) -> Optional[Dict]:
+        """
+        Get complete recognition information for a contributor per Blueprint §1.4.
+
+        Args:
+            contributor: Contributor identifier
+
+        Returns:
+            Recognition information or None
+        """
+        return self.recognition.get_contributor_recognition(contributor)
+
+    def get_recognition_leaderboard(self, limit: int = 20) -> List[Dict]:
+        """
+        Get recognition leaderboard showing top contributors.
+
+        Args:
+            limit: Maximum number of contributors
+
+        Returns:
+            Sorted list of top recognized contributors
+        """
+        return self.recognition.get_recognition_leaderboard(limit)
+
+    def get_recognition_statistics(self) -> Dict:
+        """
+        Get comprehensive recognition system statistics.
+
+        Returns:
+            Statistics about the recognition system
+        """
+        return self.recognition.get_recognition_statistics()
+
+    def get_legacy_contributors(self, limit: int = 10) -> List[Dict]:
+        """
+        Get earliest contributors for legacy recognition per Blueprint §1.4.
+
+        Args:
+            limit: Maximum number of legacy contributors
+
+        Returns:
+            List of earliest contributors with legacy information
+        """
+        return self.recognition.get_legacy_contributors(limit)

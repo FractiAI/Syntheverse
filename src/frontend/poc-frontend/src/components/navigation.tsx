@@ -2,13 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, FileSearch, List, Database, Network } from 'lucide-react'
+import { Home, FileSearch, List, Database, Network, Award, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/explorer', label: 'Explorer', icon: FileSearch },
   { href: '/submission', label: 'Submission', icon: List },
+  { href: '/tiers', label: 'Tiers', icon: Award },
+  { href: '/recognition', label: 'Recognition', icon: Trophy },
   { href: '/registry', label: 'Registry', icon: Database },
   { href: '/sandbox-map', label: 'Sandbox Map', icon: Network },
 ]

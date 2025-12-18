@@ -47,4 +47,36 @@ Maintenance, administration, and system state management utilities for the Synth
 - Selective operation modes
 - Audit logging and tracking
 
+## File Structure
 
+```
+utilities/
+├── install_deps.py               # Dependency installation
+├── clear_state.py                # State management and cleanup
+├── README.md                     # Usage documentation
+└── AGENTS.md                     # This technical documentation
+```
+
+## Usage Examples
+
+```bash
+# Install all dependencies
+python scripts/utilities/install_deps.py
+
+# Clear all state data
+python scripts/utilities/clear_state.py --all
+
+# Clear only Layer 2 state
+python scripts/utilities/clear_state.py --l2
+
+# Preview what would be cleared
+python scripts/utilities/clear_state.py --dry-run --all
+```
+
+## Cross-References
+
+- **Parent**: [scripts/AGENTS.md](../AGENTS.md) - Scripts overview
+- **Related**:
+  - [startup/AGENTS.md](../startup/AGENTS.md) - Startup orchestration
+  - [test_outputs/](../../test_outputs/) - State data storage
+  - [src/core/layer2/AGENTS.md](../../src/core/layer2/AGENTS.md) - Layer 2 state management
