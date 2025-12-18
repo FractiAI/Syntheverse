@@ -169,12 +169,18 @@ layer2/
 
 ## Cross-References
 
-- **Parent**: [core/AGENTS.md](../AGENTS.md) - Core logic overview
+- **Parent**:
+  - [core/AGENTS.md](../AGENTS.md) | [core/FRACTAL.md](../FRACTAL.md) - Core logic
+  - [src/AGENTS.md](../../AGENTS.md) | [src/FRACTAL.md](../../FRACTAL.md) - Source code
 - **Related**:
-  - [api/poc-api/AGENTS.md](../../api/poc-api/AGENTS.md) - API integration
-  - [blockchain/AGENTS.md](../../blockchain/AGENTS.md) - Blockchain registration
-  - [data/](../../data/) - Archive and state storage
-  - [config/environment/AGENTS.md](../../../config/environment/AGENTS.md) - Groq configuration
+  - [api/poc-api/AGENTS.md](../../api/poc-api/AGENTS.md) | [api/poc-api/FRACTAL.md](../../api/poc-api/FRACTAL.md) - API integration
+  - [blockchain/AGENTS.md](../../blockchain/AGENTS.md) | [blockchain/FRACTAL.md](../../blockchain/FRACTAL.md) - Blockchain registration
+  - [data/AGENTS.md](../../data/AGENTS.md) | [data/FRACTAL.md](../../data/FRACTAL.md) - Archive and state storage
+  - [config/environment/AGENTS.md](../../../config/environment/AGENTS.md) | [config/environment/FRACTAL.md](../../../config/environment/FRACTAL.md) - Groq configuration
+- **This Level**:
+  - [FRACTAL.md](FRACTAL.md) - Hydrogen-holographic evaluation analysis
+  - [evaluator/FRACTAL.md](evaluator/FRACTAL.md) - Scoring algorithms
+  - [allocator/FRACTAL.md](allocator/FRACTAL.md) - Token allocation
 
 
 

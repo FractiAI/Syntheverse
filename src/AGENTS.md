@@ -234,16 +234,18 @@ src/
 
 ## Cross-References
 
-- **Parent**: [Root AGENTS.md](../AGENTS.md) - System overview and architecture
+- **Parent**:
+  - [Root AGENTS.md](../AGENTS.md) - System overview and architecture
+  - [Root FRACTAL.md](../FRACTAL.md) - System fractal analysis
 - **Children**:
-  - [api/AGENTS.md](api/AGENTS.md) - API services documentation
-  - [blockchain/AGENTS.md](blockchain/AGENTS.md) - Blockchain implementation
-  - [core/AGENTS.md](core/AGENTS.md) - Core logic documentation
-  - [data/AGENTS.md](data/AGENTS.md) - Data management
-  - [frontend/AGENTS.md](frontend/AGENTS.md) - Frontend applications
+  - [api/AGENTS.md](api/AGENTS.md) | [api/FRACTAL.md](api/FRACTAL.md) - API services
+  - [blockchain/AGENTS.md](blockchain/AGENTS.md) | [blockchain/FRACTAL.md](blockchain/FRACTAL.md) - Blockchain implementation
+  - [core/AGENTS.md](core/AGENTS.md) | [core/FRACTAL.md](core/FRACTAL.md) - Core logic
+  - [data/AGENTS.md](data/AGENTS.md) | [data/FRACTAL.md](data/FRACTAL.md) - Data management
+  - [frontend/AGENTS.md](frontend/AGENTS.md) | [frontend/FRACTAL.md](frontend/FRACTAL.md) - Frontend applications
 - **Related**:
-  - [config/AGENTS.md](../config/AGENTS.md) - Configuration management
-  - [scripts/AGENTS.md](../scripts/AGENTS.md) - System scripts
-  - [tests/AGENTS.md](../tests/AGENTS.md) - Test documentation
+  - [config/AGENTS.md](../config/AGENTS.md) | [config/FRACTAL.md](../config/FRACTAL.md) - Configuration
+  - [scripts/AGENTS.md](../scripts/AGENTS.md) | [scripts/FRACTAL.md](../scripts/FRACTAL.md) - Scripts
+  - [tests/AGENTS.md](../tests/AGENTS.md) | [tests/FRACTAL.md](../tests/FRACTAL.md) - Testing
 
 

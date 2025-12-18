@@ -20,19 +20,19 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 
 ## 📁 Directory Overview
 
-| Directory | Purpose | AGENTS.md |
-|-----------|---------|-----------|
-| [`src/`](#-key-components) | Source code | [src/AGENTS.md](src/AGENTS.md) |
-| [`scripts/`](#-key-components) | System scripts | [scripts/AGENTS.md](scripts/AGENTS.md) |
-| [`config/`](#-key-components) | Configuration | [config/AGENTS.md](config/AGENTS.md) |
-| [`docs/`](#-key-components) | Documentation | [docs/AGENTS.md](docs/AGENTS.md) |
-| [`tests/`](#-key-components) | Test suites | [tests/AGENTS.md](tests/AGENTS.md) |
-| [`tools/`](#-key-components) | Development tools | [tools/AGENTS.md](tools/AGENTS.md) |
-| [`examples/`](#-key-components) | Demo code | [examples/AGENTS.md](examples/AGENTS.md) |
-| [`data/`](#-key-components) | Runtime data and blockchain state | [data/AGENTS.md](data/AGENTS.md) |
-| [`test_outputs/`](#-key-components) | Test state storage | [test_outputs/AGENTS.md](test_outputs/AGENTS.md) |
-| [`analysis_results/`](#-key-components) | Embedding analysis | [analysis_results/AGENTS.md](analysis_results/AGENTS.md) |
-| [`uploads/`](#-key-components) | File uploads | [uploads/AGENTS.md](uploads/AGENTS.md) |
+| Directory | Purpose | AGENTS.md | FRACTAL.md |
+|-----------|---------|-----------|-----------|
+| [`src/`](#-key-components) | Source code | [src/AGENTS.md](src/AGENTS.md) | [src/FRACTAL.md](src/FRACTAL.md) |
+| [`scripts/`](#-key-components) | System scripts | [scripts/AGENTS.md](scripts/AGENTS.md) | [scripts/FRACTAL.md](scripts/FRACTAL.md) |
+| [`config/`](#-key-components) | Configuration | [config/AGENTS.md](config/AGENTS.md) | [config/FRACTAL.md](config/FRACTAL.md) |
+| [`docs/`](#-key-components) | Documentation | [docs/AGENTS.md](docs/AGENTS.md) | [docs/FRACTAL.md](docs/FRACTAL.md) |
+| [`tests/`](#-key-components) | Test suites | [tests/AGENTS.md](tests/AGENTS.md) | [tests/FRACTAL.md](tests/FRACTAL.md) |
+| [`tools/`](#-key-components) | Development tools | [tools/AGENTS.md](tools/AGENTS.md) | [tools/FRACTAL.md](tools/FRACTAL.md) |
+| [`examples/`](#-key-components) | Demo code | [examples/AGENTS.md](examples/AGENTS.md) | [examples/FRACTAL.md](examples/FRACTAL.md) |
+| [`data/`](#-key-components) | Runtime data and blockchain state | [data/AGENTS.md](data/AGENTS.md) | [data/FRACTAL.md](data/FRACTAL.md) |
+| [`test_outputs/`](#-key-components) | Test state storage | [test_outputs/AGENTS.md](test_outputs/AGENTS.md) | [test_outputs/FRACTAL.md](test_outputs/FRACTAL.md) |
+| [`analysis_results/`](#-key-components) | Embedding analysis | [analysis_results/AGENTS.md](analysis_results/AGENTS.md) | [analysis_results/FRACTAL.md](analysis_results/FRACTAL.md) |
+| [`uploads/`](#-key-components) | File uploads | [uploads/AGENTS.md](uploads/AGENTS.md) | [uploads/FRACTAL.md](uploads/FRACTAL.md) |
 
 ## Key Components
 
