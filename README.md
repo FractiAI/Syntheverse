@@ -1,43 +1,81 @@
-# 🚀 **Syntheverse PoC System v0.2 - FULLY FUNCTIONING**
+# 🚀 **Syntheverse PoC System v0.3 - FULLY FUNCTIONING & BUG-FREE**
 
-## **🎯 CURRENT STATUS: COMPLETE WORKING SYSTEM READY FOR TESTING**
+## **🎯 CURRENT STATUS: COMPLETE WORKING SYSTEM READY FOR PRODUCTION TESTING**
 
-**FOR IMMEDIATE TESTING: The Syntheverse PoC system is NOW FULLY OPERATIONAL with real blockchain integration!** This is a complete, running Proof-of-Contribution (PoC) platform featuring multi-metal evaluation (Gold/Silver/Copper), interactive sandbox mapping, and Syntheverse Blockmine L1 blockchain integration with tiered fee structure.
+**FOR IMMEDIATE TESTING: The Syntheverse PoC system is NOW FULLY OPERATIONAL with real blockchain integration and all critical bugs resolved!** This is a complete, running Proof-of-Contribution (PoC) platform featuring multi-metal evaluation (Gold/Silver/Copper), interactive sandbox mapping, and Syntheverse Blockmine L1 blockchain integration with tiered fee structure.
 
-### **✅ WHAT'S WORKING RIGHT NOW:**
-- **Multi-Metal PoC Evaluation**: AI-powered evaluation with Grok API
-- **Interactive Sandbox Map**: Real-time network visualization with 16 knowledge dimensions
-- **Blockchain Integration**: Foundry + Anvil + Hardhat smart contracts
-- **Tiered Fee System**: First 3 submissions FREE, then $50 per submission + $200 blockchain registration
-- **Modern UI**: Next.js dashboard with real-time updates
-- **Archive-First Redundancy**: Comprehensive duplicate detection
-- **Live Tokenomics**: SYNTH token allocation and epoch management
+### **✅ WHAT'S WORKING RIGHT NOW (v0.3):**
+- **✅ Multi-Metal PoC Evaluation**: AI-powered evaluation with Grok API (BUG-FIXED)
+- **✅ Interactive Sandbox Map**: Real-time network visualization with 16 knowledge dimensions
+- **✅ Blockchain Integration**: Foundry + Anvil + Hardhat smart contracts
+- **✅ Register PoC Button**: Functional blockchain registration (BUG-FIXED)
+- **✅ Tiered Fee System**: First 3 submissions FREE, then $50 per submission + $200 blockchain registration
+- **✅ Modern UI**: Next.js dashboard with real-time updates
+- **✅ Accurate Tokenomics**: Correct SYNTH token allocation display (BUG-FIXED)
+- **✅ Archive-First Redundancy**: Comprehensive duplicate detection
+- **✅ Live Tokenomics**: SYNTH token allocation and epoch management
 
-### **🖥️ QUICK START - RUN THE FULL SYSTEM:**
+### **🐛 RECENT BUG FIXES (v0.3):**
+- **FIXED**: Tokenomics calculation showing incorrect "58.21T" → now shows accurate "37.125T"
+- **FIXED**: `tier_multiplier` reference before assignment error in token allocation
+- **FIXED**: Register PoC button "no server found" error → added legacy web UI server
+- **FIXED**: Dashboard statistics based on actual allocations vs incorrect formulas
+
+### **🖥️ QUICK START - RUN THE FULL SYSTEM (v0.3 - BUG-FREE):**
 ```bash
 # Clone and start the complete system
 git clone https://github.com/FractiAI/Syntheverse.git
 cd Syntheverse
 
-# Set your Groq API key
+# Set your Groq API key (get from https://console.groq.com/)
 export GROQ_API_KEY="your-groq-api-key-here"
 
-# Start all services automatically
-python3 start_servers.py
+# Clean up any existing processes (recommended)
+./scripts/startup/cleanup_servers.sh
 
-# Access the system:
-# Frontend: http://localhost:3001/dashboard
-# API: http://localhost:5001
+# Start all services automatically (includes all bug fixes)
+python3 scripts/startup/start_servers.py
+
+# Access the WORKING system:
+# Frontend Dashboard: http://localhost:3001/dashboard
+# Submit PoC: http://localhost:3001/submission
+# View Registry: http://localhost:3001/registry
 # Blockchain Registration: http://localhost:5000
+# API Endpoints: http://localhost:5001
 # Local Blockchain: http://localhost:8545 (Anvil)
 ```
 
-### **🔗 LIVE SYSTEM LINKS:**
-- **Dashboard**: http://localhost:3001/dashboard
-- **Submit PoC**: http://localhost:3001/submission
-- **Sandbox Map**: http://localhost:3001/sandbox-map
-- **Registry**: http://localhost:3001/registry
-- **Blockchain Registration**: http://localhost:5000
+### **🎯 TEST THE WORKING SYSTEM:**
+1. **Submit a PoC**: http://localhost:3001/submission
+2. **Watch Evaluation**: AI-powered Grok evaluation with scores
+3. **Check Dashboard**: Accurate tokenomics (37.125T distributed)
+4. **Register on Blockchain**: Click "Register PoC" button (now works!)
+5. **View Results**: Complete evaluation with token allocation
+
+### **🔗 LIVE SYSTEM LINKS (ALL WORKING):**
+- **Dashboard**: http://localhost:3001/dashboard (accurate tokenomics display)
+- **Submit PoC**: http://localhost:3001/submission (AI evaluation working)
+- **Sandbox Map**: http://localhost:3001/sandbox-map (interactive visualization)
+- **Registry**: http://localhost:3001/registry (contribution archive)
+- **Blockchain Registration**: http://localhost:5000 (Register PoC button fixed)
+
+### **📋 CHANGELOG:**
+
+#### **v0.3 - BUG FIXES & STABILITY (2025-12-18)**
+- ✅ **FIXED**: Dashboard "Total Distributed" showing incorrect 58.21T → now shows accurate 37.125T
+- ✅ **FIXED**: Tokenomics calculation using wrong formula (epoch allocations vs actual allocations)
+- ✅ **FIXED**: `tier_multiplier` reference before assignment error in token allocation
+- ✅ **FIXED**: Register PoC button "no server found" error → added legacy web UI server (port 5000)
+- ✅ **ADDED**: Automatic startup of all required servers (Flask API, Next.js, Legacy UI, RAG API)
+- ✅ **IMPROVED**: Token allocation accuracy and dashboard statistics reliability
+
+#### **v0.2 - CORE FUNCTIONALITY (2025-12-17)**
+- ✅ Complete AI-powered PoC evaluation system with Grok API integration
+- ✅ Multi-metal evaluation (Gold/Silver/Copper) with tiered token allocation
+- ✅ Interactive sandbox map with 16 knowledge dimensions
+- ✅ Blockchain integration with Foundry + Anvil + Hardhat
+- ✅ Modern Next.js frontend with real-time updates
+- ✅ Archive-first redundancy detection system
 
 ---
 
@@ -238,6 +276,9 @@ cd Syntheverse
 
 # Set your Groq API key (required for AI evaluation)
 export GROQ_API_KEY="your-groq-api-key-here"
+
+# Clean up any existing processes (recommended)
+./scripts/startup/cleanup_servers.sh
 
 # Start the complete system automatically
 python3 scripts/startup/start_servers.py
@@ -557,6 +598,9 @@ cd Syntheverse
 
 # Set up environment
 export GROQ_API_KEY="your-groq-api-key-here"
+
+# Clean up any existing processes (recommended)
+./scripts/startup/cleanup_servers.sh
 
 # Start the local demonstration system
 ./scripts/development/start_poc_ui.sh

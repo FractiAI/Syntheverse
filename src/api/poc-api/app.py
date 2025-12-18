@@ -374,6 +374,30 @@ def get_contribution(submission_hash):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/status/<submission_hash>', methods=['GET'])
+def get_submission_status(submission_hash):
+    """Get the status of a submission (for frontend polling)."""
+    try:
+        if not poc_server:
+            return jsonify({"error": "PoC Server not initialized"}), 503
+
+        contrib = poc_server.archive.get_contribution(submission_hash)
+        if not contrib:
+            return jsonify({"error": "Contribution not found"}), 404
+
+        # Return just the status and basic info for polling
+        status_data = {
+            "submission_hash": contrib["submission_hash"],
+            "status": contrib["status"],
+            "metals": contrib.get("metals", []),
+            "updated_at": contrib.get("updated_at"),
+        }
+
+        return jsonify(status_data)
+    except Exception as e:
+        app.logger.error(f"Error in get_submission_status: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/submit', methods=['POST'])
 def submit_contribution():
@@ -1259,4 +1283,5 @@ if __name__ == '__main__':
     print("Make sure GROQ_API_KEY is set in environment")
     # Debug/reloader should be off by default (test runners spawn processes and expect stable PIDs).
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
-    app.run(host='0.0.0.0', port=5001, debug=debug)
+    port = int(os.environ.get('FLASK_RUN_PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=debug)

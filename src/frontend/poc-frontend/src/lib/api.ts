@@ -16,6 +16,12 @@ export interface Contribution {
     density?: number
     redundancy?: number
     pod_score?: number
+    grok_raw_response?: string
+    progress?: string
+    evaluation_status?: string
+    tier_justification?: string
+    redundancy_analysis?: string
+    allocations?: any[]
     [key: string]: any
   }
   created_at: string
@@ -36,6 +42,9 @@ export interface EvaluationResult {
     redundancy: number
     metals: string[]
     pod_score: number
+    grok_raw_response?: string
+    progress?: string
+    evaluation_status?: string
     tier_justification?: string
     redundancy_analysis?: string
     status: string
@@ -123,6 +132,7 @@ class PoCApi {
   }
 
   private async fetch(endpoint: string, options?: RequestInit) {
+    console.log('API Call:', `${this.baseUrl}${endpoint}`)
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: {
@@ -131,11 +141,15 @@ class PoCApi {
       },
     })
 
+    console.log('API Response status:', response.status)
     if (!response.ok) {
+      console.error('API Error:', response.statusText)
       throw new Error(`API error: ${response.statusText}`)
     }
 
-    return response.json()
+    const data = await response.json()
+    console.log('API Response data:', data)
+    return data
   }
 
   // Archive operations
@@ -149,7 +163,9 @@ class PoCApi {
     metal?: string
   }): Promise<Contribution[]> {
     const query = new URLSearchParams(params as any).toString()
-    return this.fetch(`/api/archive/contributions?${query}`)
+    const response = await this.fetch(`/api/archive/contributions?${query}`)
+    // API returns {contributions: [...], count: N}, but we want just the array
+    return response.contributions || []
   }
 
   async getContribution(submissionHash: string): Promise<Contribution> {

@@ -461,6 +461,48 @@ class ServerManager:
         self.print_header()
 
         print("\n" + "="*50)
+        self.print_status("Step 0: Pre-startup cleanup...", "ℹ️")
+
+        # Pre-startup cleanup: Always kill existing processes and free ports
+        ports_to_free = [
+            ("Web UI", self.ports['web_ui']),
+            ("PoC API", self.ports['poc_api']),
+            ("Next.js Frontend", self.ports['frontend']),
+            ("Demo", self.ports['demo'])
+        ]
+
+        for name, port in ports_to_free:
+            self.print_status(f"Freeing port {port} ({name})...", "ℹ️")
+            if not self.port_manager.free_port(port, name):
+                self.print_status(f"Could not free port {port} ({name}), but continuing...", "⚠️")
+
+        # Additional cleanup using system commands if available
+        try:
+            self.print_status("Performing additional process cleanup...", "ℹ️")
+            # Kill any lingering Python and Node processes
+            cleanup_commands = [
+                ["pkill", "-f", "python.*app.py"],
+                ["pkill", "-f", "npm.*dev"],
+                ["pkill", "-f", "next.*dev"],
+                ["pkill", "-f", "flask"]
+            ]
+
+            for cmd in cleanup_commands:
+                try:
+                    result = subprocess.run(cmd, capture_output=True, timeout=5)
+                    if result.returncode in [0, 1]:  # 0 = killed processes, 1 = no processes found
+                        self.print_status(f"Cleanup command succeeded: {' '.join(cmd)}", "✅")
+                except (subprocess.TimeoutExpired, FileNotFoundError):
+                    self.logger.debug(f"Cleanup command not available: {' '.join(cmd)}")
+
+            # Wait for cleanup to complete
+            time.sleep(2)
+            self.print_status("Pre-startup cleanup completed", "✅")
+
+        except Exception as e:
+            self.print_status(f"Additional cleanup failed: {e}", "⚠️")
+
+        print("\n" + "="*50)
         self.print_status("Step 0: Loading environment configuration...", "ℹ️")
 
         # Load and validate environment variables
@@ -512,7 +554,7 @@ class ServerManager:
         if self.start_rag_api():
             servers_started.append("RAG API")
 
-        # Start Web UI (legacy)
+        # Start Web UI (legacy) - for blockchain registration
         web_ui_cmd = f"{sys.executable} src/frontend/web-legacy/app.py"
         if self.start_server(web_ui_cmd, "Web UI Server (Legacy)", self.ports['web_ui']):
             servers_started.append("Web UI")

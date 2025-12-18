@@ -595,14 +595,17 @@ EVALUATION REQUIREMENTS:
         if not tier:
             return None
         
-        # Calculate allocation
-        allocation = self.tokenomics.calculate_allocation(pod_score, epoch, tier)
-        
+        # Use timeline-based allocation (density determines percentage of open epochs)
+        allocation = self.tokenomics.calculate_timeline_allocation(density, tier)
+
         if allocation.get("success"):
+            # For backward compatibility, pick the primary epoch (highest priority open epoch)
+            primary_epoch = self.tokenomics.qualify_epoch(density) or self.tokenomics.get_open_epochs()[0]
+
             return {
                 "metal": metal.value,
-                "epoch": epoch.value,
-                "tier": tier.value,
+                "epoch": primary_epoch.value if primary_epoch else "unknown",
+                "tier": allocation["tier"],
                 "allocation": allocation
             }
         

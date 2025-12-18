@@ -46,12 +46,14 @@ export default function RegistryPage() {
       setLoading(true)
       // Get all contributions, sorted by creation date (append-only chronological order)
       const data = await api.getContributions()
+
       // Sort by created_at descending (newest first)
       const sorted = [...data].sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
       setContributions(sorted)
     } catch (err) {
+      console.error('Registry loading error:', err)
       setError(err instanceof Error ? err.message : 'Failed to load registry')
     } finally {
       setLoading(false)

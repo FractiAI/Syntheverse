@@ -100,7 +100,10 @@ class TokenomicsState:
             "founder_halving_count": 0,
             "current_epoch": Epoch.FOUNDER.value,
             "epoch_progression": {
-                epoch.value: False for epoch in Epoch
+                Epoch.FOUNDER.value: True,    # Founder starts open
+                Epoch.PIONEER.value: False,   # Pioneer initially closed
+                Epoch.COMMUNITY.value: False, # Community initially closed
+                Epoch.ECOSYSTEM.value: False, # Ecosystem initially closed
             },
             "allocation_history": [],
             "contributor_balances": {},
@@ -150,24 +153,63 @@ class TokenomicsState:
         """Get available balance for an epoch."""
         return self.state["epoch_balances"].get(epoch.value, 0.0)
     
+    def get_open_epochs(self) -> List[Epoch]:
+        """Get list of currently open epochs for allocation."""
+        return [epoch for epoch in Epoch if self.state["epoch_progression"].get(epoch.value, False)]
+
+    def open_next_epoch(self) -> bool:
+        """Open the next epoch in sequence if available."""
+        open_epochs = self.get_open_epochs()
+        if not open_epochs:
+            # Open founder if nothing is open
+            self.state["epoch_progression"][Epoch.FOUNDER.value] = True
+            self.state["current_epoch"] = Epoch.FOUNDER.value
+            return True
+
+        # Open next epoch in sequence
+        epoch_order = [Epoch.FOUNDER, Epoch.PIONEER, Epoch.COMMUNITY, Epoch.ECOSYSTEM]
+        current_index = max([epoch_order.index(epoch) for epoch in open_epochs], default=-1)
+
+        if current_index + 1 < len(epoch_order):
+            next_epoch = epoch_order[current_index + 1]
+            self.state["epoch_progression"][next_epoch.value] = True
+            self.state["current_epoch"] = next_epoch.value
+            self.save_state()
+            return True
+
+        return False  # No more epochs to open
+
+    def get_allocation_percentage(self, density_score: float) -> float:
+        """
+        Convert density score to allocation percentage (0-100%).
+        Higher density = higher percentage of available tokens.
+
+        Args:
+            density_score: Density score (0-10000)
+
+        Returns:
+            Allocation percentage (0.0-1.0)
+        """
+        # Density score directly maps to percentage
+        # 8300 density = 83% of available tokens
+        return min(density_score / 10000.0, 1.0)
+
     def qualify_epoch(self, density_score: float) -> Optional[Epoch]:
         """
-        Determine which epoch a contribution qualifies for.
-        
-        Args:
-            density_score: Density score
-        
-        Returns:
-            Qualified epoch or None
+        LEGACY METHOD - kept for backward compatibility.
+        Now returns the highest priority open epoch.
         """
-        if density_score >= self.EPOCH_THRESHOLDS[Epoch.FOUNDER]:
-            return Epoch.FOUNDER
-        elif density_score >= self.EPOCH_THRESHOLDS[Epoch.PIONEER]:
-            return Epoch.PIONEER
-        elif density_score >= self.EPOCH_THRESHOLDS[Epoch.COMMUNITY]:
-            return Epoch.COMMUNITY
-        else:
-            return Epoch.ECOSYSTEM
+        open_epochs = self.get_open_epochs()
+        if not open_epochs:
+            return None
+
+        # Return highest priority open epoch (Founder > Pioneer > Community > Ecosystem)
+        epoch_priority = [Epoch.FOUNDER, Epoch.PIONEER, Epoch.COMMUNITY, Epoch.ECOSYSTEM]
+        for epoch in epoch_priority:
+            if epoch in open_epochs:
+                return epoch
+
+        return None
     
     def calculate_pod_score(
         self,
@@ -235,21 +277,22 @@ class TokenomicsState:
                 "available": False,
             }
         
-        epoch_balance = self.get_epoch_balance(epoch)
-        
-        if epoch_balance <= 0:
+        # Get current available balance in epoch
+        current_epoch_balance = self.get_epoch_balance(epoch)
+
+        if current_epoch_balance <= 0:
             return {
                 "success": False,
                 "reason": f"No tokens available in {epoch.value} epoch",
                 "available": False,
             }
-        
-        # PoC score represents percentage of available tokens allocated (0-100%)
+
+        # PoC score represents percentage of AVAILABLE epoch balance (0-100%)
         # Convert PoC score (0-10000) to decimal percentage (0-1)
         allocation_percentage = pod_score / 10000.0  # PoC score of 10000 = 100% allocation
 
-        # Calculate base reward as percentage of available epoch balance
-        base_reward = allocation_percentage * epoch_balance
+        # Calculate base reward as percentage of CURRENT available balance
+        base_reward = allocation_percentage * current_epoch_balance
 
         # Check how many tiers are available in this epoch
         available_tiers_in_epoch = [
@@ -257,21 +300,23 @@ class TokenomicsState:
             if epoch in self.TIER_EPOCH_AVAILABILITY[t]
         ]
 
+        # Initialize tier_multiplier (needed for return statement)
+        tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
+
         if len(available_tiers_in_epoch) == 1:
             # Single tier epoch (like Founders with only Gold) - use full allocation
             reward = base_reward
         else:
             # Multi-tier epoch - apply proportional sharing
-            tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
             # Calculate total weight of available tiers only
             total_tier_weight = sum(self.TIER_MULTIPLIERS.get(available_tier, 1.0)
                                   for available_tier in available_tiers_in_epoch)
             tier_share = tier_multiplier / total_tier_weight
             reward = base_reward * tier_share
 
-        # Ensure we don't exceed epoch balance (accounting for halvings)
-        reward = min(reward, epoch_balance)
-        
+        # Ensure we don't exceed current available balance
+        reward = min(reward, current_epoch_balance)
+
         return {
             "success": True,
             "available": True,
@@ -282,10 +327,106 @@ class TokenomicsState:
             "base_reward": base_reward,
             "tier_multiplier": tier_multiplier,
             "reward": reward,
-            "epoch_balance_before": epoch_balance,
-            "epoch_balance_after": epoch_balance - reward,
+            "epoch_balance_before": current_epoch_balance,
+            "epoch_balance_after": current_epoch_balance - reward,
         }
-    
+
+    def calculate_timeline_allocation(
+        self,
+        density_score: float,
+        tier: ContributionTier
+    ) -> Dict:
+        """
+        Calculate token allocation for timeline-based epoch system.
+
+        Density score determines percentage of available tokens from currently open epochs.
+        Only open epochs participate in allocation.
+
+        Args:
+            density_score: Density score (0-10000) representing allocation percentage
+            tier: Contribution tier with multiplier
+
+        Returns:
+            Allocation details with availability check
+        """
+        # Get currently open epochs
+        open_epochs = self.get_open_epochs()
+        if not open_epochs:
+            return {
+                "success": False,
+                "reason": "No epochs are currently open for allocation",
+                "available": False,
+            }
+
+        # Check tier availability in at least one open epoch
+        tier_available = any(
+            self.is_tier_available_in_epoch(tier, epoch)
+            for epoch in open_epochs
+        )
+        if not tier_available:
+            return {
+                "success": False,
+                "reason": f"Tier {tier.value} not available in any open epoch",
+                "available": False,
+            }
+
+        # Get total available balance across all open epochs
+        total_available_balance = sum(self.get_epoch_balance(epoch) for epoch in open_epochs)
+
+        if total_available_balance <= 0:
+            return {
+                "success": False,
+                "reason": "No tokens available in any open epoch",
+                "available": False,
+            }
+
+        # Density score determines percentage of available tokens (0-100%)
+        allocation_percentage = self.get_allocation_percentage(density_score)
+
+        # Calculate total reward before tier multiplier
+        base_total_reward = allocation_percentage * total_available_balance
+
+        # Apply tier multiplier
+        tier_multiplier = self.TIER_MULTIPLIERS.get(tier, 1.0)
+        total_reward = base_total_reward * tier_multiplier
+
+        # Distribute reward proportionally across open epochs
+        epoch_allocations = {}
+        remaining_reward = total_reward
+
+        for epoch in open_epochs:
+            if remaining_reward <= 0:
+                break
+
+            epoch_balance = self.get_epoch_balance(epoch)
+            if epoch_balance <= 0:
+                continue
+
+            # Allocate proportionally to epoch balance
+            epoch_share = epoch_balance / total_available_balance
+            epoch_reward = min(remaining_reward * epoch_share, epoch_balance)
+
+            if epoch_reward > 0:
+                epoch_allocations[epoch] = {
+                    "reward": epoch_reward,
+                    "balance_before": epoch_balance,
+                    "balance_after": epoch_balance - epoch_reward,
+                }
+                remaining_reward -= epoch_reward
+
+        return {
+            "success": True,
+            "available": True,
+            "density_score": density_score,
+            "allocation_percentage": allocation_percentage,
+            "tier": tier.value,
+            "tier_multiplier": tier_multiplier,
+            "base_total_reward": base_total_reward,
+            "total_reward": total_reward,
+            "epoch_allocations": epoch_allocations,
+            "open_epochs": [e.value for e in open_epochs],
+        }
+
     def record_allocation(
         self,
         submission_hash: str,
@@ -295,7 +436,7 @@ class TokenomicsState:
     ):
         """
         Record an allocation and update state.
-        
+
         Args:
             submission_hash: Submission hash
             contributor: Contributor address
@@ -304,19 +445,32 @@ class TokenomicsState:
         """
         if not allocation.get("success"):
             return
-        
-        # Update epoch balance
-        epoch = Epoch(allocation["epoch"])
-        self.state["epoch_balances"][epoch.value] -= allocation["reward"]
-        
+
+        total_reward = 0
+
+        # Handle both old single-epoch and new multi-epoch allocations
+        if "epoch_allocations" in allocation:
+            # New timeline-based allocation (multiple epochs)
+            for epoch_name, epoch_data in allocation["epoch_allocations"].items():
+                epoch = Epoch(epoch_name)
+                reward = epoch_data["reward"]
+                self.state["epoch_balances"][epoch.value] -= reward
+                total_reward += reward
+        else:
+            # Legacy single-epoch allocation
+            epoch = Epoch(allocation["epoch"])
+            reward = allocation["reward"]
+            self.state["epoch_balances"][epoch.value] -= reward
+            total_reward = reward
+
         # Update contributor balance
         if contributor not in self.state["contributor_balances"]:
             self.state["contributor_balances"][contributor] = 0.0
-        self.state["contributor_balances"][contributor] += allocation["reward"]
-        
+        self.state["contributor_balances"][contributor] += total_reward
+
         # Update coherence density
         self.update_coherence_density(coherence)
-        
+
         # Record in history
         allocation_record = {
             "submission_hash": submission_hash,
@@ -326,24 +480,28 @@ class TokenomicsState:
             "coherence": coherence,
         }
         self.state["allocation_history"].append(allocation_record)
-        
+
         # Keep only last 1000 allocations in memory
         if len(self.state["allocation_history"]) > 1000:
             self.state["allocation_history"] = self.state["allocation_history"][-1000:]
-        
+
         self.save_state()
     
     def get_statistics(self) -> Dict:
         """Get tokenomics statistics."""
+        # Calculate total distributed as sum of all actual allocations made
         total_distributed = sum(
-            self.TOTAL_SUPPLY * self.EPOCH_DISTRIBUTION[Epoch(epoch_name)] - balance
-            for epoch_name, balance in self.state["epoch_balances"].items()
+            allocation_record["allocation"].get("reward", 0)
+            for allocation_record in self.state["allocation_history"]
         )
-        
+
+        # Calculate total remaining as sum of all epoch balances
+        total_remaining = sum(self.state["epoch_balances"].values())
+
         return {
             "total_supply": self.TOTAL_SUPPLY,
             "total_distributed": total_distributed,
-            "total_remaining": sum(self.state["epoch_balances"].values()),
+            "total_remaining": total_remaining,
             "epoch_balances": self.state["epoch_balances"].copy(),
             "current_epoch": self.state["current_epoch"],
             "founder_halving_count": self.state["founder_halving_count"],

@@ -245,6 +245,50 @@ def start_servers():
 
     logger.info("Starting Syntheverse Servers...")
 
+    # Pre-startup cleanup: Always kill existing processes and free ports
+    logger.info("Performing pre-startup cleanup...")
+    port_manager = PortManager(logger)
+
+    # Free all target ports
+    ports_to_free = [
+        (5001, "Flask API"),
+        (3001, "Next.js Frontend"),
+        (8000, "RAG API")
+    ]
+
+    for port, name in ports_to_free:
+        logger.info(f"Freeing port {port} ({name})...")
+        success = port_manager.free_port(port, name)
+        if not success:
+            logger.warning(f"Could not free port {port} ({name}), but continuing with startup...")
+        else:
+            logger.info(f"Successfully freed port {port} ({name})")
+
+    # Additional cleanup using system commands if available
+    try:
+        logger.info("Performing additional process cleanup...")
+        # Kill any lingering Python and Node processes
+        cleanup_commands = [
+            ["pkill", "-f", "python.*app.py"],
+            ["pkill", "-f", "npm.*dev"],
+            ["pkill", "-f", "next.*dev"]
+        ]
+
+        for cmd in cleanup_commands:
+            try:
+                result = subprocess.run(cmd, capture_output=True, timeout=5)
+                if result.returncode in [0, 1]:  # 0 = killed processes, 1 = no processes found
+                    logger.info(f"Cleanup command succeeded: {' '.join(cmd)}")
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                logger.debug(f"Cleanup command not available: {' '.join(cmd)}")
+
+        # Wait for cleanup to complete
+        time.sleep(2)
+        logger.info("Pre-startup cleanup completed")
+
+    except Exception as e:
+        logger.warning(f"Additional cleanup failed: {e}")
+
     if not load_environment(project_root, logger):
         logger.error("Environment validation failed. Please configure required variables.")
         return 1
@@ -265,6 +309,7 @@ def start_servers():
     env['PYTHONPATH'] = f"{project_root}/src/core:{project_root}/src:{project_root}"
     env['FLASK_SKIP_DOTENV'] = '1'
 
+    # Start Flask API
     flask_cmd = [sys.executable, "src/api/poc-api/app.py"]
     flask_proc = start_server_process(
         flask_cmd,
@@ -275,13 +320,33 @@ def start_servers():
         logger,
         health_endpoint="/health"
     )
-    
+
     if flask_proc:
         processes.append(("Flask API", flask_proc))
+        logger.info("Flask API started successfully")
     else:
-        logger.error("Failed to start Flask API")
+        logger.error("Failed to start Flask API - port may still be in use")
+        logger.error("Try running: ./scripts/startup/cleanup_servers.sh")
         cleanup_processes(processes, logger)
         return 1
+
+    # Start Legacy Web UI (for blockchain registration)
+    web_ui_cmd = [sys.executable, "src/frontend/web-legacy/app.py"]
+    web_ui_proc = start_server_process(
+        web_ui_cmd,
+        "Legacy Web UI",
+        5000,
+        project_root,
+        env,
+        logger,
+        health_endpoint="/"
+    )
+
+    if web_ui_proc:
+        processes.append(("Legacy Web UI", web_ui_proc))
+        logger.info("Legacy Web UI started successfully")
+    else:
+        logger.warning("Failed to start Legacy Web UI - continuing without it")
 
     # Start RAG API
     rag_api_dir = project_root / "src" / "api" / "rag-api" / "api"

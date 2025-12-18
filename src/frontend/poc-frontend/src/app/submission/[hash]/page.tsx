@@ -109,34 +109,71 @@ export default function SubmissionDetailPage() {
 
   useEffect(() => {
     if (hash) {
+      console.log('Loading data for hash:', hash)
       loadData()
+
+      // Add a timeout to show error if loading takes too long
+      const timeout = setTimeout(() => {
+        if (!contribution) {
+          console.error('Data loading timeout - API call may be failing')
+          setError('Failed to load submission data. Check API connectivity.')
+          setLoading(false)
+        }
+      }, 10000) // 10 second timeout
+
       // Poll for updates if evaluation is in progress
       const pollInterval = setInterval(async () => {
         if (contribution && (contribution.status === 'submitted' || contribution.status === 'evaluating')) {
           try {
+            console.log('Polling for updates...')
             const updated = await api.getContribution(hash)
+            console.log('Received update:', updated.status)
             setContribution(updated)
             // Stop polling if evaluation is complete
             if (updated.status !== 'submitted' && updated.status !== 'evaluating') {
               clearInterval(pollInterval)
+              clearTimeout(timeout)
             }
           } catch (err) {
-            // Ignore polling errors
+            console.error('Polling error:', err)
           }
         }
       }, 2000) // Poll every 2 seconds
 
-      return () => clearInterval(pollInterval)
+      return () => {
+        clearInterval(pollInterval)
+        clearTimeout(timeout)
+      }
     }
   }, [hash, contribution?.status])
 
   async function loadData() {
     try {
+      console.log('Starting loadData for hash:', hash)
       setLoading(true)
+      setError(null)
+
+      // Try direct fetch first to test connectivity
+      console.log('Testing direct API call...')
+      const directResponse = await fetch(`http://localhost:5001/api/archive/contributions/${hash}`)
+      if (!directResponse.ok) {
+        throw new Error(`Direct API call failed: ${directResponse.status} ${directResponse.statusText}`)
+      }
+      const directData = await directResponse.json()
+      console.log('Direct API call successful:', directData)
+      console.log('Direct data status:', directData.status)
+      console.log('Direct data metadata keys:', Object.keys(directData.metadata || {}))
+
+      // Now try through the API client
+      console.log('Trying API client...')
       const contrib = await api.getContribution(hash)
+      console.log('API client successful:', contrib)
+      console.log('Contribution status:', contrib.status)
+      console.log('Contribution metadata keys:', Object.keys(contrib.metadata || {}))
       setContribution(contrib)
       // Evaluation data is stored in contribution metadata
     } catch (err) {
+      console.error('loadData error:', err)
       setError(err instanceof Error ? err.message : 'Failed to load submission')
     } finally {
       setLoading(false)
@@ -171,11 +208,17 @@ export default function SubmissionDetailPage() {
   const metadata = contribution.metadata || {}
   // Evaluation data is stored directly in metadata
   const evaluationData = metadata
-  // Check if evaluation data actually exists (has scores)
+  // Check if evaluation data actually exists (has scores or grok response)
   const hasEvaluationData = evaluationData &&
-    (evaluationData.coherence !== null && evaluationData.coherence !== undefined) &&
-    (evaluationData.density !== null && evaluationData.density !== undefined) &&
-    (evaluationData.pod_score !== null && evaluationData.pod_score !== undefined)
+    ((evaluationData.coherence !== null && evaluationData.coherence !== undefined) ||
+     evaluationData.grok_raw_response ||
+     (contribution.status === 'qualified' || contribution.status === 'unqualified'))
+
+  // Debug logging
+  console.log('Contribution status:', contribution.status)
+  console.log('Has evaluation data:', hasEvaluationData)
+  console.log('Metadata keys:', Object.keys(metadata))
+  console.log('Has grok_raw_response:', !!evaluationData.grok_raw_response)
 
   return (
     <div className="space-y-6">
@@ -184,6 +227,9 @@ export default function SubmissionDetailPage() {
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
+          </Button>
+          <Button variant="outline" onClick={() => loadData()}>
+            🔄 Refresh Data
           </Button>
           <div>
             <h1 className="text-3xl font-bold">{contribution.title}</h1>
@@ -236,7 +282,7 @@ export default function SubmissionDetailPage() {
           <CardHeader>
             <CardTitle>Evaluation Metrics</CardTitle>
             <CardDescription>
-              Evaluation occurs automatically upon submission
+              AI-powered evaluation using Grok with real-time reasoning
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -246,36 +292,92 @@ export default function SubmissionDetailPage() {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Coherence</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.coherence?.toFixed(0)}
+                      {evaluationData.coherence !== undefined ? evaluationData.coherence.toFixed(0) : 'N/A'}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Density</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.density?.toFixed(0)}
+                      {evaluationData.density !== undefined ? evaluationData.density.toFixed(0) : 'N/A'}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Redundancy</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.redundancy?.toFixed(0)}
+                      {evaluationData.redundancy !== undefined ? evaluationData.redundancy.toFixed(0) : 'N/A'}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000 (lower is better)</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">PoC Score</label>
                     <p className="text-2xl font-bold mt-1">
-                      {evaluationData.pod_score?.toFixed(0)}
+                      {evaluationData.pod_score !== undefined ? evaluationData.pod_score.toFixed(0) : 'N/A'}
                     </p>
                     <p className="text-xs text-muted-foreground">0-10000</p>
                   </div>
                 </div>
+
+                {/* Debug info */}
+                <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono">
+                  <strong>Debug Info:</strong><br/>
+                  Status: {contribution.status}<br/>
+                  Has evaluationData: {hasEvaluationData ? 'true' : 'false'}<br/>
+                  Metadata keys: {Object.keys(metadata).join(', ')}<br/>
+                  Coherence: {evaluationData.coherence ?? 'undefined'}<br/>
+                  Density: {evaluationData.density ?? 'undefined'}<br/>
+                  Redundancy: {evaluationData.redundancy ?? 'undefined'}<br/>
+                  PoC Score: {evaluationData.pod_score ?? 'undefined'}
+                </div>
+
+                {/* Grok AI Conversation */}
+                {evaluationData.grok_raw_response && (
+                  <div className="mt-6 pt-4 border-t">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <h4 className="text-sm font-medium">Grok AI Evaluation Conversation</h4>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4">
+                      <pre className="text-xs text-blue-900 dark:text-blue-100 whitespace-pre-wrap font-mono overflow-x-auto max-h-96 overflow-y-auto">
+                        {evaluationData.grok_raw_response}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      This is the raw response from Grok AI showing its evaluation reasoning and thought process.
+                    </p>
+                  </div>
+                )}
+
+                {/* Evaluation Progress */}
+                {contribution.status === 'evaluating' && evaluationData.progress && (
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                        {evaluationData.progress}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </>
+            ) : contribution.status === 'evaluating' ? (
+              <div className="text-center py-8">
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <TrendingUp className="h-5 w-5 text-blue-600 animate-pulse" />
+                  <span className="text-muted-foreground">Evaluation in progress...</span>
+                </div>
+                {evaluationData.progress && (
+                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                    {evaluationData.progress}
+                  </p>
+                )}
+              </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                Evaluation in progress or not yet completed.
+                <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Evaluation not yet completed.</p>
+                <p className="text-sm mt-1">Submit your contribution to trigger AI evaluation.</p>
               </div>
             )}
           </CardContent>
@@ -482,18 +584,59 @@ export default function SubmissionDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>Evaluation Details</CardTitle>
+            <CardDescription>
+              Detailed analysis and justification from Grok AI evaluation
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {evaluationData.tier_justification && (
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Tier Justification</label>
-                <p className="mt-1 text-sm">{evaluationData.tier_justification}</p>
+                <p className="mt-1 text-sm bg-green-50 dark:bg-green-950/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                  {evaluationData.tier_justification}
+                </p>
               </div>
             )}
             {evaluationData.redundancy_analysis && (
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Redundancy Analysis</label>
-                <p className="mt-1 text-sm">{evaluationData.redundancy_analysis}</p>
+                <p className="mt-1 text-sm bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                  {evaluationData.redundancy_analysis}
+                </p>
+              </div>
+            )}
+
+            {/* Metal Assignments with Reasoning */}
+            {contribution.metals && contribution.metals.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Metal Qualifications</label>
+                <div className="mt-2 space-y-2">
+                  {contribution.metals.map((metal) => (
+                    <div
+                      key={metal}
+                      className="flex items-center space-x-3 p-3 rounded-lg border"
+                      style={{
+                        backgroundColor: `${COLORS[metal as keyof typeof COLORS] || '#888'}10`,
+                        borderColor: `${COLORS[metal as keyof typeof COLORS] || '#888'}30`,
+                      }}
+                    >
+                      <Award
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: COLORS[metal as keyof typeof COLORS] }}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium capitalize text-sm">
+                          {metal.charAt(0).toUpperCase() + metal.slice(1)} Metal
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {metal === 'gold' && 'Discovery/Scientific contribution'}
+                          {metal === 'silver' && 'Technology contribution'}
+                          {metal === 'copper' && 'Alignment contribution'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </CardContent>
