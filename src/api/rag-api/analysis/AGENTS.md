@@ -35,7 +35,7 @@ Embedding analysis, visualization, validation, and word analysis module for the 
 ### Production
 - Structured logging with configurable output and severity levels
 - Publication-quality visualizations with customizable styling
-- Comprehensive validation reports with actionable recommendations
+- Validation reports with actionable recommendations
 - CLI automation tools for batch processing workflows
 - Organized output structure with logical directory hierarchies
 
@@ -119,7 +119,7 @@ Validation agent for ensuring embedding quality and consistency:
 
 ### SimilarityAnalyzer (`similarity_analyzer.py`)
 
-Similarity analysis agent for understanding semantic relationships:
+Similarity analysis for understanding semantic relationships:
 
 - **`SimilarityAnalyzer`**: Advanced similarity analysis
 - **`compute_pairwise_similarities()`**: Calculate all pairwise similarities
@@ -132,7 +132,7 @@ Similarity analysis agent for understanding semantic relationships:
 
 ### EmbeddingSearch (`embedding_search.py`)
 
-Semantic search agent for efficient similarity-based retrieval:
+Semantic search for efficient similarity-based retrieval:
 
 - **`EmbeddingSearch`**: Semantic search using embeddings
 - **`generate_query_embedding()`**: Generate embeddings for query text

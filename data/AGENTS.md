@@ -28,6 +28,31 @@ Runtime state files for the blockchain layer:
 3. **Persistence**: JSON files ensure state survives restarts
 4. **Reset**: Can be cleared using `scripts/utilities/clear_state.py`
 
+## Responsibilities
+
+### Data Management
+- Maintain data integrity across system operations
+- Ensure consistent JSON schema for all state files
+- Provide reliable persistence for blockchain operations
+- Support system recovery and state restoration
+
+### State Synchronization
+- Coordinate state updates between Layer 1 and external systems
+- Ensure atomic operations to prevent data corruption
+- Maintain audit trails for all state changes
+- Support backup and recovery procedures
+
+## Dependencies
+
+### Runtime Dependencies
+- **Python JSON**: Standard library for data serialization
+- **File System**: Local storage for state persistence
+- **Layer 1 Components**: Blockchain state management modules
+
+### Development Dependencies
+- **Git**: Version control (state files excluded via .gitignore)
+- **Backup Tools**: State preservation and restoration utilities
+
 ## Development Guidelines
 
 - Treat as runtime-generated data (excluded from version control)

@@ -87,15 +87,15 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 ### Integration Points
 
 - APIs connect frontend to backend
-- Layer 2 evaluates contributions using Grok API
+- Layer 2 evaluates contributions using GROQ API
 - Layer 1 handles blockchain registration
 - Archive stores all contributions for redundancy detection
 
-## 🔄 Common Patterns
+## 🔄 Patterns
 
 - Archive-first evaluation: All contributions stored immediately
 - Multi-metal system: Gold, Silver, Copper qualifications
-- Direct LLM integration: Groq API for evaluations
+- Direct LLM integration: GROQ API for evaluations
 - File-based storage: JSON files for persistent state
 
 **Navigate:** [Blueprint Alignment](#blueprint-alignment) | [Responsibilities](#responsibilities) | [Testing](#testing)

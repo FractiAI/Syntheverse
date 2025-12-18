@@ -71,3 +71,11 @@ data/blockchain/
 ├── poc_contract.json   # POC contract state
 └── synth_token.json    # Token contract state
 ```
+
+## Cross-References
+
+- **Parent**: [data/AGENTS.md](../AGENTS.md) - Root data storage
+- **Related**:
+  - [src/blockchain/layer1/AGENTS.md](../../../src/blockchain/layer1/AGENTS.md) - Layer 1 implementation
+  - [test_outputs/blockchain/AGENTS.md](../../../test_outputs/blockchain/AGENTS.md) - Test blockchain state
+  - [docs/L1_EXPLANATION.md](../../../docs/L1_EXPLANATION.md) - Blockchain explanation
