@@ -2,6 +2,12 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'
 
+interface RetryOptions {
+  maxRetries?: number
+  delayMs?: number
+  backoffMultiplier?: number
+}
+
 export interface Contribution {
   submission_hash: string
   title: string
@@ -16,12 +22,6 @@ export interface Contribution {
     density?: number
     redundancy?: number
     pod_score?: number
-    grok_raw_response?: string
-    progress?: string
-    evaluation_status?: string
-    tier_justification?: string
-    redundancy_analysis?: string
-    allocations?: any[]
     [key: string]: any
   }
   created_at: string
@@ -42,9 +42,6 @@ export interface EvaluationResult {
     redundancy: number
     metals: string[]
     pod_score: number
-    grok_raw_response?: string
-    progress?: string
-    evaluation_status?: string
     tier_justification?: string
     redundancy_analysis?: string
     status: string
@@ -131,25 +128,44 @@ class PoCApi {
     this.baseUrl = baseUrl
   }
 
-  private async fetch(endpoint: string, options?: RequestInit) {
-    console.log('API Call:', `${this.baseUrl}${endpoint}`)
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    })
+  private async fetch(endpoint: string, options?: RequestInit, retryOptions?: RetryOptions) {
+    const { maxRetries = 2, delayMs = 1000, backoffMultiplier = 1.5 } = retryOptions || {}
+    let lastError: Error
 
-    console.log('API Response status:', response.status)
-    if (!response.ok) {
-      console.error('API Error:', response.statusText)
-      throw new Error(`API error: ${response.statusText}`)
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(`${this.baseUrl}${endpoint}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+          },
+        })
+
+        if (!response.ok) {
+          // Only retry on server errors (5xx) or network errors, not client errors (4xx)
+          if (response.status >= 500 || response.status === 0) {
+            if (attempt < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, delayMs * Math.pow(backoffMultiplier, attempt)))
+              continue
+            }
+          }
+          throw new Error(`API error: ${response.status} ${response.statusText}`)
+        }
+
+        return response.json()
+      } catch (error) {
+        lastError = error as Error
+        if (attempt < maxRetries && (error as Error).message.includes('fetch')) {
+          // Retry on network errors
+          await new Promise(resolve => setTimeout(resolve, delayMs * Math.pow(backoffMultiplier, attempt)))
+          continue
+        }
+        break
+      }
     }
 
-    const data = await response.json()
-    console.log('API Response data:', data)
-    return data
+    throw lastError
   }
 
   // Archive operations
@@ -164,8 +180,8 @@ class PoCApi {
   }): Promise<Contribution[]> {
     const query = new URLSearchParams(params as any).toString()
     const response = await this.fetch(`/api/archive/contributions?${query}`)
-    // API returns {contributions: [...], count: N}, but we want just the array
-    return response.contributions || []
+    // API returns {contributions: [...], count: N} - extract the array
+    return response.contributions || response || []
   }
 
   async getContribution(submissionHash: string): Promise<Contribution> {

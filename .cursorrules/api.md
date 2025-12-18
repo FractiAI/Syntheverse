@@ -90,10 +90,11 @@ async def query(request: QueryRequest):
 - APIs handle file uploads and processing
 
 ### Environment Variables
-- Store API keys in environment variables
-- Use `.env` files for local development
-- Document required environment variables
+- Use centralized `src.core.utils.load_groq_api_key()` utility for loading GROQ_API_KEY
+- Store API keys in `.env` file at project root
+- Document required variables in module docstrings
 - Validate configuration on startup
+- Never commit `.env` files to repository
 
 ### CORS Configuration
 - Configure CORS for frontend origins
@@ -111,6 +112,10 @@ async def query(request: QueryRequest):
 - Include request IDs for tracing
 - Log errors with full context
 - Use appropriate log levels
+
+
+
+
 
 
 

@@ -12,17 +12,18 @@ This directory contains documentation for the Syntheverse PoC system.
 ## Key Documents
 
 ### System Overview
-- `POC_SYSTEM_SUMMARY.md` - Complete system overview
+- `POC_SYSTEM_SUMMARY.md` - System overview
 - `POC_UPGRADE.md` - System upgrade information
 - `L1_EXPLANATION.md` - Layer 1 blockchain explanation
 
 ### Technical Documentation
+- `POC_SUBMISSION_SYSTEM.md` - Complete PoC submission system overview
 - `POC_SUBMISSION_TO_ALLOCATION_FLOW.md` - End-to-end flow documentation
 - `L2_TOKENOMICS.md` - Tokenomics and reward system
 - `DUPLICATE_PREVENTION.md` - Archive-first redundancy system
 
 ### Setup and Usage
-- `QUICK_START_POD_UI.md` - Quick start guide
+- `QUICK_START_POC_UI.md` - Quick start guide
 - `START_WEB_UI.md` - Web UI startup guide
 
 ### Architecture

@@ -3,16 +3,16 @@
 ## What Layer 1 Does
 
 Layer 1 is the **Syntheverse Blockchain** - the foundational blockchain layer that:
-1. **Stores immutable records** of all Proof-of-Discovery (PoD) submissions
+1. **Stores immutable records** of all Proof-of-Contribution (PoC) submissions
 2. **Manages SYNTH token distribution** across 4 epochs (Founder, Pioneer, Community, Ecosystem)
 3. **Enforces tier-based rewards** (Gold: 1000x, Silver: 100x, Copper: 1x)
-4. **Validates and mines blocks** containing PoD transactions
+4. **Validates and mines blocks** containing PoC transactions
 5. **Tracks epoch progression** and token balances
 6. **Maintains contributor balances** and reward history
 
 ## L1 Inputs
 
-### 1. POD Submissions
+### 1. PoC Submissions
 ```python
 {
     "title": "Paper Title",
@@ -23,7 +23,7 @@ Layer 1 is the **Syntheverse Blockchain** - the foundational blockchain layer th
 }
 ```
 
-### 2. POD Evaluations (from Layer 2)
+### 2. PoC Evaluations (from Layer 2)
 ```python
 {
     "coherence": 8500.0,  # 0-10000
@@ -76,20 +76,20 @@ Layer 1 is the **Syntheverse Blockchain** - the foundational blockchain layer th
 ## L1 Processing Flow
 
 ```
-1. Submit POD → L1 stores submission, creates transaction
-2. Evaluate POD → L2 evaluates, sends results to L1
-3. L1 calculates PoD score → (coherence × density × novelty) / 10000² × 10000
+1. Submit PoC → L1 stores submission, creates transaction
+2. Evaluate PoC → L2 evaluates, sends results to L1
+3. L1 calculates PoC score → (coherence × density × novelty) / 10000² × 10000
 4. L1 determines epoch → Based on density threshold
 5. L1 checks tier availability → Gold/Silver/Copper in allowed epochs
-6. L1 calculates reward → (PoD Score / 10000) × epoch balance × tier multiplier
+6. L1 calculates reward → (PoC Score / 10000) × epoch balance × tier multiplier
 7. L1 allocates tokens → Updates balances, records reward
 8. L1 mines block → Includes all transactions
 ```
 
 ## Key L1 Functions
 
-- **submit_pod()**: Accepts POD submission, creates transaction
-- **evaluate_pod()**: Records evaluation results, calculates PoD score
+- **submit_poc()**: Accepts PoC submission, creates transaction
+- **evaluate_poc()**: Records evaluation results, calculates PoC score
 - **allocate_tokens()**: Allocates SYNTH tokens based on score/epoch/tier
 - **mine_block()**: Mines pending transactions into a block
 - **get_node_status()**: Returns comprehensive blockchain state

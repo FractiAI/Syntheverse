@@ -16,6 +16,9 @@ from typing import Dict, List, Any, Optional, Callable
 from datetime import datetime
 import unittest
 
+# Module-level logger for utility functions
+logger = logging.getLogger(__name__)
+
 def retry_test(max_attempts: int = 3, delay: float = 1.0, backoff: float = 2.0,
                exceptions: tuple = (Exception,)):
     """
@@ -56,6 +59,175 @@ def retry_test(max_attempts: int = 3, delay: float = 1.0, backoff: float = 2.0,
 
         return wrapper
     return decorator
+
+# Dependency Management Functions
+
+def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
+    """
+    Ensure a Python dependency is available, installing it if necessary.
+
+    Args:
+        package_name: Name of the Python package to check/install
+        max_attempts: Maximum number of installation attempts
+
+    Returns:
+        bool: True if dependency is available after installation attempts
+
+    Raises:
+        RuntimeError: If dependency cannot be installed after all attempts
+    """
+    import subprocess
+    import sys
+
+    # First, try to import the package
+    try:
+        __import__(package_name.replace('-', '_'))
+        return True
+    except ImportError:
+        pass
+
+    logger.info(f"Installing missing dependency: {package_name}")
+
+    for attempt in range(max_attempts):
+        try:
+            # Try to install the package (use --user to avoid externally managed environment issues)
+            result = subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', '--user', package_name],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+
+            if result.returncode == 0:
+                # Try to import again
+                try:
+                    __import__(package_name.replace('-', '_'))
+                    logger.info(f"Successfully installed and imported {package_name}")
+                    return True
+                except ImportError as e:
+                    if attempt == max_attempts - 1:
+                        raise RuntimeError(f"Failed to import {package_name} after installation: {e}")
+                    continue
+            else:
+                error_msg = result.stderr.strip()
+                if attempt == max_attempts - 1:
+                    raise RuntimeError(f"Failed to install {package_name}: {error_msg}")
+
+        except subprocess.TimeoutExpired:
+            if attempt == max_attempts - 1:
+                raise RuntimeError(f"Installation of {package_name} timed out")
+        except Exception as e:
+            if attempt == max_attempts - 1:
+                raise RuntimeError(f"Error installing {package_name}: {e}")
+
+        logger.warning(f"Installation attempt {attempt + 1} failed, retrying...")
+
+    return False
+
+def ensure_service_running(service_name: str, startup_command: list = None, health_url: str = None,
+                          startup_timeout: int = 60, health_check_interval: float = 2.0, startup_cwd: str = None) -> bool:
+    """
+    Ensure a service is running, starting it if necessary.
+
+    Args:
+        service_name: Name of the service to check/start
+        startup_command: Command to start the service (if None, assumes service is already running)
+        health_url: URL to check for service health
+        startup_timeout: Maximum time to wait for service to start
+        health_check_interval: Time between health checks
+
+    Returns:
+        bool: True if service is running and healthy
+
+    Raises:
+        RuntimeError: If service cannot be started or fails health checks
+    """
+    import subprocess
+    import time
+    import requests
+    from pathlib import Path
+
+    # First, check if service is already healthy
+    if health_url:
+        try:
+            response = requests.get(health_url, timeout=5)
+            if response.status_code == 200:
+                logger.info(f"Service {service_name} is already running and healthy")
+                return True
+        except:
+            pass
+
+    # If no startup command provided, assume service should be running
+    if not startup_command:
+        raise RuntimeError(f"Service {service_name} is not running and no startup command provided")
+
+    logger.info(f"Starting service: {service_name}")
+
+    try:
+        # Start the service
+        project_root = Path(__file__).parent.parent
+        working_dir = startup_cwd if startup_cwd else project_root
+        process = subprocess.Popen(
+            startup_command,
+            cwd=working_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            start_new_session=True
+        )
+
+        # Wait for service to become healthy
+        start_time = time.time()
+        while time.time() - start_time < startup_timeout:
+            if health_url:
+                try:
+                    response = requests.get(health_url, timeout=2)
+                    if response.status_code == 200:
+                        logger.info(f"Service {service_name} started successfully")
+                        return True
+                except:
+                    pass
+
+            time.sleep(health_check_interval)
+
+        # If we get here, service failed to start
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+
+        raise RuntimeError(f"Service {service_name} failed to start within {startup_timeout} seconds")
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to start service {service_name}: {e}")
+
+def ensure_module_available(module_name: str, package_name: str = None, max_attempts: int = 3) -> bool:
+    """
+    Ensure a Python module is available, installing the package if necessary.
+
+    Args:
+        module_name: Name of the Python module to check
+        package_name: Name of the package to install (defaults to module_name)
+        max_attempts: Maximum number of installation attempts
+
+    Returns:
+        bool: True if module is available after installation attempts
+
+    Raises:
+        RuntimeError: If module cannot be made available after all attempts
+    """
+    if package_name is None:
+        package_name = module_name
+
+    # Try to import the module
+    try:
+        __import__(module_name)
+        return True
+    except ImportError:
+        pass
+
+    # Module not available, try to install the package
+    return ensure_dependency(package_name, max_attempts)
 
 class TestResult:
     """Standardized test result container with enhanced reporting"""
@@ -251,6 +423,20 @@ class SyntheverseTestCase(unittest.TestCase):
         """Clean up test files"""
         TestFixtures.cleanup_test_files(file_paths)
 
+    def ensure_dependency(self, package_name: str, max_attempts: int = 3):
+        """Ensure a Python dependency is available, installing it if necessary"""
+        return ensure_dependency(package_name, max_attempts)
+
+    def ensure_service(self, service_name: str, startup_command: list = None, health_url: str = None,
+                      startup_timeout: int = 60, health_check_interval: float = 2.0):
+        """Ensure a service is running, starting it if necessary"""
+        return ensure_service_running(service_name, startup_command, health_url,
+                                     startup_timeout, health_check_interval)
+
+    def ensure_module(self, module_name: str, package_name: str = None, max_attempts: int = 3):
+        """Ensure a Python module is available, installing the package if necessary"""
+        return ensure_module_available(module_name, package_name, max_attempts)
+
 class TestConfig:
     """Test configuration management"""
 
@@ -319,7 +505,7 @@ class TestFixtures:
     def ensure_services_running(services_to_check: List[str] = None):
         """Ensure required services are running before tests"""
         if services_to_check is None:
-            services_to_check = ["poc_api", "rag_api", "frontend"]
+            services_to_check = ["poc_api", "frontend"]  # Removed rag_api as it's optional
 
         unavailable = []
 
@@ -336,11 +522,12 @@ class TestFixtures:
     @staticmethod
     def generate_test_pdf():
         """Generate a simple test PDF file for testing"""
+        import tempfile
+        import os
+
         try:
             from reportlab.pdfgen import canvas
             from reportlab.lib.pagesizes import letter
-            import tempfile
-            import os
 
             # Create temporary PDF
             fd, pdf_path = tempfile.mkstemp(suffix='.pdf')
@@ -355,7 +542,6 @@ class TestFixtures:
             return pdf_path
         except ImportError:
             # Fallback: create a text file that looks like a PDF
-            import tempfile
             fd, pdf_path = tempfile.mkstemp(suffix='.pdf')
             with os.fdopen(fd, 'w') as f:
                 f.write("%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n")
@@ -389,42 +575,6 @@ class TestFixtures:
         base_contribution.update(overrides)
         return base_contribution
 
-    @staticmethod
-    def create_mock_evaluation_result(success: bool = True, tier: str = "gold", **overrides):
-        """Create a mock evaluation result"""
-        result = {
-            "success": success,
-            "evaluation": {
-                "coherence": 87,
-                "density": 83,
-                "novelty": 79,
-                "tier": tier,
-                "reasoning": "Mock evaluation result"
-            } if success else None,
-            "timestamp": datetime.now().isoformat()
-        }
-
-        if overrides:
-            if success and "evaluation" in result:
-                result["evaluation"].update(overrides)
-            else:
-                result.update(overrides)
-
-        return result
-
-    @staticmethod
-    def mock_service_response(service_name: str, status: str = "healthy", **overrides):
-        """Create a mock service health response"""
-        base_response = {
-            "service": service_name,
-            "status": status,
-            "timestamp": datetime.now().isoformat(),
-            "version": "1.0.0",
-            "uptime": 3600
-        }
-
-        base_response.update(overrides)
-        return base_response
 
 class ErrorReporting:
     """Error reporting utilities with enhanced diagnostics"""
@@ -738,7 +888,7 @@ class APITestCase(SyntheverseTestCase):
         super().setUp()
 
         # Check service availability for common services
-        services_to_check = ["poc_api", "rag_api", "frontend"]
+        services_to_check = ["poc_api", "frontend"]  # rag_api is optional
         for service in services_to_check:
             url = test_config.get(f"api_urls.{service}")
             if url:
@@ -752,7 +902,7 @@ class APITestCase(SyntheverseTestCase):
     def require_service(self, service_name: str):
         """Require a specific service to be available for this test"""
         if not self.services_available.get(service_name, False):
-            self.skipTest(f"{service_name} service not available")
+            self.fail(f"{service_name} service not available - tests should ensure services are started")
 
     def get_service_url(self, service: str) -> str:
         """Get the URL for a service"""

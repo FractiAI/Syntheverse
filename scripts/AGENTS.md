@@ -1,4 +1,4 @@
-# Scripts Agents
+# Scripts
 
 ## Purpose
 
@@ -6,30 +6,69 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 
 ## Key Modules
 
+### Main Menu (`main.py`)
+
+Menu-based runner for all Syntheverse scripts.
+
+**Class: `ScriptMenu`**
+
+Provides an interactive terminal menu for executing scripts organized by category.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__()` | None | None | Initialize paths, check dependencies, load categories |
+| `check_dependencies_on_startup()` | None | None | Check and install dependencies |
+| `clear_screen()` | None | None | Clear terminal (POSIX: clear, Windows: cls) |
+| `print_header(title, subtitle)` | `title: str`, `subtitle: str` | None | Print formatted menu header |
+| `print_menu(category)` | `category: str` | None | Print category menu with scripts |
+| `print_main_menu()` | None | None | Print main category selection menu |
+| `validate_script_exists(script_path)` | `script_path: str` | `bool` | Check if script file exists |
+| `run_script(script_info)` | `script_info: Dict` | `bool` | Execute a script, return success status |
+| `handle_category_menu(category)` | `category: str` | None | Interactive loop for category menu |
+| `run()` | None | None | Main menu loop until quit |
+
+**Function: `main()`**
+
+Entry point that creates a ScriptMenu instance and runs it.
+
+**Attributes:**
+
+- `project_root`: Path to project root directory
+- `scripts_dir`: Path to scripts directory
+- `current_category`: Currently selected category (None at main menu)
+- `categories`: Dictionary of script categories and their scripts
+
+**Script Info Dictionary:**
+
+```python
+{
+    "name": "script_name.py",       # Display name
+    "description": "Description",    # Brief description
+    "path": "category/script.py",   # Relative path from scripts/
+    "type": "python",               # "python" or "shell"
+    "args": ["--arg", "value"]      # Optional arguments
+}
+```
+
 ### Startup (`startup/`)
 
-- **`start_servers.py`**: Main startup script for complete system
-- **`start_servers_simple.py`**: Simplified startup script
-- **`start_complete_ui.py`**: Complete UI startup script
-- **`start_servers.sh`**: Shell script for starting servers
+- **`start_servers.py`**: System startup with modes (full, poc, minimal)
+- **`anvil_manager.py`**: Anvil blockchain node management
+- **`port_manager.py`**: Port conflict resolution
+- **`service_health.py`**: Service health monitoring
 
 ### Development (`development/`)
 
-- **`start_poc_ui.sh`**: Start PoC UI development environment (Next.js frontend + PoC API)
-- **`stop_poc_ui.sh`**: Stop PoC UI services
-- **`start_all_services.sh`**: Start all system services (RAG API + Legacy Web UI)
-- **`stop_all_services.sh`**: Stop all system services
-- **`submit_pod.py`**: Submit PoD for testing (legacy PoD system)
-- **`ui_pod_submission.py`**: UI for PoD submission (legacy PoD system)
-- **`Syntheverse.sh`**: Main Syntheverse startup script (Legacy Web UI)
+- **`manage_services.sh`**: Service manager (start/stop/status)
 
 ### Deployment (`deployment/`)
 
-- **`deploy_contracts.py`**: Deploy smart contracts to blockchain
+- **`deploy_contracts.py`**: Deploy SYNTH and POCRegistry contracts
 
 ### Utilities (`utilities/`)
 
-- **`clear_persistent_memory.py`**: Clear test data and reset system state
+- **`install_deps.py`**: Install system dependencies
+- **`clear_state.py`**: Clear system state files
 
 ## Integration Points
 
@@ -37,25 +76,60 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 - Startup scripts manage service lifecycle
 - Deployment scripts interact with blockchain
 - Utility scripts maintain system state
-- All paths are relative to project root
-- Scripts navigate correctly from their directory location
+- All paths resolve relative to project root
 
-## Development Guidelines
+## Testing
 
-- Use Python for complex orchestration
-- Use shell scripts for simple service management
-- Handle errors gracefully
-- Provide clear output and logging
-- Support environment variable configuration
-- Document script usage in README files
+Tests for `main.py` are in `tests/test_main_menu.py`:
 
-## Common Patterns
+- `TestScriptMenuInit`: Initialization and dependency checking
+- `TestScriptValidation`: Script path validation
+- `TestScriptExecution`: Script execution logic
+- `TestMenuDisplay`: Output formatting methods
+- `TestMenuNavigation`: Menu interaction and navigation
+- `TestErrorHandling`: Error scenarios and recovery
+- `TestPerformance`: Initialization and execution performance
 
-- Service orchestration and lifecycle management
-- Environment variable configuration
-- Error handling and logging
-- Service health checks
-- Cleanup and maintenance operations
-- Path resolution: Scripts use `PROJECT_ROOT` variable to navigate to project root
-- Port management: Frontend (3001), PoC API (5001), Legacy Web UI (5000), RAG API (8000)
+Run tests:
 
+```bash
+pytest tests/test_main_menu.py -v
+```
+
+## Usage
+
+```bash
+# From project root
+python scripts/main.py
+
+# From scripts directory
+cd scripts && python main.py
+```
+
+## Adding Scripts
+
+Add to `self.categories` in `ScriptMenu.__init__()`:
+
+```python
+"category_name": {
+    "title": "Category Title",
+    "description": "Category description",
+    "scripts": {
+        "1": {
+            "name": "script.py",
+            "description": "Script description",
+            "path": "category/script.py",
+            "type": "python",
+            "args": ["--option", "value"]
+        }
+    }
+}
+```
+
+## Ports
+
+| Service | Port |
+|---------|------|
+| PoC API | 5001 |
+| RAG API | 8000 |
+| Frontend | 3001 |

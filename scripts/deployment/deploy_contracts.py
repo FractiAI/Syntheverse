@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced contract deployment script for Syntheverse
+Contract deployment script for Syntheverse
 Deploys SYNTH and POCRegistry contracts to Anvil with comprehensive management
 """
 
@@ -16,11 +16,14 @@ from datetime import datetime
 try:
     from ..startup.anvil_manager import AnvilManager, start_anvil, wait_for_anvil
     from ..startup.service_health import check_service_health, ServiceStatus
+    from ..utilities.install_deps import auto_install_dependencies
 except ImportError:
     # Fallback for direct execution
     sys.path.insert(0, str(Path(__file__).parent.parent / 'startup'))
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'utilities'))
     from anvil_manager import AnvilManager, start_anvil, wait_for_anvil
     from service_health import check_service_health, ServiceStatus
+    from install_deps import auto_install_dependencies
 
 def setup_logging():
     """Set up logging for deployment"""
@@ -34,7 +37,7 @@ def setup_logging():
     )
     return logging.getLogger(__name__)
 
-def deploy_contracts(max_retries: int = 3, anvil_accounts: int = 10):
+def deploy_contracts(max_retries: int = 3, anvil_accounts: int = 10, install_deps: bool = True):
     """Deploy contracts with comprehensive Anvil management and error handling"""
     logger = setup_logging()
 
@@ -44,6 +47,17 @@ def deploy_contracts(max_retries: int = 3, anvil_accounts: int = 10):
     # Record deployment start
     deployment_start = datetime.now()
     logger.info("Starting Syntheverse contract deployment")
+
+    # Step 0: Install dependencies (if requested)
+    if install_deps:
+        print("\n📍 Step 0: Installing dependencies...")
+        logger.info("Installing dependencies")
+        if not auto_install_dependencies():
+            print("❌ Failed to install dependencies")
+            logger.error("Dependency installation failed")
+            return False
+        print("✅ Dependencies installed")
+        logger.info("Dependencies installed successfully")
 
     # Initialize Anvil manager
     anvil_manager = AnvilManager(logger)
@@ -429,6 +443,8 @@ def main():
                        help='Maximum retries for connection attempts (default: 3)')
     parser.add_argument('--no-validation', action='store_true',
                        help='Skip contract validation after deployment')
+    parser.add_argument('--no-install-deps', action='store_true',
+                       help='Skip automatic dependency installation (default: false)')
 
     args = parser.parse_args()
 
@@ -437,7 +453,8 @@ def main():
 
     success = deploy_contracts(
         max_retries=args.retries,
-        anvil_accounts=args.anvil_accounts
+        anvil_accounts=args.anvil_accounts,
+        install_deps=not args.no_install_deps
     )
 
     if success:

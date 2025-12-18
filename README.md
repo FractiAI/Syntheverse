@@ -23,9 +23,9 @@
 
 ### **🖥️ QUICK START - RUN THE FULL SYSTEM (v0.3 - BUG-FREE):**
 ```bash
-# Clone and start the complete system
 git clone https://github.com/FractiAI/Syntheverse.git
 cd Syntheverse
+<<<<<<< HEAD
 
 # Set your Groq API key (get from https://console.groq.com/)
 export GROQ_API_KEY="your-groq-api-key-here"
@@ -794,29 +794,75 @@ Early contributors influence:
 - **Sandbox Map**: http://localhost:3001/sandbox-map
 - **Registry**: http://localhost:3001/registry
 - **Blockchain Registration**: http://localhost:5000 (first 3 free, then $50)
-- **PoC API**: http://localhost:5001
-- **Local Blockchain**: http://localhost:8545 (Anvil)
-
-**🚀 START THE SYSTEM:**
-```bash
+=======
+export GROQ_API_KEY="your-groq-api-key-here"
 python3 scripts/startup/start_servers.py
-# OR
-python3 scripts/startup/start_servers_simple.py
 ```
 
-⸻
+Access the system:
+- **Dashboard**: http://localhost:3001/dashboard
+- **Submit PoC**: http://localhost:3001/submission
+- **Sandbox Map**: http://localhost:3001/sandbox-map
+- **Registry**: http://localhost:3001/registry
+- **Blockchain Registration**: http://localhost:5000
+>>>>>>> 596d8c9edb9a28f6473aa82ce9aafbf6b437b840
+- **PoC API**: http://localhost:5001
+- **Local Blockchain**: http://localhost:8545
 
-Resources & Links
-	•	Website: https://fractiai.com
-	•	Whitepapers: https://zenodo.org/records/17873279
-	•	GitHub: https://github.com/FractiAI/Syntheverse
-	•	YouTube: https://www.youtube.com/@FractiAI
-	•	X: https://x.com/FractiAi
+## Repository Structure
 
-⸻
+### Core Components
+- **`src/api/`**: REST API servers (PoC API, RAG API)
+- **`src/blockchain/`**: Smart contracts and Layer 1 blockchain logic
+- **`src/core/`**: PoC evaluation engine and tokenomics
+- **`src/frontend/`**: Next.js dashboard and legacy interfaces
+- **`src/data/`**: PDF processing and vectorization pipeline
 
-Support
+### Supporting Systems
+- **`scripts/`**: Startup, deployment, and utility scripts
+- **`config/`**: Environment and wallet configuration
+- **`docs/`**: Technical documentation and guides
+- **`tests/`**: Test suites and validation
+- **`examples/`**: Demo scripts and interface examples
+- **`tools/`**: Development tools and guides
 
-For early contribution, collaboration, or questions:
-📧 info@fractiai.com
+## Key Features
 
+### Proof-of-Contribution System
+- Multi-metal evaluation (Gold: Discovery, Silver: Technology, Copper: Alignment)
+- AI-powered evaluation using Grok API
+- Archive-first redundancy detection
+- Token allocation based on structural impact
+
+### Interactive Components
+- Sandbox map with 16 knowledge dimensions updates in real-time
+- Contribution registry shows chronological timeline
+- Dashboard shows system statistics
+- Visualization shows metals: Gold, Silver, Copper
+
+### Blockchain Integration
+- SYNTH token contracts on Base Layer 2
+- Tiered fee structure (first 3 submissions free)
+- Certificate registration system
+- Foundry + Anvil development environment
+
+## Requirements
+
+- Python 3.8+ for backend services
+- Node.js 18+ for Next.js frontend
+- Groq API key for AI evaluation
+- Foundry (optional, for blockchain development)
+
+## Development
+
+Each component has its own README with setup instructions. See `docs/` for documentation.
+
+## Testing
+
+Run the full test suite:
+```bash
+cd tests
+./run_tests.sh --all
+```
+
+## License

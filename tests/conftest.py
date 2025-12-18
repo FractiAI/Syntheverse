@@ -1,19 +1,44 @@
 """
 Pytest configuration for Syntheverse test suite
+NO SKIPS POLICY: Tests must never skip - they install dependencies or fail with clear errors
 """
 
 import pytest
 import os
 from pathlib import Path
 
-# Import test configuration
-from test_framework import test_config
+# Import test framework with dependency management
+from test_framework import test_config, ensure_dependency, ensure_service_running, ensure_module_available
 
 # Load environment variables from .env file if it exists
 def load_env_file():
+    """Load environment variables with fallback for missing python-dotenv"""
     try:
-        from dotenv import load_dotenv
-        import os
+        # Try to ensure python-dotenv is available, but don't fail if it can't be installed
+        try:
+            ensure_dependency("python-dotenv")
+            dotenv_available = True
+        except RuntimeError:
+            dotenv_available = False
+            print("⚠️  python-dotenv not available, using manual .env parsing")
+
+        if dotenv_available:
+            from dotenv import load_dotenv
+            load_dotenv_func = load_dotenv
+        else:
+            # Fallback: manual .env parsing
+            def load_dotenv_func(env_path):
+                try:
+                    with open(env_path, 'r') as f:
+                        for line in f:
+                            line = line.strip()
+                            if line and not line.startswith('#'):
+                                if '=' in line:
+                                    key, value = line.split('=', 1)
+                                    os.environ[key.strip()] = value.strip()
+                    return True
+                except Exception:
+                    return False
 
         # Try multiple possible paths for .env file
         possible_paths = [
@@ -24,7 +49,7 @@ def load_env_file():
 
         for env_path in possible_paths:
             if env_path.exists():
-                result = load_dotenv(env_path)
+                result = load_dotenv_func(env_path)
                 groq_key = os.getenv('GROQ_API_KEY')
                 if groq_key:
                     print(f"✓ Loaded GROQ_API_KEY from {env_path}")
@@ -35,19 +60,18 @@ def load_env_file():
         print("⚠️  .env file not found or GROQ_API_KEY not set in any expected location")
         return False
 
-    except ImportError:
-        print("⚠️  python-dotenv not installed, environment variables not loaded from .env")
-        return False
     except Exception as e:
         print(f"⚠️  Error loading .env: {e}")
         return False
 
+# Set testing environment variable first
+os.environ['TESTING'] = 'true'
+
 # Load environment at module import time
 load_env_file()
 
-
 def pytest_sessionstart(session):
-    """Set up Python path and validate GROQ_API_KEY at the start of the test session"""
+    """Set up Python path, validate environment, and ensure dependencies"""
     import sys
     from pathlib import Path
 
@@ -57,6 +81,15 @@ def pytest_sessionstart(session):
     sys.path.insert(0, str(project_root / "src" / "blockchain"))
     sys.path.insert(0, str(project_root / "src"))
     sys.path.insert(0, str(project_root / "scripts" / "development"))
+
+    # Ensure critical dependencies are available
+    print("🔧 Ensuring critical dependencies are available...")
+    critical_deps = ["requests", "pytest", "openai"]
+    for dep in critical_deps:
+        try:
+            ensure_dependency(dep)
+        except RuntimeError as e:
+            pytest.fail(f"Critical dependency {dep} could not be installed: {e}", pytrace=False)
 
     # Validate GROQ_API_KEY
     groq_key = os.getenv('GROQ_API_KEY')
@@ -78,31 +111,9 @@ def pytest_sessionstart(session):
 
 
 def pytest_addoption(parser):
-    """Add command-line options for service handling"""
-    parser.addoption(
-        "--mock-services",
-        action="store_true",
-        default=False,
-        help="Run tests with mocked services even when real services are unavailable"
-    )
-    parser.addoption(
-        "--skip-service-checks",
-        action="store_true",
-        default=False,
-        help="Skip all service availability checks"
-    )
-    parser.addoption(
-        "--auto-start-services",
-        action="store_true",
-        default=True,
-        help="Automatically start required services for integration tests"
-    )
-    parser.addoption(
-        "--no-auto-start-services",
-        action="store_false",
-        dest="auto_start_services",
-        help="Do not automatically start required services"
-    )
+    """Add command-line options (removed mock and skip options per no-skips policy)"""
+    # No options for mocking or skipping - tests must run with real dependencies
+    pass
 
 # Suppress warnings for utility classes in test framework
 collect_ignore = [
@@ -123,82 +134,21 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "requires_blockchain: Test requires blockchain services")
 
 
-@pytest.fixture(scope="session")
-def check_service_availability():
-    """Fixture to check service availability"""
-    def _check_service(url, timeout=5):
-        """Check if a service is available at the given URL"""
-        import requests
-        try:
-            response = requests.get(url, timeout=timeout)
-            return response.status_code == 200
-        except:
-            return False
-    return _check_service
-
-
-@pytest.fixture(scope="session")
-def rag_api_available(check_service_availability):
-    """Check if RAG API is available"""
-    rag_api_url = test_config.get("api_urls.rag_api")
-    return check_service_availability(f"{rag_api_url}/health")
-
-
-@pytest.fixture(scope="session")
-def poc_api_available(check_service_availability):
-    """Check if PoC API is available"""
-    poc_api_url = test_config.get("api_urls.poc_api")
-    return check_service_availability(f"{poc_api_url}/health")
-
-
-@pytest.fixture(scope="session")
-def frontend_available(check_service_availability):
-    """Check if frontend is available"""
-    def _check_frontend(url, timeout=5):
-        """Check if frontend is available (accepts redirects for Next.js)"""
-        import requests
-        try:
-            response = requests.get(url, timeout=timeout, allow_redirects=False)
-            return response.status_code in [200, 301, 302, 307, 308]  # Accept redirects
-        except:
-            return False
-    frontend_url = test_config.get("api_urls.frontend")
-    return _check_frontend(frontend_url)
-
-
-@pytest.fixture(scope="session")
-def blockchain_available():
-    """Check if blockchain modules are available"""
-    try:
-        from layer1.node import SyntheverseNode
-        return True
-    except ImportError:
-        return False
-
-
 @pytest.fixture(scope="session", autouse=True)
 def ensure_environment_loaded():
     """Ensure environment variables are loaded at the start of the test session"""
-    # GROQ_API_KEY validation is now handled by pytest_sessionstart
+    # Environment validation is now handled by pytest_sessionstart
     pass
 
 
 @pytest.fixture(scope="session", autouse=True)
 def service_bootstrapper(request):
-    """Automatically start and stop required services for integration tests"""
+    """Automatically start and stop required services for integration tests - FAILS HARD if services cannot start"""
     import subprocess
     import signal
     import time
     import sys
     from pathlib import Path
-
-    auto_start = request.config.getoption("--auto-start-services")
-    mock_services = request.config.getoption("--mock-services")
-    skip_checks = request.config.getoption("--skip-service-checks")
-
-    if skip_checks or mock_services or not auto_start:
-        yield
-        return
 
     # Get the project root
     project_root = Path(__file__).parent.parent
@@ -218,12 +168,10 @@ def service_bootstrapper(request):
         yield
         return
 
-    print(f"Services needed for tests: {', '.join(services_needed)}")
+    print(f"🚀 Starting required services: {', '.join(services_needed)}")
 
     # Track started services for cleanup
-    started_services = []
     processes = []  # list[tuple[str, subprocess.Popen, str|None]] -> (service_name, proc, log_path)
-    unavailable_services = set()
 
     def _is_service_healthy(url: str, timeout: float = 2.0) -> bool:
         try:
@@ -247,14 +195,7 @@ def service_bootstrapper(request):
             print(f"   ⚠️ Could not read log file {log_path}: {e}")
 
     try:
-        # NOTE:
-        # - We only auto-start backend services (RAG API + PoC API).
-        # - We do NOT auto-start the frontend (Next.js dev server) during "all tests" because it's heavy and
-        #   the interactive menu already provides a dedicated frontend test mode.
-        # - If a service fails to start, we do NOT hard-fail the entire session; instead, tests that require
-        #   that service will be skipped by `skip_unavailable_services`.
-
-        # Start RAG API if needed (FastAPI) — start only the API, not the legacy UI bundle
+        # Start RAG API if needed (FastAPI) — FAIL HARD if it cannot start
         if "rag_api" in services_needed:
             rag_api_base = test_config.get("api_urls.rag_api", "http://localhost:8000")
             rag_health_url = f"{rag_api_base}/health"
@@ -263,38 +204,34 @@ def service_bootstrapper(request):
                 print(f"✓ RAG API already running at {rag_health_url}")
             else:
                 print("Starting RAG API service (FastAPI)...")
-                rag_api_cwd = project_root / "src" / "api" / "rag-api" / "api"
-                rag_log = "/tmp/syntheverse_rag_api_test.log"
-                rag_log_f = open(rag_log, "w")
-                proc = subprocess.Popen(
-                    [sys.executable, "rag_api.py"],
-                    cwd=rag_api_cwd,
-                    stdout=rag_log_f,
-                    stderr=subprocess.STDOUT,
-                    start_new_session=True
-                )
-                # Parent can close its handle; child keeps the FD
+
+                # Ensure the service can be started
+                startup_command = [sys.executable, "rag_api.py"]
+                startup_cwd = project_root / "src" / "api" / "rag_api" / "api"
+
                 try:
-                    rag_log_f.close()
-                except Exception:
-                    pass
-                processes.append(("rag_api", proc, rag_log))
-                started_services.append("rag_api")
+                    ensure_service_running(
+                        service_name="rag_api",
+                        startup_command=startup_command,
+                        health_url=rag_health_url,
+                        startup_timeout=test_config.get("timeouts.service_startup", 120),  # Increased timeout
+                        startup_cwd=startup_cwd
+                    )
+                except RuntimeError as e:
+                    # Try to show recent log output for debugging
+                    log_file = startup_cwd / "rag_api.log" if startup_cwd else Path("rag_api.log")
+                    if log_file.exists():
+                        print(f"📋 Last 20 lines of RAG API log ({log_file}):")
+                        try:
+                            with open(log_file, 'r') as f:
+                                lines = f.readlines()[-20:]
+                                for line in lines:
+                                    print(f"   {line.rstrip()}")
+                        except Exception as log_e:
+                            print(f"   ⚠️ Could not read log file: {log_e}")
+                    pytest.fail(f"CRITICAL: RAG API service could not be started: {e}", pytrace=False)
 
-            # Wait for RAG API to be ready
-            timeout_seconds = test_config.get("timeouts.service_startup", 60)
-            print(f"Waiting for RAG API at {rag_health_url}... (timeout: {timeout_seconds}s)")
-            for _ in range(int(timeout_seconds)):
-                if _is_service_healthy(rag_health_url, timeout=2):
-                    print("✓ RAG API is ready")
-                    break
-                time.sleep(1)
-            else:
-                print("❌ RAG API failed to start within timeout (tests will be skipped)")
-                _tail_log("/tmp/syntheverse_rag_api_test.log", lines=60)
-                unavailable_services.add("rag_api")
-
-        # Start PoC API if needed (Flask). Do not auto-start Next.js frontend here.
+        # Start PoC API if needed (Flask) — FAIL HARD if it cannot start
         if "poc_api" in services_needed:
             poc_api_base = test_config.get("api_urls.poc_api", "http://localhost:5001")
             poc_health_url = f"{poc_api_base}/health"
@@ -303,46 +240,39 @@ def service_bootstrapper(request):
                 print(f"✓ PoC API already running at {poc_health_url}")
             else:
                 print("Starting PoC API service (Flask)...")
-                poc_api_cwd = project_root / "src" / "api" / "poc-api"
-                poc_log = "/tmp/syntheverse_poc_api_test.log"
-                poc_log_f = open(poc_log, "w")
-                proc = subprocess.Popen(
-                    [sys.executable, "app.py"],
-                    cwd=poc_api_cwd,
-                    stdout=poc_log_f,
-                    stderr=subprocess.STDOUT,
-                    start_new_session=True
-                )
+
+                # Ensure the service can be started
+                startup_command = [sys.executable, "app.py"]
+                startup_cwd = project_root / "src" / "api" / "poc-api"
+
                 try:
-                    poc_log_f.close()
-                except Exception:
-                    pass
-                processes.append(("poc_api", proc, poc_log))
-                started_services.append("poc_api")
+                    ensure_service_running(
+                        service_name="poc_api",
+                        startup_command=startup_command,
+                        health_url=poc_health_url,
+                        startup_timeout=test_config.get("timeouts.service_startup", 120),  # Increased timeout
+                        startup_cwd=startup_cwd
+                    )
+                except RuntimeError as e:
+                    # Try to show recent log output for debugging
+                    log_file = startup_cwd / "app.log" if startup_cwd else Path("app.log")
+                    if log_file.exists():
+                        print(f"📋 Last 20 lines of PoC API log ({log_file}):")
+                        try:
+                            with open(log_file, 'r') as f:
+                                lines = f.readlines()[-20:]
+                                for line in lines:
+                                    print(f"   {line.rstrip()}")
+                        except Exception as log_e:
+                            print(f"   ⚠️ Could not read log file: {log_e}")
+                    pytest.fail(f"CRITICAL: PoC API service could not be started: {e}", pytrace=False)
 
-            # Wait for services to be ready
-            timeout_seconds = test_config.get("timeouts.service_startup", 60)
-            print(f"Waiting for PoC API at {poc_health_url}... (timeout: {timeout_seconds}s)")
-            for _ in range(int(timeout_seconds)):
-                if _is_service_healthy(poc_health_url, timeout=2):
-                    print("✓ PoC API is ready")
-                    break
-                time.sleep(1)
-            else:
-                print("❌ PoC API failed to start within timeout (tests will be skipped)")
-                _tail_log("/tmp/syntheverse_poc_api_test.log", lines=80)
-                unavailable_services.add("poc_api")
-
-        if unavailable_services:
-            print(f"⚠️ Some services are unavailable: {', '.join(sorted(unavailable_services))}")
-            print("   Tests requiring those services will be skipped.")
-        else:
-            print("All required services are running")
+        print("✅ All required services are running and healthy")
         yield
 
     finally:
         # Cleanup: stop all started services
-        print("Stopping services...")
+        print("🛑 Stopping services...")
         for service_name, proc, log_path in processes:
             try:
                 if proc.poll() is None:
@@ -367,30 +297,4 @@ def service_bootstrapper(request):
             except Exception as e:
                 print(f"⚠️ Error stopping {service_name}: {e}")
 
-        # Best-effort: do not run global stop scripts here, as they can kill user-managed dev servers.
-        # We only terminate processes we started in this session.
-
         print("Service cleanup complete")
-
-@pytest.fixture(autouse=True)
-def skip_unavailable_services(request, rag_api_available, poc_api_available, frontend_available, blockchain_available):
-    """Automatically skip tests that require unavailable services"""
-    # Check command-line options
-    mock_services = request.config.getoption("--mock-services")
-    skip_checks = request.config.getoption("--skip-service-checks")
-
-    if skip_checks:
-        return  # Skip all checks
-
-    if mock_services:
-        return  # Allow tests to run with mocked services
-
-    # Normal service availability checks
-    if request.node.get_closest_marker("requires_rag_api") and not rag_api_available:
-        pytest.skip("RAG API service not available (use --mock-services to run with mocks)")
-    elif request.node.get_closest_marker("requires_poc_api") and not poc_api_available:
-        pytest.skip("PoC API service not available (use --mock-services to run with mocks)")
-    elif request.node.get_closest_marker("requires_frontend") and not frontend_available:
-        pytest.skip("Frontend service not available (use --mock-services to run with mocks)")
-    elif request.node.get_closest_marker("requires_blockchain") and not blockchain_available:
-        pytest.skip("Blockchain modules not available (use --mock-services to run with mocks)")

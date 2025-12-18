@@ -10,13 +10,18 @@ HTML templates for web UI components, including certificate registration interfa
 
 ## Integration
 
-- Used by web-legacy Flask application
-- Provides UI for blockchain certificate registration
+- Legacy templates directory
+- Contains minimal HTML templates for certificate registration
 - Integrates with Web3 for blockchain interactions
 
 ## Status
 
-Legacy component - see `web-legacy/` for main Flask application.
+Legacy component - main UI is now in `poc-frontend/` (Next.js).
+
+
+
+
+
 
 
 

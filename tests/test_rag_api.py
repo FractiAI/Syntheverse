@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Test script to send a simple query to the RAG API.
-Uses standardized test framework for consistent execution and reporting.
+RAG API Test Suite
+Tests RAG API functionality with real API calls and automatic service management.
+
+Dependencies: Automatically installs requests library if needed.
+Services: Requires RAG API service (automatically started by conftest.py).
+Isolation: Uses real API calls with proper error handling and metrics collection.
 """
 
 import sys
@@ -15,7 +19,7 @@ from pathlib import Path
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir))
 
-from test_framework import APITestCase, TestUtils, test_config
+from test_framework import APITestCase, TestUtils, test_config, ensure_dependency
 
 @pytest.mark.requires_rag_api
 class TestRAGAPI(APITestCase):
@@ -106,7 +110,13 @@ class TestRAGAPI(APITestCase):
                 self.log_info(f"Source {i}: {title} (score: {score:.4f})")
 
         except ImportError:
-            self.skipTest("requests library not available")
+            # Try to install requests dependency
+            try:
+                ensure_dependency("requests")
+                # Retry the import
+                import requests
+            except RuntimeError:
+                self.fail("requests library could not be installed")
         except Exception as e:
             self.fail(f"RAG API query failed: {e}")
 
@@ -116,10 +126,7 @@ class TestRAGAPI(APITestCase):
 
         rag_api_url = test_config.get("api_urls.rag_api")
 
-        # Ensure service is available
-        available = TestUtils.wait_for_service(rag_api_url, timeout=5)  # Reduced timeout for testing
-        if not available:
-            self.skipTest("RAG API service not available - skipping integration test")
+        # Service should be started automatically by conftest.py due to @pytest.mark.requires_rag_api
 
         import requests
 
@@ -185,10 +192,7 @@ class TestRAGAPI(APITestCase):
 
         rag_api_url = test_config.get("api_urls.rag_api")
 
-        # Ensure service is available
-        available = TestUtils.wait_for_service(rag_api_url, timeout=30)
-        if not available:
-            self.skipTest("RAG API service not available")
+        # Service should be started automatically by conftest.py due to @pytest.mark.requires_rag_api
 
         import requests
 

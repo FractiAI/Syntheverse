@@ -26,6 +26,12 @@
 - LLM integration (Groq, Ollama, HuggingFace)
 - Web UI for interactive queries
 
+## API Key Configuration
+
+GROQ_API_KEY must be set in `.env` file at project root.
+See `config/environment/GET_GROQ_KEY.md` for setup instructions.
+Use centralized `src.core.utils.load_groq_api_key()` for loading.
+
 ## LLM Provider Integration
 
 ### Groq (Primary)
@@ -33,6 +39,7 @@
 - Free tier available
 - Model: llama-3.1-8b-instant
 - OpenAI-compatible API
+- API key required for all RAG operations
 
 ### Ollama (Fallback)
 - Local LLM runner
@@ -114,6 +121,10 @@ def query(query: str, llm_model: str = "groq"):
 - Use similarity thresholds
 - Batch process when possible
 - Optimize LLM calls
+
+
+
+
 
 
 

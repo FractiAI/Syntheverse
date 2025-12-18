@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Comprehensive documentation for the Syntheverse system including architecture, API documentation, user guides, and contributor resources.
+Documentation for the Syntheverse system including architecture, API documentation, user guides, and contributor resources.
 
 ## Key Modules
 
@@ -25,16 +25,33 @@ Comprehensive documentation for the Syntheverse system including architecture, A
 
 ### Main Documentation
 
-- **`POC_SYSTEM_SUMMARY.md`**: Complete system overview
+- **`POC_SYSTEM_SUMMARY.md`**: System overview
+- **`POC_SUBMISSION_SYSTEM.md`**: Complete PoC submission system overview
 - **`POC_UPGRADE.md`**: System upgrade information
 - **`POC_SUBMISSION_TO_ALLOCATION_FLOW.md`**: End-to-end flow documentation
 - **`L1_EXPLANATION.md`**: Layer 1 blockchain explanation
 - **`L2_SYSTEM_PROMPT.md`**: Layer 2 system prompt documentation
 - **`L2_TOKENOMICS.md`**: Tokenomics and reward system
 - **`DUPLICATE_PREVENTION.md`**: Archive-first redundancy system
-- **`QUICK_START_POD_UI.md`**: Quick start guide
+- **`QUICK_START_POC_UI.md`**: Quick start guide
 - **`START_WEB_UI.md`**: Web UI startup guide
 - **`EMAIL_CONFIGURATION_GUIDE.md`**: Email setup guide
+- **`EMAIL_TROUBLESHOOTING.md`**: Historical email functionality documentation
+
+## Environment Configuration
+
+### GROQ_API_KEY Setup
+- **Required for**: All LLM-powered services (RAG API, PoC evaluation, Layer 2)
+- **Location**: `.env` file in project root
+- **Format**: `GROQ_API_KEY=gsk_your-key-here`
+- **How to get**: Visit https://console.groq.com/ and create a free API key
+- **Loading**: Use centralized `src.core.utils.load_groq_api_key()` utility
+- **Security**: Never commit `.env` files to repository
+
+### Configuration Files
+- `config/environment/README.md` - Complete environment setup guide
+- `config/environment/GET_GROQ_KEY.md` - Step-by-step API key acquisition
+- `config/environment/SETUP_GROQ.md` - Groq integration setup
 
 ## Integration Points
 

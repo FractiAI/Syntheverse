@@ -9,8 +9,8 @@ Both systems use direct Grok API calls and connect to Layer 1 blockchain for tok
 
 ## Status
 
-✅ **PoC System**: Complete archive-first evaluation with multi-metal support, sandbox map, and persistent state
-✅ **PoD System**: Legacy evaluation system maintained for backward compatibility
+**PoC System**: Archive-first evaluation with multi-metal support, sandbox map, and persistent state
+**PoD System**: Legacy evaluation system maintained for backward compatibility
 
 ## Components
 
@@ -26,7 +26,7 @@ Archive-first contribution evaluation system:
 
 #### 2. PoC Archive (`poc_archive.py`)
 Persistent storage for all contributions:
-- **Archive-First Rule**: Stores ALL contributions regardless of status
+- **Archive-First**: Stores all contributions regardless of status
 - **Content Hashing**: Prevents exact duplicates
 - **Multi-Metal Indexing**: Tracks Gold/Silver/Copper by contributor and metal
 - **Lifecycle Management**: Manages contribution status transitions

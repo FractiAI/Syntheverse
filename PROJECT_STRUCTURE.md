@@ -18,6 +18,7 @@ syntheverse/
 ├── 📁 docs/                     # Documentation
 ├── 📁 examples/                 # Example code and demos
 ├── 📁 tests/                    # Test suites
+├── 📁 data/                     # Data files and resources
 ├── 📁 tools/                    # Development tools
 └── 📁 config/                   # Configuration files
 ```
@@ -28,23 +29,45 @@ syntheverse/
 src/
 ├── 📁 api/                      # Backend API services
 │   ├── 📁 poc-api/             # Main PoC API (Flask)
-│   ├── 📁 rag-api/             # RAG API for document processing
-│   └── 📁 test_outputs/         # API test data and outputs
+│   │   ├── 📄 app.py           # Flask application
+│   │   ├── 📄 server.py        # Server implementation
+│   │   └── 📁 uploads/         # File uploads directory
+│   └── 📁 rag_api/             # RAG API for document processing
+│       ├── 📁 analysis/        # Analysis modules
+│       │   ├── 📁 cli/         # Command line tools
+│       │   └── 📄 *.py         # Analysis utilities
+│       ├── 📁 api/             # API endpoints
+│       ├── 📁 parser/          # Document parsing
+│       ├── 📁 scraper/         # Web scraping tools
+│       └── 📁 vectorizer/      # Vectorization tools
 ├── 📁 blockchain/              # Blockchain/smart contract code
-│   ├── 📁 contracts/           # Solidity contracts (Foundry)
-│   ├── 📁 foundry/             # Foundry configuration
-│   ├── 📁 hardhat/             # Hardhat configuration
-│   ├── 📁 layer1/              # Layer 1 blockchain logic
-│   ├── 📁 scripts/             # Deployment scripts
-│   └── 📁 test/                # Contract tests
+│   ├── 📁 contracts/           # Solidity contracts and deployment
+│   │   ├── 📁 src/             # Contract source code
+│   │   ├── 📁 test/            # Contract tests
+│   │   ├── 📁 script/          # Deployment scripts
+│   │   ├── 📁 lib/             # External libraries
+│   │   ├── 📁 deploy/          # Deployment scripts
+│   │   └── 📄 foundry.toml     # Foundry configuration
+│   ├── 📁 layer1/              # Python Layer 1 blockchain logic
+│   ├── 📁 test/                # Additional tests
+│   └── 📄 *.py                 # Blockchain integration scripts
 ├── 📁 core/                    # Core business logic
 │   └── 📁 layer2/              # PoC evaluation and tokenomics
+│       ├── 📁 allocator/       # Token allocation logic
+│       ├── 📁 evaluator/       # PoC evaluation engine
+│       └── 📄 *.py             # Core services
 ├── 📁 data/                    # Data files and resources
+│   ├── 📁 metadata/            # Metadata storage
+│   ├── 📁 parsed/              # Parsed document data
+│   ├── 📁 pdfs/                # PDF document storage
+│   └── 📁 vectorized/          # Vectorized data and embeddings
 ├── 📁 frontend/                # Frontend applications
 │   ├── 📁 poc-frontend/        # Main Next.js PoC UI
 │   ├── 📁 web-legacy/          # Legacy Flask web UI
-│   └── 📁 submission/          # Submission form UI
-└── 📁 ui/                      # Additional UI components
+│   ├── 📁 submission/          # Submission form UI
+│   ├── 📁 admin/               # Administrative interface
+│   └── 📁 ui_web/              # Web UI components
+└── 📁 test_outputs/            # Test output data
 ```
 
 ## 📁 Scripts (`scripts/`)
@@ -59,7 +82,10 @@ scripts/
 ├── 📁 deployment/              # Deployment scripts
 │   └── 📄 deploy_contracts.py
 └── 📁 utilities/               # Maintenance utilities
-    └── 📄 clear_persistent_memory.py
+    ├── 📄 clear_persistent_memory.py
+    ├── 📄 test_setup_functions.sh    # Test setup functions
+    ├── 📄 test_startup_readiness.sh  # Test startup readiness
+    └── 📄 test_verify.sh             # Test verification script
 ```
 
 ## 📁 Documentation (`docs/`)
@@ -71,7 +97,7 @@ docs/
 ├── 📁 architecture/            # System architecture docs
 ├── 📁 contributors/            # Contributor resources
 ├── 📁 deployment/              # Deployment guides
-└── 📁 user-guides/             # User manuals
+└── 📄 *.md                     # Technical documentation files
 ```
 
 ## 📁 Examples (`examples/`)
@@ -89,10 +115,22 @@ examples/
 ```
 tests/
 ├── 📁 outputs/                 # Test output files
-├── 📄 test_full_submission_flow.py
-├── 📄 test_poc_frontend.sh
-├── 📄 test_rag_api.py
-└── 📄 test_submission_flow.py
+├── 📁 results/                 # Test result logs and reports
+├── 📄 conftest.py              # Pytest configuration
+├── 📄 test_*.py                # Python test modules (20+ test files)
+├── 📄 test_*.sh                # Shell script tests
+├── 📄 run_tests.sh             # Test runner script
+├── 📄 test_config.json         # Test configuration
+└── 📄 *.md                     # Test documentation
+```
+
+## 📁 Data (`data/`)
+
+```
+data/
+├── 📄 blockchain.json          # Blockchain state data
+├── 📄 poc_contract.json        # PoC contract state
+└── 📄 synth_token.json         # SYNTH token contract state
 ```
 
 ## 📁 Tools (`tools/`)
@@ -113,7 +151,6 @@ tools/
 config/
 ├── 📄 .env                     # Environment variables
 ├── 📁 environment/             # Environment-specific configs
-│   ├── 📄 EMAIL_TROUBLESHOOTING.md
 │   ├── 📄 GET_GROQ_KEY.md
 │   └── 📄 SETUP_GROQ.md
 └── 📁 wallet/                  # Wallet configuration

@@ -2,21 +2,25 @@
 
 ## Purpose
 
-Comprehensive test suites for validating system functionality, API endpoints, submission flows, and integration testing. Features standardized test framework with unified execution, reporting, caching, and advanced analytics.
+Test suites for validating system functionality, API endpoints, submission flows, and integration testing. Uses real implementations with dependency management and service startup.
+
+## Testing Policy
+
+Tests use real implementations with no mocking. Dependencies install automatically and services start automatically. Tests pass or fail with error messages.
 
 ## Test Framework
 
 ### Core Components
 
-- **`test_framework.py`** - Standardized test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, enhanced error reporting, and utilities
-- **`test_runner.py`** - Advanced Python test orchestrator with discovery, filtering, caching, parallel execution, and HTML reporting
-- **`run_tests.sh`** - Unified shell script for test execution with colored output and comprehensive reporting
-- **`test_config.json`** - Comprehensive configuration file for test settings, scenarios, thresholds, and mock responses
-- **`conftest.py`** - Pytest configuration for proper test discovery and marker definitions
+- **`test_framework.py`**: Test framework with base classes, retry mechanisms, error reporting, and utilities
+- **`test_runner.py`**: Test orchestrator with discovery, filtering, caching, parallel execution, and HTML reporting
+- **`run_tests.sh`**: Shell script for test execution with colored output
+- **`test_config.json`**: Configuration file for test settings, scenarios, thresholds, and dependency requirements
+- **`conftest.py`**: Pytest configuration for test discovery and marker definitions
 
 ### Test Categories
 
-Tests are organized into multiple categories for comprehensive coverage:
+Tests are organized into categories for coverage:
 
 #### **Unit Tests** - Individual Component Testing
 - `test_core_modules.py` - Core business logic (archive, tokenomics, evaluator, allocator)
@@ -74,14 +78,13 @@ python test_runner.py --category e2e      # Run end-to-end tests
 python test_runner.py --report-only       # Generate report from results
 ```
 
-#### Pytest with Service Control
+#### Pytest with Real Dependencies
 ```bash
 cd tests
-pytest -v -rs                          # Run all tests with skip reasons shown
-pytest -m "not requires_service"       # Skip tests requiring external services
-pytest -m "requires_rag_api"           # Run only RAG API tests
-pytest --mock-services                 # Run tests with mocked services
-pytest --skip-service-checks           # Skip all service availability checks
+pytest -v                              # Run all tests with real dependencies
+pytest -m "requires_rag_api"           # Run only RAG API tests (services auto-start)
+pytest -x                              # Stop on first failure for debugging
+pytest --tb=short                      # Short traceback format
 ```
 
 ### Test Framework Features
@@ -89,10 +92,10 @@ pytest --skip-service-checks           # Skip all service availability checks
 #### Pytest Configuration
 
 The test suite uses enhanced pytest configuration in `pytest.ini`:
-- **Skip reporting**: `-rs` flag shows reasons for skipped tests
-- **Service markers**: Automatic detection and skipping of service-dependent tests
-- **Coverage integration**: Built-in coverage reporting for core modules
-- **Custom markers**: Support for unit, integration, e2e, and service-specific markers
+- **Automatic Service Management**: Services marked with `@pytest.mark.requires_*` are automatically started
+- **Dependency Installation**: Required Python packages are automatically installed
+- **Real Implementation Testing**: All tests use real APIs, file operations, and service calls
+- **Comprehensive Error Reporting**: Failed tests provide detailed error information and context
 
 #### Standardized Test Base Classes
 ```python
@@ -184,10 +187,16 @@ class MyDataTest(DataTestCase):
 
 Before running tests:
 
-1. **Python Dependencies**: `pip install requests pytest` (for API testing and pytest framework)
-2. **System Services**: Use startup scripts to launch required services
-3. **Configuration**: Check `test_config.json` for API URLs and settings
-4. **Environment**: Set GROQ_API_KEY for AI-powered tests
+1. **Python Environment**: Python 3.8+ with pip
+2. **Environment Variables**: Set GROQ_API_KEY in `.env` file for AI-powered tests
+3. **Network Access**: Required for API calls to external services
+4. **Automatic Setup**: All other dependencies and services are installed/started automatically
+
+The test framework will automatically:
+- Install required Python packages
+- Start required services (RAG API, PoC API)
+- Validate environment configuration
+- Provide clear error messages if setup fails
 
 ## Service Requirements
 

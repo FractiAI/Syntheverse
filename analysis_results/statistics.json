@@ -1,0 +1,28 @@
+{
+  "total_embeddings": 50,
+  "dimension": 384,
+  "norm_mean": 19.45422655614414,
+  "norm_std": 0.6729212437972074,
+  "value_mean": -0.00982804098444024,
+  "value_std": 0.9933144527557598,
+  "sparsity": 0.0,
+  "outliers": 0,
+  "clusters": 2,
+  "sources": {
+    "test_doc_0.pdf": 10,
+    "test_doc_1.pdf": 10,
+    "test_doc_2.pdf": 10,
+    "test_doc_3.pdf": 10,
+    "test_doc_4.pdf": 10
+  },
+  "metadata_fields": [
+    "word_count",
+    "chunk_index",
+    "source"
+  ],
+  "analysis_timestamp": "2025-12-17T17:52:28.754295",
+  "norm_min": 17.77089093698712,
+  "norm_max": 20.589323556478945,
+  "value_min": -4.643196160922871,
+  "value_max": 4.785876109209682
+}

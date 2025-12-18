@@ -18,7 +18,7 @@ Flask REST API server that:
 - `app.py`: Main Flask application
 - `server.py`: Server setup and configuration
 
-### RAG API (`rag-api/`)
+### RAG API (`rag_api/`)
 
 FastAPI server for document processing:
 - Semantic search over vectorized documents
@@ -55,6 +55,3 @@ FastAPI server for document processing:
 - Error handling with consistent structure
 - File upload validation
 - CORS configuration for frontend
-
-
-

@@ -1,4 +1,4 @@
-# Development Scripts Agents
+# Development Scripts
 
 ## Purpose
 
@@ -6,24 +6,13 @@ Development workflow scripts for service management, testing, and validation dur
 
 ## Key Modules
 
-### Service Management Scripts
+### Service Manager (`manage_services.sh`)
 
-- **PoC UI Development**: `start_poc_ui.sh` and `stop_poc_ui.sh` for Next.js + PoC API development
-- **All Services Control**: `start_all_services.sh` and `stop_all_services.sh` for complete service management
-- **Syntheverse Control**: `Syntheverse.sh` and `stop_Syntheverse.sh` for legacy system management
-
-### Testing and Submission Scripts
-
-- **PoD Submission**: `submit_pod.py` for testing PoD submission workflow
-- **UI Submission**: `ui_pod_submission.py` for interactive PoD submission testing
-- **Test Data Generation**: Scripts for creating test contributions and scenarios
-
-### Development Workflow
-
-- **Environment Setup**: Scripts for setting up development environments
-- **Service Orchestration**: Coordinated startup of multiple services
-- **Testing Automation**: Automated testing and validation workflows
-- **Data Management**: Test data creation and cleanup
+- **Unified Service Control**: Single script for all service management operations
+- **PoC Services**: Start/stop PoC API + Next.js frontend
+- **All Services**: Start/stop RAG API
+- **Service Status**: Check status of all services
+- **Restart Functionality**: Restart services with single command
 
 ## Integration Points
 
@@ -47,3 +36,5 @@ Development workflow scripts for service management, testing, and validation dur
 - Testing workflow automation
 - Path resolution and navigation
 - Environment configuration handling
+
+

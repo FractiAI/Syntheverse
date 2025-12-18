@@ -11,8 +11,10 @@ import socket
 import subprocess
 import signal
 import os
+import threading
 from unittest.mock import patch, MagicMock, call
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 # Add src to path for imports
 import sys
@@ -21,12 +23,20 @@ sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 from scripts.startup.port_manager import (
     PortManager,
     ProcessInfo,
+    PortReservation,
+    PortMetrics,
     port_manager,
     kill_processes_on_port,
     check_port_available,
     free_port,
     get_process_info,
-    get_port_status
+    get_port_status,
+    reserve_port,
+    release_port_reservation,
+    is_port_reserved,
+    check_ports_batch,
+    get_port_metrics,
+    get_process_fingerprint
 )
 
 class TestPortManager(unittest.TestCase):
@@ -321,6 +331,232 @@ class TestConvenienceFunctions(unittest.TestCase):
 
         self.assertEqual(result['port'], 55555)
         mock_method.assert_called_once_with(55555, "Test")
+
+class TestEnhancedPortManager(unittest.TestCase):
+    """Test cases for enhanced port manager features"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.port_manager = PortManager()
+        self.test_port = 55530
+        self.test_service = "TestService"
+
+    def tearDown(self):
+        """Clean up after tests"""
+        try:
+            port_manager.free_port(self.test_port, "Test Cleanup")
+        except:
+            pass
+
+    def test_process_fingerprint_generation(self):
+        """Test process fingerprint generation"""
+        fingerprint = self.port_manager.get_process_fingerprint(os.getpid())
+        self.assertIsInstance(fingerprint, str)
+        self.assertGreater(len(fingerprint), 0)
+
+        # Same PID should return same fingerprint
+        fingerprint2 = self.port_manager.get_process_fingerprint(os.getpid())
+        self.assertEqual(fingerprint, fingerprint2)
+
+    def test_port_reservation_system(self):
+        """Test port reservation functionality"""
+        # Reserve port
+        success = self.port_manager.reserve_port(self.test_port, self.test_service, os.getpid())
+        self.assertTrue(success)
+
+        # Check reservation
+        self.assertTrue(self.port_manager.is_port_reserved(self.test_port))
+        self.assertTrue(self.port_manager.is_port_reserved(self.test_port, self.test_service))
+
+        # Check different service
+        self.assertFalse(self.port_manager.is_port_reserved(self.test_port, "OtherService"))
+
+        # Release reservation
+        success = self.port_manager.release_port_reservation(self.test_port, self.test_service)
+        self.assertTrue(success)
+        self.assertFalse(self.port_manager.is_port_reserved(self.test_port))
+
+    def test_parallel_port_checking(self):
+        """Test parallel port availability checking"""
+        ports_to_check = [55531, 55532, 55533, 55534, 55535]
+        results = self.port_manager.check_ports_batch(ports_to_check)
+
+        self.assertIsInstance(results, dict)
+        self.assertEqual(len(results), len(ports_to_check))
+
+        for port in ports_to_check:
+            self.assertIn(port, results)
+            self.assertIsInstance(results[port], bool)
+
+    @patch('time.sleep')  # Prevent actual sleeping in tests
+    def test_metrics_collection(self, mock_sleep):
+        """Test metrics collection during port operations"""
+        # Create a scenario that will generate metrics
+        with patch.object(self.port_manager, 'kill_processes_on_port', return_value=True):
+            with patch.object(self.port_manager, 'check_port_available', side_effect=[False, True]):
+                success = self.port_manager.free_port(self.test_port, self.test_service)
+
+        # Check that metrics were recorded
+        metrics = self.port_manager.get_metrics()
+        self.assertGreater(len(metrics), 0)
+
+        # Find metrics for our test port
+        port_metrics = [m for m in metrics if m.port == self.test_port]
+        if port_metrics:
+            metric = port_metrics[0]
+            self.assertEqual(metric.service, self.test_service)
+            self.assertIsInstance(metric.cleanup_duration, float)
+            self.assertIsInstance(metric.success, bool)
+
+    def test_process_fingerprinting_protection(self):
+        """Test that fingerprinting prevents killing wrong processes"""
+        # Mock a process with different fingerprint
+        mock_process = ProcessInfo(
+            pid=99999,
+            name='test_process',
+            command='test command',
+            user='testuser',
+            fingerprint='old_fingerprint'
+        )
+
+        with patch.object(self.port_manager, 'get_process_info', return_value=[mock_process]):
+            with patch.object(self.port_manager, 'get_process_fingerprint', return_value='new_fingerprint'):
+                with patch('os.kill') as mock_kill:
+                    result = self.port_manager.kill_processes_on_port(self.test_port, target_service="TestService")
+
+                    # Should return True but not kill the process due to fingerprint mismatch
+                    self.assertTrue(result)
+                    mock_kill.assert_not_called()
+
+    def test_cache_functionality(self):
+        """Test port status caching"""
+        # First call should cache result
+        with patch.object(self.port_manager, 'get_process_info') as mock_get_process:
+            mock_get_process.return_value = []
+            result1 = self.port_manager.get_process_info(self.test_port, use_cache=True)
+
+        # Second call should use cache
+        result2 = self.port_manager.get_process_info(self.test_port, use_cache=True)
+        self.assertEqual(result1, result2)
+
+        # With use_cache=False, should call again
+        result3 = self.port_manager.get_process_info(self.test_port, use_cache=False)
+        self.assertEqual(result1, result3)
+
+    def test_concurrent_operations(self):
+        """Test concurrent port operations"""
+        results = []
+        errors = []
+
+        def worker(worker_id):
+            try:
+                # Test parallel port checking
+                result = self.port_manager.check_port_available(self.test_port + worker_id)
+                results.append((worker_id, result))
+            except Exception as e:
+                errors.append((worker_id, str(e)))
+
+        # Run multiple threads
+        threads = []
+        for i in range(5):
+            t = threading.Thread(target=worker, args=(i,))
+            threads.append(t)
+            t.start()
+
+        # Wait for all threads
+        for t in threads:
+            t.join()
+
+        # Should have results from all threads
+        self.assertEqual(len(results), 5)
+        self.assertEqual(len(errors), 0)
+
+class TestPerformanceBenchmarks(unittest.TestCase):
+    """Performance tests for port manager"""
+
+    def setUp(self):
+        self.port_manager = PortManager()
+        self.test_ports = list(range(55500, 55520))  # 20 ports
+
+    def test_batch_port_check_performance(self):
+        """Test performance of batch port checking"""
+        import time
+
+        start_time = time.time()
+        results = self.port_manager.check_ports_batch(self.test_ports)
+        end_time = time.time()
+
+        duration = end_time - start_time
+
+        # Should check 20 ports in reasonable time (< 1 second)
+        self.assertLess(duration, 1.0)
+        self.assertEqual(len(results), len(self.test_ports))
+
+    def test_cache_performance_improvement(self):
+        """Test that caching improves performance"""
+        import time
+
+        # First call (no cache)
+        start_time = time.time()
+        with patch.object(self.port_manager, 'get_process_info') as mock_get:
+            mock_get.return_value = []
+            result1 = self.port_manager.get_process_info(55530, use_cache=False)
+        no_cache_time = time.time() - start_time
+
+        # Second call (with cache)
+        start_time = time.time()
+        result2 = self.port_manager.get_process_info(55530, use_cache=True)
+        cache_time = time.time() - start_time
+
+        # Cache should be significantly faster
+        self.assertLess(cache_time, no_cache_time)
+        self.assertEqual(result1, result2)
+
+class TestChaosTesting(unittest.TestCase):
+    """Chaos tests for port manager resilience"""
+
+    def setUp(self):
+        self.port_manager = PortManager()
+        self.test_port = 55525
+
+    @patch('subprocess.run')
+    def test_lsof_failure_resilience(self, mock_run):
+        """Test resilience when lsof command fails"""
+        mock_run.side_effect = subprocess.CalledProcessError(1, 'lsof')
+
+        # Should not crash, should return empty list
+        processes = self.port_manager.get_process_info(self.test_port)
+        self.assertEqual(processes, [])
+
+    @patch('os.kill')
+    def test_process_kill_permission_denied(self, mock_kill):
+        """Test handling of permission denied when killing processes"""
+        mock_kill.side_effect = OSError("Permission denied")
+
+        mock_process = ProcessInfo(
+            pid=12345,
+            name='test_process',
+            command='test command',
+            user='root'
+        )
+
+        with patch.object(self.port_manager, 'get_process_info', return_value=[mock_process]):
+            result = self.port_manager.kill_processes_on_port(self.test_port)
+
+            # Should handle permission error gracefully
+            self.assertIsInstance(result, bool)
+
+    def test_empty_port_list_batch_check(self):
+        """Test batch checking with empty port list"""
+        results = self.port_manager.check_ports_batch([])
+        self.assertEqual(results, {})
+
+    def test_invalid_pid_fingerprint(self):
+        """Test fingerprint generation for invalid PID"""
+        fingerprint = self.port_manager.get_process_fingerprint(999999)
+        # Should return a valid fingerprint even for non-existent PID
+        self.assertIsInstance(fingerprint, str)
+        self.assertGreater(len(fingerprint), 0)
 
 if __name__ == '__main__':
     unittest.main()

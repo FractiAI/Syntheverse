@@ -47,3 +47,8 @@ Storage and management of vectorized embeddings for semantic search and retrieva
 - Metadata attachment to embeddings
 - Batch processing workflows
 - Model versioning and tracking
+
+
+
+
+

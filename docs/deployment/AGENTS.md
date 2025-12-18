@@ -8,15 +8,13 @@ Deployment guides and configuration documentation for the Syntheverse system, co
 
 ### Deployment Guide (`README.md`)
 
-- **Prerequisites**: Python, Node.js, Ollama, Git requirements
-- **Component Deployment**: Step-by-step deployment for each system component
-- **RAG API Deployment**: Installation and startup instructions
-- **Layer 2 Services**: Evaluator and allocator service deployment
-- **Layer 1 Blockchain**: Blockchain node initialization
-- **UI Deployment**: Submission and admin interface deployment
-- **Docker Deployment**: Containerized deployment plans
-- **Production Considerations**: Security, monitoring, persistence
-- **Environment Variables**: Configuration for each component
+- **Prerequisites**: Python, Node.js, Groq API, Git requirements
+- **Quick Start**: One-command system startup using startup scripts
+- **Component Deployment**: Individual service deployment instructions
+- **Environment Setup**: Dependency installation and configuration
+- **Production Deployment**: Process managers, reverse proxy, SSL setup
+- **Blockchain Deployment**: Local Anvil and Base network deployment
+- **Environment Variables**: Required and optional configuration
 
 ## Integration Points
 

@@ -8,54 +8,32 @@ Scripts for development workflow, service management, and testing during develop
 
 ### Service Management
 
-- **`start_poc_ui.sh`**: Start PoC UI development environment (Next.js frontend + PoC API)
-- **`stop_poc_ui.sh`**: Stop PoC UI services
-- **`start_all_services.sh`**: Start all system services (RAG API + Legacy Web UI)
-- **`stop_all_services.sh`**: Stop all system services
-- **`stop_Syntheverse.sh`**: Stop Syntheverse services
-- **`Syntheverse.sh`**: Main Syntheverse startup script (Legacy Web UI)
-
-### Testing and Submission
-
-- **`submit_pod.py`**: Submit PoD for testing (legacy PoD system)
-- **`ui_pod_submission.py`**: UI for PoD submission (legacy PoD system)
+- **`manage_services.sh`**: Unified service manager for all development services
 
 ## Usage
 
-### Start PoC UI Development Environment
+### Service Management
+
+The `manage_services.sh` script provides unified control over all development services:
 
 ```bash
-cd scripts/development
-./start_poc_ui.sh
-```
+# Start PoC UI development environment
+./manage_services.sh start poc
 
-This starts:
-- PoC API on http://localhost:5001
-- Next.js Frontend on http://localhost:3001
+# Stop PoC UI services
+./manage_services.sh stop poc
 
-### Stop PoC UI Services
+# Start all services (RAG API)
+./manage_services.sh start all
 
-```bash
-cd scripts/development
-./stop_poc_ui.sh
-```
+# Stop all services
+./manage_services.sh stop all
 
-### Start All Services (Legacy)
+# Restart services
+./manage_services.sh restart poc
 
-```bash
-cd scripts/development
-./start_all_services.sh
-```
-
-This starts:
-- RAG API on http://localhost:8000
-- Legacy Web UI on http://localhost:5000
-
-### Submit Test Contribution (Legacy PoD)
-
-```bash
-cd scripts/development
-python submit_pod.py --submit paper.pdf --contributor researcher-001 --category scientific
+# Check service status
+./manage_services.sh status
 ```
 
 ## Integration

@@ -249,3 +249,8 @@ allocator.tokenomics = {
 - **Cross-Epoch Transfers**: Token movement between epochs</content>
 </xai:function_call name="read_lints">
 <parameter name="target_file">src/core/layer2/allocator/README.md
+
+
+
+
+

@@ -9,7 +9,6 @@ Environment setup and configuration documentation for external services, API key
 ### API Configuration Guides
 
 - **Groq API Setup**: `SETUP_GROQ.md` and `GET_GROQ_KEY.md` for AI service configuration
-- **Email Configuration**: `EMAIL_TROUBLESHOOTING.md` for email service setup
 - **External Service Integration**: Guides for third-party API configuration
 
 ### Environment Variables
@@ -46,3 +45,5 @@ Environment setup and configuration documentation for external services, API key
 - Service integration documentation
 - Troubleshooting and error resolution
 - Security best practices for secrets
+
+

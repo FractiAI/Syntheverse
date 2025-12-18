@@ -38,3 +38,8 @@ Each embedding JSON file contains an array of chunk objects with:
 - Metadata enrichment for search relevance
 - Sequential chunk indexing within documents
 - JSON serialization for persistence
+
+
+
+
+

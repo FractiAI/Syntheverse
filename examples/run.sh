@@ -617,20 +617,18 @@ show_examples_menu() {
         print_header "📚 EXAMPLES"
         echo "Choose an example to run:"
         echo ""
-        echo "1) 🐍 Run PoC System Demo    - demo_poc_system.py simulation"
-        echo "2) 🌐 Open Interface Demo    - demo_interface.html in browser"
-        echo "3) 🧪 Open Test UI Demo      - test_ui.html in browser"
-        echo "4) ↩️  Back to Main Menu"
+        echo "1) 🌟 Unified Demo          - All interfaces in one place (unified_demo.html)"
+        echo "2) 🐍 Run PoC System Demo    - demo_poc_system.py simulation"
+        echo "3) ↩️  Back to Main Menu"
         echo ""
 
-        read -p "Enter your choice (1-4): " choice
+        read -p "Enter your choice (1-3): " choice
 
         case "$choice" in
-            1) run_demo_poc_system ;;
-            2) open_html_demo "demo_interface" ;;
-            3) open_html_demo "test_ui" ;;
-            4) return ;;
-            *) print_status "Invalid choice. Please select 1-4." "❌" ;;
+            1) open_html_demo "unified_demo" ;;
+            2) run_demo_poc_system ;;
+            3) return ;;
+            *) print_status "Invalid choice. Please select 1-3." "❌" ;;
         esac
     done
 }

@@ -132,7 +132,6 @@ export default function SandboxMapPage() {
   useEffect(() => {
     if (mapData) {
       const processed = processNetworkData()
-      console.log('Processed network data:', { nodes: processed.nodes.length, edges: processed.edges.length })
       setNetworkData(processed)
     }
   }, [mapData, filterType, filterStatus, filterMetal, activeDimensions])

@@ -33,6 +33,15 @@
 - Provide clear error messages to users
 - Validate inputs at boundaries
 
+### Environment Variables
+- **GROQ_API_KEY (Required)**: API key for Groq LLM service
+  - Location: `.env` file in project root
+  - Format: `GROQ_API_KEY=gsk_your-key-here`
+  - How to get: Visit https://console.groq.com/ and create a free API key
+  - Used by: RAG API, PoC evaluation, Layer 2 services
+- Use centralized `src.core.utils.load_groq_api_key()` utility for loading
+- Store sensitive configuration in `.env` files (never commit to repository)
+
 ### Performance
 - Optimize for readability first, performance second
 - Profile before optimizing
@@ -50,6 +59,10 @@
 - Make atomic commits
 - Keep commits focused on a single change
 - Review changes before committing
+
+
+
+
 
 
 

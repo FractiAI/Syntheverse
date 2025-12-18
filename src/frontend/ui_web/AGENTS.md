@@ -1,8 +1,8 @@
-# Web UI Agents
+# Web UI Templates
 
 ## Purpose
 
-Web UI templates and components for the Syntheverse system, providing user interfaces for certificate registration and web interactions.
+Legacy HTML templates for certificate registration and web interactions.
 
 ## Key Modules
 
@@ -10,28 +10,26 @@ Web UI templates and components for the Syntheverse system, providing user inter
 
 - **Certificate Registration**: HTML template for registering certificates on blockchain
 - **Web3 Integration**: Frontend components for blockchain interactions
-- **Legacy Web Interface**: Flask-integrated web templates
-- **Certificate Management**: Certificate viewing and registration workflows
+- **Legacy Templates**: Minimal template directory for certificate workflows
 
 ## Integration Points
 
-- Web UI templates integrate with Flask applications in `web-legacy/`
-- Connects to blockchain Layer 1 for certificate registration
+- Legacy templates directory
+- Connects to blockchain for certificate registration
 - Uses Web3 libraries for blockchain interactions
-- Links to frontend styling and JavaScript components
+- Main UI is now in `poc-frontend/` (Next.js)
 
 ## Development Guidelines
 
-- Maintain consistent HTML structure across templates
-- Include proper form validation and error handling
-- Ensure responsive design for mobile compatibility
-- Document template variables and integration points
-- Test Web3 integration thoroughly
+- Main development should focus on `poc-frontend/` (Next.js)
+- This directory contains legacy templates
+- Maintain for backward compatibility only
 
-## Common Patterns
+## Status
 
-- HTML template structures
-- Web3 integration patterns
-- Certificate registration workflows
-- Form validation and error display
-- Responsive web design
+Legacy component - primary UI development is in `poc-frontend/`.
+
+
+
+
+

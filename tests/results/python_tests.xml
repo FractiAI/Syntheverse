@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="5" failures="0" skipped="0" tests="5" time="65.163" timestamp="2025-12-18T09:02:39.698929-08:00" hostname="timelock.local"><testcase classname="tests.test_anvil_manager.TestAnvilManager" name="test_check_anvil_running_failure" time="60.257"><error message="failed on setup with &quot;Failed: CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds&quot;">Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+Failed to start service rag_api: Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds</error></testcase><testcase classname="tests.test_anvil_manager.TestAnvilManager" name="test_check_anvil_running_invalid_response" time="0.000"><error message="failed on setup with &quot;Failed: CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds&quot;">Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+Failed to start service rag_api: Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds</error></testcase><testcase classname="tests.test_anvil_manager.TestAnvilManager" name="test_check_anvil_running_success" time="0.000"><error message="failed on setup with &quot;Failed: CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds&quot;">Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+Failed to start service rag_api: Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds</error></testcase><testcase classname="tests.test_anvil_manager.TestAnvilManager" name="test_get_anvil_status_not_running" time="0.000"><error message="failed on setup with &quot;Failed: CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds&quot;">Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+Failed to start service rag_api: Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds</error></testcase><testcase classname="tests.test_anvil_manager.TestAnvilManager" name="test_get_anvil_status_running" time="0.000"><error message="failed on setup with &quot;Failed: CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds&quot;">Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+Failed to start service rag_api: Service rag_api failed to start within 60 seconds
+
+During handling of the above exception, another exception occurred:
+CRITICAL: RAG API service could not be started: Failed to start service rag_api: Service rag_api failed to start within 60 seconds</error></testcase></testsuite></testsuites>

@@ -5,22 +5,20 @@ Archive-first evaluation with multi-metal support and Syntheverse Sandbox Map in
 
 import os
 import json
+import logging
 from typing import Dict, Optional, List, Callable
 from datetime import datetime
 from pathlib import Path
 
-# Try to load .env file
-try:
-    from dotenv import load_dotenv
-    env_path = Path(__file__).parent.parent / ".env"
-    if env_path.exists():
-        load_dotenv(env_path)
-except ImportError:
-    pass
-
 from .tokenomics_state import TokenomicsState, Epoch, ContributionTier
 from .poc_archive import PoCArchive, ContributionStatus, MetalType
 from .sandbox_map import SandboxMap
+
+# Load GROQ_API_KEY using centralized utility
+from core.utils import load_groq_api_key
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 
 class PoCServer:
@@ -46,7 +44,7 @@ class PoCServer:
             archive_file: Path to PoC archive file
         """
         # Initialize Grok API client
-        self.groq_api_key = groq_api_key or os.getenv("GROQ_API_KEY")
+        self.groq_api_key = groq_api_key or load_groq_api_key()
         if not self.groq_api_key:
             raise ValueError(
                 "Groq API key not provided. Set GROQ_API_KEY environment variable or pass groq_api_key parameter."
@@ -59,7 +57,7 @@ class PoCServer:
                 base_url="https://api.groq.com/openai/v1"
             )
             self.groq_client.models.list()
-            print("✓ Grok API initialized successfully")
+            logger.info("Grok API initialized successfully")
         except Exception as e:
             raise ValueError(f"Failed to initialize Grok API client: {e}")
         
@@ -71,13 +69,13 @@ class PoCServer:
         self.archive = PoCArchive(archive_file=archive_file)
         self.sandbox_map = SandboxMap(self.archive)
 
-        print("✓ PoC Archive initialized")
-        print("✓ Syntheverse Sandbox Map initialized")
+        logger.info("PoC Archive initialized")
+        logger.info("Syntheverse Sandbox Map initialized")
 
         # Run initial cleanup of any existing test submissions
         cleanup_result = self.cleanup_test_submissions()
         if cleanup_result.get("cleaned_count", 0) > 0:
-            print(f"✓ Cleaned up {cleanup_result['cleaned_count']} existing test submissions")
+            logger.info(f"Cleaned up {cleanup_result['cleaned_count']} existing test submissions")
     
     def submit_contribution(
         self,
@@ -259,7 +257,7 @@ class PoCServer:
             progress_callback("calling_llm", "Calling Grok API for HHFE evaluation...")
         
         try:
-            print(f"🤖 Starting Grok API evaluation for {submission_hash}...")
+            logger.info(f"Starting Grok API evaluation for {submission_hash}")
 
             # Update status to show evaluation is in progress
             self.archive.update_contribution(
@@ -274,7 +272,7 @@ class PoCServer:
             )
 
             evaluation_result = self._call_grok_api(evaluation_query)
-            print(f"✅ Grok API evaluation completed for {submission_hash}")
+            logger.info(f"Grok API evaluation completed for {submission_hash}")
 
             # Store the raw Grok response for user display
             self.archive.update_contribution(
@@ -287,7 +285,7 @@ class PoCServer:
             )
 
         except Exception as e:
-            print(f"❌ Grok API evaluation failed for {submission_hash}: {e}")
+            logger.error(f"Grok API evaluation failed for {submission_hash}: {e}")
             self.archive.update_contribution(
                 submission_hash,
                 status=ContributionStatus.UNQUALIFIED,
@@ -453,12 +451,10 @@ EVALUATION REQUIREMENTS:
         # For now, using a simplified version - in production, include full system prompt
         system_prompt = """You are Syntheverse PoC Reviewer evaluating contributions using the Hydrogen-Holographic Fractal Engine (HHFE)."""
 
-        print("🔗 Calling Grok API with detailed evaluation query...")
-        print(f"📊 Query length: {len(query)} characters")
+        logger.debug(f"Calling Grok API with evaluation query (length: {len(query)} characters)")
 
         try:
-            print("⏳ Sending evaluation request to Grok AI...")
-            print("🔬 Grok is analyzing coherence, density, and redundancy...")
+            logger.debug("Sending evaluation request to Grok AI")
 
             response = self.groq_client.chat.completions.create(
                 model="llama-3.1-8b-instant",
@@ -471,13 +467,12 @@ EVALUATION REQUIREMENTS:
                 timeout=300  # 5 minute timeout for complex evaluations - let Grok finish
             )
 
-            print("📨 Grok AI evaluation completed!")
-            print(f"📝 Response length: {len(response.choices[0].message.content)} characters")
-            print("✅ Grok has provided detailed evaluation metrics")
+            logger.info("Grok AI evaluation completed")
+            logger.debug(f"Response length: {len(response.choices[0].message.content)} characters")
 
             return response.choices[0].message.content
         except Exception as e:
-            print(f"💥 Grok API call failed: {e}")
+            logger.error(f"Grok API call failed: {e}")
             raise e
     
     def _parse_evaluation_result(self, result: str, contribution: Dict) -> Dict:
@@ -736,7 +731,7 @@ EVALUATION REQUIREMENTS:
                     cleaned_count += 1
 
             except Exception as e:
-                print(f"Warning: Failed to clean up test submission {submission_hash}: {e}")
+                logger.warning(f"Failed to clean up test submission {submission_hash}: {e}")
                 continue
 
         # Save the cleaned archive

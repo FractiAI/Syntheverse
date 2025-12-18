@@ -212,3 +212,8 @@ Allocation validation and state management:
 - **Cross-Chain Support**: Multi-blockchain allocation capabilities</content>
 </xai:function_call name="read_lints">
 <parameter name="target_file">src/core/layer2/allocator/AGENTS.md
+
+
+
+
+

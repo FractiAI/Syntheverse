@@ -1,4 +1,4 @@
-# Start Web UI for PoD Submissions
+# Start Web UI for PoC Submissions
 
 ## Quick Start
 
@@ -17,7 +17,7 @@ http://localhost:5000
 - Upload PDF files directly in the browser
 - Enter your Contributor ID
 - Select category (Scientific/Tech/Alignment)
-- Get instant PoD evaluation and scoring
+- Get instant PoC evaluation and scoring
 
 ### 2. View Epoch Status
 - See current epoch and token balances
@@ -37,7 +37,7 @@ http://localhost:5000
 ✅ **Real-time Updates** - Auto-refreshes every 10 seconds
 ✅ **File Upload** - Drag and drop or click to select PDFs
 ✅ **Status Dashboard** - Comprehensive epoch and tokenomics view
-✅ **Submission History** - All PoD submissions with details
+✅ **Submission History** - All PoC submissions with details
 
 ## Stopping the Server
 

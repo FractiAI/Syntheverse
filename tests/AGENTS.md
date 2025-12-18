@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Test suites for validating system functionality, API endpoints, submission flows, and integration testing.
+Test suites for validating system functionality, API endpoints, submission flows, and integration testing. Tests use real implementations with dependency management and service startup.
 
 ## Key Modules
 
 ### Core Test Framework
 
-- **`test_framework.py`**: Standardized test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, and utilities
-- **`test_runner.py`**: Advanced test orchestrator with filtering, caching, parallel execution, and HTML reporting
-- **`run_tests.sh`**: Unified shell script for test execution with colored output
-- **`test_config.json`**: Comprehensive configuration with test scenarios, thresholds, and environment settings
+- **`test_framework.py`**: Test framework with base classes (`SyntheverseTestCase`, `APITestCase`, `DataTestCase`), retry mechanisms, and utilities
+- **`test_runner.py`**: Test orchestrator with filtering, caching, parallel execution, and HTML reporting
+- **`run_tests.sh`**: Shell script for test execution with colored output
+- **`test_config.json`**: Configuration with test scenarios, thresholds, and environment settings
 
 ### Unit Test Modules
 
@@ -44,6 +44,7 @@ Test suites for validating system functionality, API endpoints, submission flows
 ### Infrastructure Test Modules
 
 - **`test_startup_scripts.py`**: Service startup validation and environment configuration
+- **`test_main_menu.py`**: ScriptMenu class testing (init, validation, execution, navigation, errors, performance)
 - **`test_deployment.py`**: Smart contract deployment and validation
 - **`test_fixtures.py`**: Test data generators and environment management utilities
 
@@ -75,12 +76,13 @@ Test suites for validating system functionality, API endpoints, submission flows
 
 ## Development Guidelines
 
-- Write tests for new functionality
-- Follow test-driven development (TDD)
-- Test both happy paths and error scenarios
+- Write real tests for new functionality (no mocking)
+- Follow test-driven development (TDD) with real dependencies
+- Test both happy paths and error scenarios using real implementations
 - Keep tests maintainable and readable
-- Use appropriate test frameworks
-- Document test usage
+- Use automatic dependency management and service startup
+- Document test dependencies and isolation requirements
+- Never skip tests - ensure dependencies are available or installable
 
 ## Common Patterns
 
