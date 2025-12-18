@@ -37,3 +37,8 @@ The root `.cursorrules` file references these modular rules. When working in spe
 
 
 
+
+
+
+
+

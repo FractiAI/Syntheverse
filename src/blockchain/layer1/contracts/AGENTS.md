@@ -234,3 +234,8 @@ reward = (pod_score / 10000) × epoch_balance × tier_multiplier
 - **Cross-Chain Operations**: Enable multi-blockchain contract deployments</content>
 </xai:function_call name="read_lints">
 <parameter name="target_file">src/blockchain/layer1/contracts/AGENTS.md
+
+
+
+
+

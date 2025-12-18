@@ -44,3 +44,8 @@ See `SYNTH_Pitch.md` for the complete contributor pitch document, including:
 ## Contact
 
 For questions about contributing, contact: info@fractiai.com
+
+
+
+
+

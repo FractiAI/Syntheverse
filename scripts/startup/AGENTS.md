@@ -1,47 +1,41 @@
-# Startup Scripts Agents
+# Startup Scripts
 
 ## Purpose
 
-System startup and service management scripts for orchestrating the complete Syntheverse platform, handling service lifecycle, port management, and dependency validation.
+System startup and service management scripts for orchestrating the Syntheverse platform, handling service lifecycle, port management, and dependency validation.
 
 ## Key Modules
 
 ### Main Startup (`start_servers.py`)
 
-- **Complete System Orchestration**: Starts all Syntheverse services simultaneously
-- **Environment Validation**: Checks required environment variables and dependencies
-- **Port Management**: Intelligent port conflict resolution and cleanup
-- **Service Health Checks**: Validates all services are running and responsive
-- **Error Handling**: Comprehensive error reporting and recovery
-
-### Simplified Startup (`start_servers_simple.py`)
-
-- **Streamlined Orchestration**: Simplified version of main startup script
-- **Reduced Validation**: Minimal dependency checking for faster startup
-- **Port Management**: Same intelligent port handling as main script
-- **Service Monitoring**: Basic service availability checks
-
-### Complete UI Startup (`start_complete_ui.py`)
-
-- **UI-Focused Startup**: Specialized script for UI components
-- **Frontend Priority**: Emphasizes Next.js and web interface startup
-- **API Integration**: Ensures backend APIs are available for frontend
-- **Cross-Service Coordination**: Manages UI-backend service dependencies
-
-### Shell Script (`start_servers.sh`)
-
-- **Shell-Based Startup**: Bash script alternative for system startup
-- **Environment Setup**: Shell environment configuration
-- **Service Sequencing**: Proper startup order for dependent services
-- **Error Propagation**: Shell-compatible error handling
+- Supports full, poc, and minimal startup modes
+- Installs required packages before startup
+- Checks required environment variables and dependencies
+- Port conflict resolution and cleanup
+- Validates all services are running and responsive
+- Error reporting and recovery
 
 ### Port Manager (`port_manager.py`)
 
-- **Shared Port Management**: Intelligent port conflict resolution
-- **Process Detection**: Identifies processes using target ports
-- **System Service Protection**: Avoids killing critical system services
-- **Retry Logic**: Exponential backoff for persistent conflicts
-- **Cross-Platform Support**: Works on macOS, Linux, and Windows
+- Port conflict resolution
+- Identifies processes using target ports
+- Avoids killing critical system services
+- Exponential backoff for persistent conflicts
+- Cross-platform support (macOS, Linux, Windows)
+
+### Anvil Manager (`anvil_manager.py`)
+
+- Starts and manages Foundry Anvil Ethereum node
+- Checks Anvil service status and connectivity
+- Handles Anvil startup, shutdown, and restart
+- Supports custom accounts, gas limits, and block time
+
+### Service Health (`service_health.py`)
+
+- Monitors all Syntheverse services
+- HTTP and RPC endpoint checking
+- Configurable timeout and retry for service availability
+- Health status and diagnostics
 
 ## Integration Points
 
@@ -66,3 +60,5 @@ System startup and service management scripts for orchestrating the complete Syn
 - Environment variable validation
 - Health check implementations
 - Error handling and recovery
+
+

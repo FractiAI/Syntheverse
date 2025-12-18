@@ -47,3 +47,8 @@ API documentation for the Syntheverse system, covering both the RAG API and PoC 
 - Multi-language integration examples (Python, JavaScript, cURL)
 - Configuration and troubleshooting sections
 - Performance and scaling considerations
+
+
+
+
+

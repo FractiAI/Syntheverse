@@ -55,6 +55,3 @@ PoC evaluation and tokenomics system:
 - Direct LLM integration for evaluation
 - File-based state persistence
 - Status-based contribution lifecycle
-
-
-

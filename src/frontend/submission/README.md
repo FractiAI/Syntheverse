@@ -51,5 +51,5 @@ This UI will be developed as a standalone submission interface with:
 ## Related
 
 - [Web UI](../ui_web/README.md) - Full-featured web interface (recommended)
-- [Layer 2](../layer2/README.md) - PoD evaluator backend
-- [PoD Submission System](../docs/POD_SUBMISSION_SYSTEM.md) - Complete submission flow
+- [Layer 2](../layer2/README.md) - PoC evaluator backend
+- [PoC Submission System](../docs/POC_SUBMISSION_SYSTEM.md) - Complete submission flow

@@ -1,0 +1,196 @@
+{
+  "total_embeddings": 50,
+  "similarity_matrix_shape": [
+    50,
+    50
+  ],
+  "distribution_analysis": {
+    "total_similarity_pairs": 1225,
+    "mean_similarity": -0.0025079585746535533,
+    "std_similarity": 0.04944922148418741,
+    "min_similarity": -0.16363289717353371,
+    "max_similarity": 0.16469060376943287,
+    "median_similarity": -0.0038108191428610767,
+    "percentiles": {
+      "p10": -0.06660074145374331,
+      "p25": -0.03668185077710096,
+      "p75": 0.03190940829732055,
+      "p90": 0.06075684606545307,
+      "p95": 0.07886029694772753,
+      "p99": 0.11884770717865756
+    },
+    "distribution_shape": {
+      "skewness": 0.11165955833595127,
+      "kurtosis": -0.058785288625210264
+    },
+    "similarity_categories": {
+      "very_high (>0.9)": 0,
+      "high (0.7-0.9)": 0,
+      "moderate (0.5-0.7)": 0,
+      "low (0.3-0.5)": 0,
+      "very_low (\u22640.3)": 1225
+    },
+    "analysis_timestamp": "2025-12-17T17:52:28.754970"
+  },
+  "most_similar_pairs": [
+    {
+      "index_1": 31,
+      "index_2": 33,
+      "similarity": 0.16469060376943287,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 31 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 31
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 33 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_3.pdf",
+        "chunk_index": 33
+      }
+    },
+    {
+      "index_1": 26,
+      "index_2": 35,
+      "similarity": 0.14958889828366947,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 26 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 26
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 35 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_0.pdf",
+        "chunk_index": 35
+      }
+    },
+    {
+      "index_1": 23,
+      "index_2": 47,
+      "similarity": 0.1424995430719177,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 23 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_3.pdf",
+        "chunk_index": 23
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 47 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_2.pdf",
+        "chunk_index": 47
+      }
+    },
+    {
+      "index_1": 1,
+      "index_2": 31,
+      "similarity": 0.14124116101702888,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 1 containing sample text for embedding analysis and visualization demonstr...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 1
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 31 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 31
+      }
+    },
+    {
+      "index_1": 6,
+      "index_2": 17,
+      "similarity": 0.13982003350202934,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 6 containing sample text for embedding analysis and visualization demonstr...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 6
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 17 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_2.pdf",
+        "chunk_index": 17
+      }
+    }
+  ],
+  "least_similar_pairs": [
+    {
+      "index_1": 7,
+      "index_2": 27,
+      "similarity": -0.16363289717353371,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 7 containing sample text for embedding analysis and visualization demonstr...",
+        "pdf_filename": "test_doc_2.pdf",
+        "chunk_index": 7
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 27 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_2.pdf",
+        "chunk_index": 27
+      }
+    },
+    {
+      "index_1": 45,
+      "index_2": 47,
+      "similarity": -0.15024039397979935,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 45 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_0.pdf",
+        "chunk_index": 45
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 47 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_2.pdf",
+        "chunk_index": 47
+      }
+    },
+    {
+      "index_1": 21,
+      "index_2": 24,
+      "similarity": -0.13424579898096708,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 21 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_1.pdf",
+        "chunk_index": 21
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 24 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_4.pdf",
+        "chunk_index": 24
+      }
+    },
+    {
+      "index_1": 5,
+      "index_2": 39,
+      "similarity": -0.1313664585720693,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 5 containing sample text for embedding analysis and visualization demonstr...",
+        "pdf_filename": "test_doc_0.pdf",
+        "chunk_index": 5
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 39 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_4.pdf",
+        "chunk_index": 39
+      }
+    },
+    {
+      "index_1": 4,
+      "index_2": 33,
+      "similarity": -0.12903227724225805,
+      "chunk_1": {
+        "text_preview": "This is test chunk number 4 containing sample text for embedding analysis and visualization demonstr...",
+        "pdf_filename": "test_doc_4.pdf",
+        "chunk_index": 4
+      },
+      "chunk_2": {
+        "text_preview": "This is test chunk number 33 containing sample text for embedding analysis and visualization demonst...",
+        "pdf_filename": "test_doc_3.pdf",
+        "chunk_index": 33
+      }
+    }
+  ],
+  "duplicate_groups": [],
+  "duplicate_summary": {
+    "total_duplicate_groups": 0,
+    "total_embeddings_in_duplicates": 0,
+    "largest_duplicate_group": 0
+  },
+  "analysis_timestamp": "2025-12-17T17:52:28.755254"
+}

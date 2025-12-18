@@ -1,6 +1,6 @@
 # Layer 1 - Syntheverse Blockchain
 
-Complete blockchain implementation for Proof-of-Discovery (POD) protocol and SYNTH token management with epoch-based distribution and tier rewards.
+Blockchain implementation for Proof-of-Discovery (POD) protocol and SYNTH token management with epoch-based distribution and tier rewards.
 
 ## Status
 
@@ -224,6 +224,6 @@ This will:
 - [ ] Network consensus (multi-node)
 - [ ] P2P networking
 - [ ] Block synchronization
-- [ ] Advanced consensus mechanisms
+- [ ] Consensus mechanisms
 - [ ] Governance voting
 - [ ] Staking mechanisms

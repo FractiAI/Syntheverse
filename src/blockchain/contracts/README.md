@@ -1,6 +1,6 @@
 # Syntheverse Smart Contracts
 
-This directory contains the Solidity smart contracts for the Syntheverse PoC system, designed to deploy on Base Layer 2.
+Solidity smart contracts for the Syntheverse PoC system, designed to deploy on Base Layer 2.
 
 ## 🏗️ Architecture
 
@@ -61,7 +61,7 @@ forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast 
 - **Foundry**: Latest version (`foundryup`)
 - **Solidity**: ^0.8.19
 - **OpenZeppelin**: ^4.9.0
-- **Base Goerli ETH**: For testnet deployment
+- **Base Sepolia ETH**: For testnet deployment
 
 ## 🚀 Quick Start
 

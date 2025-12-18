@@ -2,7 +2,7 @@
 
 ## Overview
 
-Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. This document describes the system architecture and component responsibilities for AI-assisted development.
+Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. This document describes the system architecture and component responsibilities.
 
 ## System Architecture
 
@@ -16,7 +16,7 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 
 ### Source Code (`src/`)
 
-- **`api/`**: API services (PoC API, RAG API)
+- **`api/`**: API services (PoC API, RAG API in `rag_api/`)
 - **`blockchain/`**: Blockchain infrastructure (contracts, Layer 1)
 - **`core/`**: Core business logic (Layer 2 evaluation, tokenomics)
 - **`frontend/`**: Frontend applications (Next.js, legacy Flask)
@@ -46,8 +46,8 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 ### Documentation
 
 - Every folder level must have AGENTS.md and README.md
-- Documentation should be understated and "show not tell"
-- Keep documentation accurate and complete
+- Documentation shows rather than tells
+- Documentation stays current with code changes
 
 ### Integration Points
 
@@ -60,8 +60,5 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 
 - Archive-first evaluation: All contributions stored immediately
 - Multi-metal system: Gold, Silver, Copper qualifications
-- Direct LLM integration: Grok API for evaluations
+- Direct LLM integration: Groq API for evaluations
 - File-based storage: JSON files for persistent state
-
-
-

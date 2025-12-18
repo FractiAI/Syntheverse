@@ -16,6 +16,9 @@ from typing import Dict, List, Any, Optional, Callable
 from datetime import datetime
 import unittest
 
+# Module-level logger for utility functions
+logger = logging.getLogger(__name__)
+
 def retry_test(max_attempts: int = 3, delay: float = 1.0, backoff: float = 2.0,
                exceptions: tuple = (Exception,)):
     """
@@ -83,7 +86,7 @@ def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
     except ImportError:
         pass
 
-    print(f"📦 Installing missing dependency: {package_name}")
+    logger.info(f"Installing missing dependency: {package_name}")
 
     for attempt in range(max_attempts):
         try:
@@ -99,7 +102,7 @@ def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
                 # Try to import again
                 try:
                     __import__(package_name.replace('-', '_'))
-                    print(f"✅ Successfully installed and imported {package_name}")
+                    logger.info(f"Successfully installed and imported {package_name}")
                     return True
                 except ImportError as e:
                     if attempt == max_attempts - 1:
@@ -117,7 +120,7 @@ def ensure_dependency(package_name: str, max_attempts: int = 3) -> bool:
             if attempt == max_attempts - 1:
                 raise RuntimeError(f"Error installing {package_name}: {e}")
 
-        print(f"⚠️ Installation attempt {attempt + 1} failed, retrying...")
+        logger.warning(f"Installation attempt {attempt + 1} failed, retrying...")
 
     return False
 
@@ -149,7 +152,7 @@ def ensure_service_running(service_name: str, startup_command: list = None, heal
         try:
             response = requests.get(health_url, timeout=5)
             if response.status_code == 200:
-                print(f"✅ Service {service_name} is already running and healthy")
+                logger.info(f"Service {service_name} is already running and healthy")
                 return True
         except:
             pass
@@ -158,7 +161,7 @@ def ensure_service_running(service_name: str, startup_command: list = None, heal
     if not startup_command:
         raise RuntimeError(f"Service {service_name} is not running and no startup command provided")
 
-    print(f"🚀 Starting service: {service_name}")
+    logger.info(f"Starting service: {service_name}")
 
     try:
         # Start the service
@@ -179,7 +182,7 @@ def ensure_service_running(service_name: str, startup_command: list = None, heal
                 try:
                     response = requests.get(health_url, timeout=2)
                     if response.status_code == 200:
-                        print(f"✅ Service {service_name} started successfully")
+                        logger.info(f"Service {service_name} started successfully")
                         return True
                 except:
                     pass
@@ -502,7 +505,7 @@ class TestFixtures:
     def ensure_services_running(services_to_check: List[str] = None):
         """Ensure required services are running before tests"""
         if services_to_check is None:
-            services_to_check = ["poc_api", "rag_api", "frontend"]
+            services_to_check = ["poc_api", "frontend"]  # Removed rag_api as it's optional
 
         unavailable = []
 
@@ -885,7 +888,7 @@ class APITestCase(SyntheverseTestCase):
         super().setUp()
 
         # Check service availability for common services
-        services_to_check = ["poc_api", "rag_api", "frontend"]
+        services_to_check = ["poc_api", "frontend"]  # rag_api is optional
         for service in services_to_check:
             url = test_config.get(f"api_urls.{service}")
             if url:

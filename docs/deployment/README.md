@@ -19,8 +19,7 @@ python scripts/startup/start_servers.py
 This starts all services:
 - PoC API (Flask) on http://localhost:5001
 - PoC Frontend (Next.js) on http://localhost:3001
-- Legacy Web UI (Flask) on http://localhost:5000
-- Local Blockchain (Anvil) on http://localhost:8545
+- RAG API (FastAPI) on http://localhost:8000
 
 ## Component Deployment
 
@@ -69,20 +68,11 @@ npm run dev
 
 Available at: http://localhost:3001
 
-#### 3. Legacy Web UI
+#### 3. RAG API
 
 ```bash
-cd src/frontend/web-legacy
-python app.py
-```
-
-Available at: http://localhost:5000
-
-#### 4. RAG API
-
-```bash
-cd src/api/rag-api
-python main.py
+cd src/api/rag-api/api
+python rag_api.py
 ```
 
 Available at: http://localhost:8000

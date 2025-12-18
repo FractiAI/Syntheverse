@@ -28,9 +28,7 @@ export default function SandboxMapNetwork({
     const loadNetwork = async () => {
       try {
         if (typeof window !== 'undefined') {
-          console.log('Loading vis-network...')
           const visNetwork = await import('vis-network/standalone')
-          console.log('vis-network loaded successfully')
           setNetworkLoaded(true)
         }
       } catch (err) {
@@ -44,14 +42,11 @@ export default function SandboxMapNetwork({
 
   useEffect(() => {
     // Only proceed if network is loaded and we have data
-    console.log('Network component useEffect:', { networkLoaded, hasRef: !!networkRef.current, nodeCount: nodes.length })
     if (!networkLoaded || !networkRef.current) {
-      console.log('Skipping network creation - not ready:', { networkLoaded, hasRef: !!networkRef.current })
       return
     }
 
     if (nodes.length === 0) {
-      console.log('No nodes to display')
       return
     }
 
@@ -114,13 +109,8 @@ export default function SandboxMapNetwork({
         }
 
         // Create new network
-        console.log('Creating network with data:', { nodes: data.nodes.length, edges: data.edges.length })
-        console.log('Network options:', options)
-        console.log('Container element:', networkRef.current)
-
         const network = new Network(networkRef.current, data, options)
         networkInstanceRef.current = network
-        console.log('Network created successfully')
 
         // Handle node click
         if (onNodeClick) {
@@ -142,11 +132,7 @@ export default function SandboxMapNetwork({
 
         // Verify the network was created
         setTimeout(() => {
-          console.log('Network verification:', {
-            exists: !!networkInstanceRef.current,
-            container: networkRef.current,
-            canvas: networkRef.current?.querySelector('canvas')
-          })
+          // Network verification completed
         }, 1000)
 
       } catch (error) {

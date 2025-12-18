@@ -73,6 +73,3 @@ server = PoCServer(
 ## Documentation
 
 - [Layer 2 README](layer2/README.md)
-
-
-

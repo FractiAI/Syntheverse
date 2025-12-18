@@ -2,11 +2,11 @@
 
 ## ⚠️ Email Functionality Removed
 
-**Note**: SMTP email functionality has been removed from the Syntheverse PoD system. All evaluation results and reports are now displayed directly in the web UI.
+**Note**: SMTP email functionality has been removed from the Syntheverse PoC system. All evaluation results and reports are now displayed directly in the web UI.
 
 ## Viewing Results
 
-All PoD evaluation results, reports, and certificates are available in the web UI:
+All PoC evaluation results, reports, and certificates are available in the web UI:
 
 1. Go to http://localhost:5000 in your browser
 2. Navigate to the **"📄 Results"** tab
@@ -25,3 +25,7 @@ All PoD evaluation results, reports, and certificates are available in the web U
 You can export reports and certificates as PDFs directly from the web UI:
 - Click the **"📄 View PDF"** button on any submission
 - Download and share reports manually if needed
+
+## Historical Documentation
+
+For historical reference, see `EMAIL_TROUBLESHOOTING.md` for details about the previous email functionality.

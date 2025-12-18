@@ -15,7 +15,7 @@ Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Co
 
 ```
 ┌─────────────────┐
-│  POD Submission │
+│  PoC Submission │
 │       UI        │
 └────────┬────────┘
          │

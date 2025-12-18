@@ -19,7 +19,7 @@ Flask REST API server connecting Next.js frontend to Layer 2 backend.
 
 **Status:** ✅ Operational
 
-### RAG API (`rag-api/`)
+### RAG API (`rag_api/`)
 
 FastAPI server for document processing and RAG queries.
 
@@ -52,7 +52,7 @@ python app.py
 ### RAG API
 
 ```bash
-cd src/api/rag-api/api
+cd src/api/rag_api/api
 pip install -r requirements_api.txt
 export GROQ_API_KEY=your-key
 python rag_api.py
@@ -61,7 +61,7 @@ python rag_api.py
 ## Documentation
 
 - [PoC API README](poc-api/README.md)
-- [RAG API README](rag-api/README.md)
+- [RAG API README](rag_api/README.md)
 
 
 

@@ -1,4 +1,4 @@
-# Deployment Scripts Agents
+# Deployment Scripts
 
 ## Purpose
 
@@ -8,18 +8,18 @@ Smart contract deployment and blockchain management scripts for Syntheverse Laye
 
 ### Contract Deployment (`deploy_contracts.py`)
 
-- **Smart Contract Deployment**: Automated deployment to blockchain networks
-- **Multi-Network Support**: Local Anvil, Base Sepolia, Base Mainnet
-- **Contract Verification**: Automatic verification on block explorers
-- **Address Management**: Storage and tracking of deployed contract addresses
-- **Configuration Management**: Environment variable handling for keys and networks
+- Automated deployment to blockchain networks
+- Local Anvil, Base Sepolia, Base Mainnet support
+- Verification on block explorers
+- Storage and tracking of deployed contract addresses
+- Environment variable handling for keys and networks
 
 ### Deployment Workflow
 
-- **SYNTH Token Deployment**: ERC-20 token contract deployment
-- **POCRegistry Deployment**: Proof-of-Contribution registry contract deployment
-- **Verification Process**: Contract source code verification on Etherscan/BaseScan
-- **Address Storage**: Persistent storage of deployment addresses
+- SYNTH token contract deployment
+- POCRegistry contract deployment
+- Contract verification on Etherscan/BaseScan
+- Deployment address storage
 
 ### Network Configuration
 
@@ -50,3 +50,5 @@ Smart contract deployment and blockchain management scripts for Syntheverse Laye
 - Contract verification processes
 - Environment variable configuration
 - Address management and storage
+
+

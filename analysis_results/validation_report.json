@@ -1,0 +1,99 @@
+{
+  "overall_valid": false,
+  "summary": {
+    "total_embeddings": 50,
+    "checks_run": 5,
+    "failed_checks": 1,
+    "warnings_as_errors": 0,
+    "overall_valid": false
+  },
+  "checks": {
+    "dimensions": {
+      "valid": true,
+      "details": "All 50 embeddings have consistent dimension 384",
+      "dimension": 384
+    },
+    "norms": {
+      "valid": false,
+      "details": ".3f, 50 extreme norms detected",
+      "mean_norm": 19.45422655614414,
+      "std_norm": 0.6729212437972076,
+      "min_norm": 17.77089093698712,
+      "max_norm": 20.58932355647895,
+      "in_range_percentage": 0.1,
+      "extreme_norms_count": 50,
+      "extreme_norms": [
+        [
+          0,
+          19.809305871389707
+        ],
+        [
+          1,
+          20.095062633109688
+        ],
+        [
+          2,
+          18.968554865171978
+        ],
+        [
+          3,
+          18.775464311166704
+        ],
+        [
+          4,
+          19.744055317055246
+        ]
+      ]
+    },
+    "similarity_range": {
+      "valid": true,
+      "details": ".3f",
+      "min_similarity": -0.16363289717353371,
+      "max_similarity": 0.16469060376943287,
+      "mean_similarity": -0.0025079585746535533,
+      "suspicious_count": 0,
+      "sample_size": 50
+    },
+    "outliers": {
+      "outliers": [],
+      "outlier_count": 0,
+      "details": "Detected 0 outliers using iqr method",
+      "method": "iqr",
+      "threshold": 1.5,
+      "total_embeddings": 50
+    },
+    "metadata": {
+      "valid": true,
+      "details": "Metadata validation: All required fields present",
+      "issues": [],
+      "field_completeness": {
+        "text": 1.0,
+        "metadata": 1.0,
+        "chunk_index": 1.0,
+        "pdf_filename": 1.0,
+        "embedding": 1.0
+      },
+      "metadata_fields": [
+        "source",
+        "chunk_index",
+        "word_count"
+      ],
+      "metadata_field_counts": {
+        "source": 50,
+        "chunk_index": 50,
+        "word_count": 50
+      },
+      "empty_texts": 0,
+      "empty_metadata": 0,
+      "total_chunks": 50
+    }
+  },
+  "recommendations": [
+    "Address issues in: norms",
+    "Consider re-generating embeddings if issues persist",
+    "Check embedding model and preprocessing pipeline"
+  ],
+  "validation_timestamp": "2025-12-17T17:56:12.085126",
+  "processing_time_seconds": 0.001582,
+  "strict_mode": false
+}

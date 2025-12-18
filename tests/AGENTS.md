@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Real-only test suites for validating system functionality, API endpoints, submission flows, and integration testing. All tests use real implementations with automatic dependency management and service startup.
+Test suites for validating system functionality, API endpoints, submission flows, and integration testing. Tests use real implementations with dependency management and service startup.
 
 ## Key Modules
 

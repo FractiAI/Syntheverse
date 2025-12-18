@@ -113,7 +113,7 @@ Variable: `self.pod_evaluation_prompt`
 ## Usage
 
 The system prompt is automatically used when:
-- L2 evaluates a POD submission
+- L2 evaluates a PoC submission
 - Direct Grok API call is made for evaluation
 - No manual configuration needed
 - No RAG API dependency required

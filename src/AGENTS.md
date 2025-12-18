@@ -9,7 +9,7 @@ The `src/` directory contains all source code for the Syntheverse system, organi
 ### API Services (`api/`)
 
 - **`poc-api/`**: Flask API server connecting Next.js frontend to Layer 2 backend
-- **`rag-api/`**: FastAPI server for document processing and RAG queries
+- **`rag_api/`**: FastAPI server for document processing and RAG queries
 
 ### Blockchain (`blockchain/`)
 

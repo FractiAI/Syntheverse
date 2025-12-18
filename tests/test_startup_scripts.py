@@ -18,10 +18,6 @@ from unittest.mock import patch, MagicMock, mock_open
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from scripts.startup.start_servers import ServerManager
-from scripts.startup.start_servers_simple import (
-    load_environment, validate_dependencies, start_servers
-)
-from scripts.startup.start_complete_ui import CompleteUIStarter
 from test_framework import SyntheverseTestCase
 
 class TestServerManager(SyntheverseTestCase):
@@ -217,84 +213,6 @@ class TestServerManager(SyntheverseTestCase):
             # Should return empty list or handle gracefully
             self.assertIsInstance(result, list)
 
-class TestSimpleStartupFunctions(SyntheverseTestCase):
-    """Test cases for simple startup functions"""
-
-    def get_category(self):
-        return "startup"
-
-    def setUp(self):
-        """Set up test fixtures"""
-        super().setUp()
-        self.project_root = Path(__file__).parent.parent
-
-    @patch('pathlib.Path.exists')
-    @patch('builtins.open', new_callable=mock_open, read_data="GROQ_API_KEY=gsk_test_key\n")
-    def test_load_environment_simple_success(self, mock_file, mock_exists):
-        """Test load_environment function from simple startup"""
-        mock_exists.return_value = True
-
-        result = load_environment(self.project_root, self.logger)
-
-        self.assertTrue(result)
-
-    @patch('pathlib.Path.exists')
-    def test_validate_dependencies_simple_success(self, mock_exists):
-        """Test validate_dependencies function from simple startup"""
-        mock_exists.return_value = True
-
-        with patch.dict('sys.modules', {
-            'flask': MagicMock(),
-            'flask_cors': MagicMock(),
-            'werkzeug': MagicMock(),
-            'requests': MagicMock()
-        }):
-            with patch('subprocess.run') as mock_run:
-                mock_run.return_value = MagicMock(returncode=0, stdout="Node.js v18.0.0\n")
-                result = validate_dependencies(self.project_root, self.logger)
-
-        self.assertTrue(result)
-
-class TestCompleteUIStarter(SyntheverseTestCase):
-    """Test cases for CompleteUIStarter class"""
-
-    def get_category(self):
-        return "startup"
-
-    def setUp(self):
-        """Set up test fixtures"""
-        super().setUp()
-        self.starter = CompleteUIStarter()
-        # Override project root for testing
-        self.starter.project_root = Path(__file__).parent.parent
-
-    @patch('pathlib.Path.exists')
-    @patch('builtins.open', new_callable=mock_open, read_data="GROQ_API_KEY=gsk_test_key\n")
-    def test_load_environment_complete_success(self, mock_file, mock_exists):
-        """Test environment loading in CompleteUIStarter"""
-        mock_exists.return_value = True
-
-        result = self.starter.load_environment()
-
-        self.assertTrue(result)
-
-    @patch('pathlib.Path.exists')
-    @patch('pathlib.Path.__truediv__')
-    def test_validate_dependencies_complete_success(self, mock_truediv, mock_exists):
-        """Test dependency validation in CompleteUIStarter"""
-        mock_exists.return_value = True
-
-        with patch.dict('sys.modules', {
-            'flask': MagicMock(),
-            'flask_cors': MagicMock(),
-            'werkzeug': MagicMock(),
-            'requests': MagicMock()
-        }):
-            with patch('subprocess.run') as mock_run:
-                mock_run.return_value = MagicMock(returncode=0, stdout="Node.js v18.0.0\n")
-                result = self.starter.validate_dependencies()
-
-        self.assertTrue(result)
 
 class TestStartupIntegration(SyntheverseTestCase):
     """Integration tests for startup scripts"""
@@ -315,39 +233,6 @@ class TestStartupIntegration(SyntheverseTestCase):
         self.assertIsNotNone(manager.port_manager)
         self.assertIsNotNone(manager.logger)
 
-    @patch('pathlib.Path.exists')
-    @patch('builtins.open', new_callable=mock_open, read_data="GROQ_API_KEY=gsk_test_key\n")
-    @patch('subprocess.run')
-    def test_complete_ui_starter_initialization(self, mock_run, mock_file, mock_exists):
-        """Test that CompleteUIStarter initializes correctly"""
-        mock_exists.return_value = True
-
-        starter = CompleteUIStarter()
-
-        # Should have port manager initialized
-        self.assertIsNotNone(starter.port_manager)
-        self.assertIsNotNone(starter.logger)
-
-    @patch('scripts.startup.start_servers_simple.load_environment')
-    @patch('scripts.startup.start_servers_simple.validate_dependencies')
-    def test_simple_startup_validation_chain(self, mock_validate_deps, mock_load_env):
-        """Test the validation chain in simple startup"""
-        mock_load_env.return_value = True
-        mock_validate_deps.return_value = True
-
-        # This would normally start servers, but we're just testing the validation
-        with patch('scripts.startup.start_servers_simple.start_server_process') as mock_start:
-            mock_start.return_value = MagicMock()
-
-            with patch('scripts.startup.start_servers_simple.cleanup_processes'):
-                with patch('time.sleep'):
-                    # Should not raise exceptions during validation
-                    try:
-                        # Just test that the function exists and can be called
-                        # (without actually running the full startup)
-                        pass
-                    except Exception as e:
-                        self.fail(f"Simple startup validation failed: {e}")
 
 class TestStartupErrorHandling(SyntheverseTestCase):
     """Test error handling in startup scripts"""

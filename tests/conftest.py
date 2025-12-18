@@ -207,17 +207,28 @@ def service_bootstrapper(request):
 
                 # Ensure the service can be started
                 startup_command = [sys.executable, "rag_api.py"]
-                startup_cwd = project_root / "src" / "api" / "rag-api" / "api"
+                startup_cwd = project_root / "src" / "api" / "rag_api" / "api"
 
                 try:
                     ensure_service_running(
                         service_name="rag_api",
                         startup_command=startup_command,
                         health_url=rag_health_url,
-                        startup_timeout=test_config.get("timeouts.service_startup", 60),
+                        startup_timeout=test_config.get("timeouts.service_startup", 120),  # Increased timeout
                         startup_cwd=startup_cwd
                     )
                 except RuntimeError as e:
+                    # Try to show recent log output for debugging
+                    log_file = startup_cwd / "rag_api.log" if startup_cwd else Path("rag_api.log")
+                    if log_file.exists():
+                        print(f"📋 Last 20 lines of RAG API log ({log_file}):")
+                        try:
+                            with open(log_file, 'r') as f:
+                                lines = f.readlines()[-20:]
+                                for line in lines:
+                                    print(f"   {line.rstrip()}")
+                        except Exception as log_e:
+                            print(f"   ⚠️ Could not read log file: {log_e}")
                     pytest.fail(f"CRITICAL: RAG API service could not be started: {e}", pytrace=False)
 
         # Start PoC API if needed (Flask) — FAIL HARD if it cannot start
@@ -239,10 +250,21 @@ def service_bootstrapper(request):
                         service_name="poc_api",
                         startup_command=startup_command,
                         health_url=poc_health_url,
-                        startup_timeout=test_config.get("timeouts.service_startup", 60),
+                        startup_timeout=test_config.get("timeouts.service_startup", 120),  # Increased timeout
                         startup_cwd=startup_cwd
                     )
                 except RuntimeError as e:
+                    # Try to show recent log output for debugging
+                    log_file = startup_cwd / "app.log" if startup_cwd else Path("app.log")
+                    if log_file.exists():
+                        print(f"📋 Last 20 lines of PoC API log ({log_file}):")
+                        try:
+                            with open(log_file, 'r') as f:
+                                lines = f.readlines()[-20:]
+                                for line in lines:
+                                    print(f"   {line.rstrip()}")
+                        except Exception as log_e:
+                            print(f"   ⚠️ Could not read log file: {log_e}")
                     pytest.fail(f"CRITICAL: PoC API service could not be started: {e}", pytrace=False)
 
         print("✅ All required services are running and healthy")

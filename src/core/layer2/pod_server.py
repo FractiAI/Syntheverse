@@ -12,17 +12,13 @@ from typing import Dict, Optional, List, Callable
 from datetime import datetime
 from pathlib import Path
 
-# Try to load .env file if python-dotenv is available
-try:
-    from dotenv import load_dotenv
-    # Load .env from project root (go up three levels from layer2/)
-    env_path = Path(__file__).parent.parent.parent / ".env"
-    if env_path.exists():
-        load_dotenv(env_path)
-except ImportError:
-    pass  # python-dotenv not installed, rely on system environment variables
+# Set up logger
+logger = logging.getLogger(__name__)
 
 from .tokenomics_state import TokenomicsState, Epoch, ContributionTier
+
+# Load GROQ_API_KEY using centralized utility
+from ..utils import load_groq_api_key
 
 # Set up logger
 logger = logging.getLogger(__name__)
@@ -49,8 +45,7 @@ class PODServer:
             tokenomics_state_file: Path to tokenomics state file
         """
         # Initialize Grok API client
-        import os as os_module
-        self.groq_api_key = groq_api_key or os_module.getenv("GROQ_API_KEY")
+        self.groq_api_key = groq_api_key or load_groq_api_key()
         if not self.groq_api_key:
             raise ValueError(
                 "Groq API key not provided. Set GROQ_API_KEY environment variable or pass groq_api_key parameter."

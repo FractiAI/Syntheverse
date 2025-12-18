@@ -3,6 +3,7 @@ Syntheverse Blockchain Node
 Full node implementation with consensus and contract integration.
 """
 
+import logging
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
@@ -12,6 +13,9 @@ from .blockchain import Blockchain, Transaction, TransactionType, Block
 from .contracts.poc_contract import POCContract
 from .contracts.synth_token import SYNTHToken
 from .epoch_manager import EpochManager
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 
 class SyntheverseNode:
@@ -227,7 +231,7 @@ class SyntheverseNode:
             with open(pod_file, "w") as f:
                 json.dump(pod_data, f, indent=2, default=str)
         except Exception as e:
-            print(f"Warning: Failed to save state: {e}")
+            logger.warning(f"Failed to save state: {e}")
     
     def _load_state(self):
         """Load blockchain and contract state from disk."""

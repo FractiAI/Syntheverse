@@ -10,7 +10,6 @@ Configuration files and documentation for environment setup, wallet configuratio
 
 - **`SETUP_GROQ.md`**: Groq API key setup instructions
 - **`GET_GROQ_KEY.md`**: How to obtain Groq API key
-- **`EMAIL_TROUBLESHOOTING.md`**: Email configuration troubleshooting
 
 ### Wallet (`wallet/`)
 
@@ -37,6 +36,8 @@ Configuration files and documentation for environment setup, wallet configuratio
 - Setup guides for external services
 - Wallet configuration for blockchain
 - Network configuration for different environments
+
+
 
 
 

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Syntheverse PoC system represents a paradigm shift from the original Proof-of-Discovery (PoD) model to a unified Proof-of-Contribution (PoC) framework. This upgrade introduces archive-first evaluation, multi-metal contributions, and sophisticated visualization tools to maximize contribution enrichment while minimizing redundancy.
+The Syntheverse PoC system builds on the original Proof-of-Discovery (PoD) model with a unified Proof-of-Contribution (PoC) framework. The system uses archive-first evaluation, multi-metal contributions, and visualization tools for contribution assessment and redundancy management.
 
 ## Core Architecture
 

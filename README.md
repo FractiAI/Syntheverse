@@ -1,6 +1,6 @@
 # Syntheverse PoC System
 
-Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. This repository contains the complete PoC test program with multi-metal evaluation, interactive sandbox mapping, and blockchain integration.
+Syntheverse is a hydrogen-holographic fractal blockchain game with a Proof-of-Contribution (PoC) system. This repository contains the PoC test program with multi-metal evaluation, interactive sandbox mapping, and blockchain integration.
 
 ## Quick Start
 
@@ -46,10 +46,10 @@ Access the system:
 - Token allocation based on structural impact
 
 ### Interactive Components
-- Real-time sandbox map with 16 knowledge dimensions
-- Contribution registry with chronological timeline
-- Live dashboard with system statistics
-- Multi-metal visualization
+- Sandbox map with 16 knowledge dimensions updates in real-time
+- Contribution registry shows chronological timeline
+- Dashboard shows system statistics
+- Visualization shows metals: Gold, Silver, Copper
 
 ### Blockchain Integration
 - SYNTH token contracts on Base Layer 2
@@ -66,7 +66,7 @@ Access the system:
 
 ## Development
 
-Each component has its own README with setup instructions. See `docs/` for comprehensive documentation.
+Each component has its own README with setup instructions. See `docs/` for documentation.
 
 ## Testing
 

@@ -180,6 +180,27 @@ console.log(data.answer);
 
 ## Configuration
 
+### Environment Setup
+
+Before running the RAG API, set up your environment:
+
+1. **Create .env file** in project root:
+```bash
+# In project root directory
+echo "GROQ_API_KEY=gsk_your-groq-api-key-here" > .env
+```
+
+2. **Get Groq API Key**:
+   - Visit https://console.groq.com/
+   - Sign up (free)
+   - Create API key
+   - Copy the key (starts with `gsk_`)
+
+3. **Verify setup**:
+```bash
+python -c "from src.core.utils import load_groq_api_key; print('✓' if load_groq_api_key() else '✗')"
+```
+
 ### Embedding Model
 
 The API uses `all-MiniLM-L6-v2` by default. To change:

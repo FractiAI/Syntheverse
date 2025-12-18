@@ -49,3 +49,8 @@ Each JSON file contains an array of chunk objects:
 - RAG API automatically loads all `*.json` files at startup
 - Test framework uses seed corpus for integration tests
 - Generated embeddings are excluded from version control
+
+
+
+
+

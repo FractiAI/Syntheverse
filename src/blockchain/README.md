@@ -14,7 +14,7 @@ Solidity contracts deployed on Base Layer 2:
 
 **Technology:** Foundry + Anvil (development), Hardhat (deployment)
 
-**Status:** ✅ Under Development
+**Status:** Development in progress
 
 ### Layer 1 (`layer1/`)
 
@@ -24,7 +24,7 @@ Python implementation of blockchain logic:
 - Node implementation with mining
 - Contract interfaces
 
-**Status:** ✅ Implemented
+**Status:** Implemented
 
 ## Architecture
 
@@ -71,6 +71,3 @@ forge script script/Deploy.s.sol --rpc-url https://sepolia.base.org --broadcast 
 
 - [Smart Contracts README](contracts/README.md)
 - [Layer 1 README](layer1/README.md)
-
-
-

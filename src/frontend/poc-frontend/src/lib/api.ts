@@ -2,6 +2,12 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'
 
+interface RetryOptions {
+  maxRetries?: number
+  delayMs?: number
+  backoffMultiplier?: number
+}
+
 export interface Contribution {
   submission_hash: string
   title: string
@@ -122,20 +128,44 @@ class PoCApi {
     this.baseUrl = baseUrl
   }
 
-  private async fetch(endpoint: string, options?: RequestInit) {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    })
+  private async fetch(endpoint: string, options?: RequestInit, retryOptions?: RetryOptions) {
+    const { maxRetries = 2, delayMs = 1000, backoffMultiplier = 1.5 } = retryOptions || {}
+    let lastError: Error
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`)
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(`${this.baseUrl}${endpoint}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+          },
+        })
+
+        if (!response.ok) {
+          // Only retry on server errors (5xx) or network errors, not client errors (4xx)
+          if (response.status >= 500 || response.status === 0) {
+            if (attempt < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, delayMs * Math.pow(backoffMultiplier, attempt)))
+              continue
+            }
+          }
+          throw new Error(`API error: ${response.status} ${response.statusText}`)
+        }
+
+        return response.json()
+      } catch (error) {
+        lastError = error as Error
+        if (attempt < maxRetries && (error as Error).message.includes('fetch')) {
+          // Retry on network errors
+          await new Promise(resolve => setTimeout(resolve, delayMs * Math.pow(backoffMultiplier, attempt)))
+          continue
+        }
+        break
+      }
     }
 
-    return response.json()
+    throw lastError
   }
 
   // Archive operations

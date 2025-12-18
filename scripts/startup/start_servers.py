@@ -11,7 +11,11 @@ import signal
 import subprocess
 import webbrowser
 import logging
+import argparse
 from pathlib import Path
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 # Import port management module
 try:
@@ -21,17 +25,42 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from port_manager import PortManager, free_port
 
+# Import dependency installer
+try:
+    from ..utilities.install_deps import auto_install_dependencies
+except ImportError:
+    # Fallback for direct execution
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'utilities'))
+    from install_deps import auto_install_dependencies
+
 class ServerManager:
-    def __init__(self):
+    def __init__(self, mode: str = 'full'):
+        """
+        Initialize server manager with different startup modes.
+
+        Args:
+            mode: Startup mode - 'full' (all services), 'poc' (PoC system only), 'minimal' (PoC API only)
+        """
+        self.mode = mode
         self.project_root = Path(__file__).parent.parent.parent
         self.processes = []
-        self.ports = {
-            'web_ui': 5000,      # Legacy Flask web UI
+
+        # Define ports based on mode
+        base_ports = {
             'poc_api': 5001,     # PoC API
             'rag_api': 8000,     # RAG API (FastAPI)
             'frontend': 3001,    # Next.js frontend
             'demo': 8999         # Demo port (moved to avoid conflict)
         }
+
+        if mode == 'poc':
+            # PoC system only: API + Frontend
+            self.ports = {k: v for k, v in base_ports.items() if k in ['poc_api', 'frontend']}
+        elif mode == 'minimal':
+            # Minimal mode: PoC API only
+            self.ports = {k: v for k, v in base_ports.items() if k in ['poc_api']}
+        else:  # 'full' mode
+            self.ports = base_ports
 
         # Set up logging
         self.logger = logging.getLogger(__name__)
@@ -171,7 +200,6 @@ class ServerManager:
         # Check required Python files exist
         required_files = [
             ("PoC API", self.project_root / "src" / "api" / "poc-api" / "app.py"),
-            ("Legacy Web UI", self.project_root / "src" / "frontend" / "web-legacy" / "app.py"),
         ]
 
         for service_name, file_path in required_files:
@@ -334,7 +362,7 @@ class ServerManager:
                 stdout, stderr = process.communicate()
                 self.print_status(f"{name} failed to start", "❌")
                 if stderr:
-                    print(f"Error: {stderr.decode()[:200]}...")
+                    logger.error(f"Service startup error: {stderr.decode()[:200]}...")
                 return False
 
         except Exception as e:
@@ -400,8 +428,6 @@ class ServerManager:
                     (f"http://127.0.0.1:{self.ports['rag_api']}/health", "RAG API health endpoint"),
                     (f"http://127.0.0.1:{self.ports['rag_api']}/", "RAG API root")
                 ]
-            elif "Web UI" in service:
-                urls = [(f"http://127.0.0.1:{self.ports['web_ui']}/", "Web UI")]
             elif "Next.js" in service:
                 urls = [(f"http://127.0.0.1:{self.ports['frontend']}/", "Next.js UI")]
             else:
@@ -469,7 +495,15 @@ class ServerManager:
             return
 
         print("\n" + "="*50)
-        self.print_status("Step 0.5: Validating dependencies...", "ℹ️")
+        self.print_status("Step 0.5: Installing dependencies...", "ℹ️")
+
+        # Auto-install dependencies
+        if not auto_install_dependencies():
+            self.print_status("Dependency installation failed. Please resolve issues above.", "❌")
+            return
+
+        print("\n" + "="*50)
+        self.print_status("Step 0.6: Validating dependencies...", "ℹ️")
 
         # Validate dependencies
         if not self.validate_dependencies():
@@ -480,8 +514,7 @@ class ServerManager:
         self.print_status("Step 1: Cleaning up existing processes...", "ℹ️")
 
         # Kill existing processes
-        for port, name in [("Web UI", self.ports['web_ui']),
-                          ("PoC API", self.ports['poc_api']),
+        for port, name in [("PoC API", self.ports['poc_api']),
                           ("Next.js Frontend", self.ports['frontend']),
                           ("Demo", self.ports['demo'])]:
             self.kill_process_on_port(port, name)
@@ -490,8 +523,6 @@ class ServerManager:
         self.print_status("Step 2: Checking port availability...", "ℹ️")
 
         # Check port availability (with force cleanup)
-        if not self.check_port_available(self.ports['web_ui'], "Web UI", force_cleanup=True):
-            return
         if not self.check_port_available(self.ports['poc_api'], "PoC API", force_cleanup=True):
             return
         if not self.check_port_available(self.ports['frontend'], "Next.js Frontend", force_cleanup=True):
@@ -512,10 +543,6 @@ class ServerManager:
         if self.start_rag_api():
             servers_started.append("RAG API")
 
-        # Start Web UI (legacy)
-        web_ui_cmd = f"{sys.executable} src/frontend/web-legacy/app.py"
-        if self.start_server(web_ui_cmd, "Web UI Server (Legacy)", self.ports['web_ui']):
-            servers_started.append("Web UI")
 
         # Start Next.js Frontend
         frontend_dir = self.project_root / "src" / "frontend" / "poc-frontend"
@@ -537,9 +564,7 @@ class ServerManager:
                 print("=" * 40)
 
                 for service in ready_services:
-                    if "Web UI" in service:
-                        self.print_status(f"Web UI (Legacy): http://127.0.0.1:{self.ports['web_ui']}", "✅")
-                    elif "PoC API" in service:
+                    if "PoC API" in service:
                         self.print_status(f"PoC API:         http://127.0.0.1:{self.ports['poc_api']}", "✅")
                         self.print_status(f"API Health:      http://127.0.0.1:{self.ports['poc_api']}/health", "✅")
                     elif "RAG API" in service:
@@ -551,7 +576,6 @@ class ServerManager:
                 self.print_status("⚠️ Services started but some may not be responding yet", "⚠️")
                 print("\n🌐 SYNTHVERSE SERVERS ATTEMPTED:")
                 print("=" * 40)
-                self.print_status(f"Web UI (Legacy): http://127.0.0.1:{self.ports['web_ui']}", "ℹ️")
                 self.print_status(f"PoC API:         http://127.0.0.1:{self.ports['poc_api']}", "ℹ️")
                 if "RAG API" in servers_started:
                     self.print_status(f"RAG API:         http://127.0.0.1:{self.ports['rag_api']}", "ℹ️")
@@ -564,8 +588,8 @@ class ServerManager:
             print("1. Open your browser")
             if "Next.js Frontend" in servers_started:
                 print(f"2. Go to: http://127.0.0.1:{self.ports['frontend']} (Next.js UI)")
-            else:
-                print(f"2. Go to: http://127.0.0.1:{self.ports['web_ui']} (Legacy UI)")
+            elif "PoC API" in servers_started:
+                print(f"2. Go to: http://127.0.0.1:{self.ports['poc_api']} (PoC API)")
             print("3. Upload PDFs and test the PoC evaluation system!")
             print("\nPress Ctrl+C to stop all servers...")
 
@@ -573,8 +597,8 @@ class ServerManager:
             try:
                 if "Next.js Frontend" in servers_started:
                     webbrowser.open(f"http://127.0.0.1:{self.ports['frontend']}")
-                else:
-                    webbrowser.open(f"http://127.0.0.1:{self.ports['web_ui']}")
+                elif "PoC API" in servers_started:
+                    webbrowser.open(f"http://127.0.0.1:{self.ports['poc_api']}")
             except:
                 pass
 
@@ -600,8 +624,20 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    # Run server manager
-    manager = ServerManager()
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Start Syntheverse services')
+    parser.add_argument('--mode', choices=['full', 'poc', 'minimal'],
+                       default='full',
+                       help='Startup mode: full (all services), poc (PoC system only), minimal (PoC API only)')
+    parser.add_argument('--no-browser', action='store_true',
+                       help='Do not open browser automatically')
+
+    args = parser.parse_args()
+
+    # Run server manager with specified mode
+    manager = ServerManager(mode=args.mode)
+    if hasattr(manager, 'auto_open_browser'):
+        manager.auto_open_browser = not args.no_browser
     manager.main()
 
 if __name__ == "__main__":

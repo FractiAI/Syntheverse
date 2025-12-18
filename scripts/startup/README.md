@@ -6,30 +6,30 @@ Scripts to start the complete Syntheverse system, orchestrating all services and
 
 ## Scripts
 
-- **`start_servers.py`**: Main startup script for complete system
-- **`start_servers_simple.py`**: Simplified startup script
-- **`start_complete_ui.py`**: Complete UI startup script
-- **`start_servers.sh`**: Shell script for starting servers
-- **`port_manager.py`**: Shared port management module for all scripts
+- **`start_servers.py`**: Main startup script with multiple modes
+  - `full`: All services (default)
+  - `poc`: PoC API + Frontend
+  - `minimal`: PoC API only
+- **`port_manager.py`**: Port conflict resolution and management
+- **`anvil_manager.py`**: Anvil blockchain node management
+- **`service_health.py`**: Service health monitoring
 
 ## Usage
 
-### Main Startup
+### Startup with Different Modes
 
 ```bash
+# Start all services (default)
 python scripts/startup/start_servers.py
-```
 
-### Simple Startup
+# Start only PoC system (API + Frontend)
+python scripts/startup/start_servers.py --mode poc
 
-```bash
-python scripts/startup/start_servers_simple.py
-```
+# Start minimal system (PoC API only)
+python scripts/startup/start_servers.py --mode minimal
 
-### Shell Script
-
-```bash
-./scripts/startup/start_servers.sh
+# Start without opening browser
+python scripts/startup/start_servers.py --no-browser
 ```
 
 ## Services Started
@@ -265,14 +265,14 @@ To use different ports, modify the `ports` dictionary in the startup scripts.
 
 ## Integration
 
-- **Orchestrates all system services**: Manages Flask API, Next.js frontend, and legacy UI
-- **Intelligent port management**: Shared `port_manager.py` handles conflicts across all scripts
-- **Service lifecycle management**: Graceful startup, monitoring, and shutdown
-- **Enhanced error handling**: Comprehensive logging and actionable error messages
-- **Health checks with retry logic**: Exponential backoff for service availability
-- **Dependency validation**: Pre-flight checks prevent startup failures
-- **Cross-platform compatibility**: Works on macOS, Linux, and Windows
-- **Comprehensive testing**: Full test coverage for reliability
+- Orchestrates system services: Manages Flask API, Next.js frontend, and RAG API
+- Port management: Shared `port_manager.py` handles conflicts across all scripts
+- Service lifecycle management: Startup, monitoring, and shutdown
+- Error handling: Logging and actionable error messages
+- Health checks with retry logic: Exponential backoff for service availability
+- Dependency validation: Pre-flight checks prevent startup failures
+- Cross-platform compatibility: Works on macOS, Linux, and Windows
+- Testing: Test coverage for reliability
 
 ## Development
 

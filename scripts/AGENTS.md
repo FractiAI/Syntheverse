@@ -1,4 +1,4 @@
-# Scripts Agents
+# Scripts
 
 ## Purpose
 
@@ -6,22 +6,27 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 
 ## Key Modules
 
+### Main Menu (`main.py`)
+
+- **`main.py`**: Central menu-based runner for all scripts
+  - Organized by category (startup, development, deployment, utilities)
+  - Interactive menu system with descriptions
+  - Supports both Python and shell script execution
+  - Error handling and script validation
+
 ### Startup (`startup/`)
 
-- **`start_servers.py`**: Main startup script for system
-- **`start_servers_simple.py`**: Simplified startup script
-- **`start_complete_ui.py`**: UI startup script
-- **`start_servers.sh`**: Shell script for starting servers
+- **`start_servers.py`**: System startup script with multiple modes
+  - Full mode: All services (default)
+  - PoC mode: API + Frontend only
+  - Minimal mode: API only
 
 ### Development (`development/`)
 
-- **`start_poc_ui.sh`**: Start PoC UI development environment (Next.js frontend + PoC API)
-- **`stop_poc_ui.sh`**: Stop PoC UI services
-- **`start_all_services.sh`**: Start all system services (RAG API + Legacy Web UI)
-- **`stop_all_services.sh`**: Stop all system services
-- **`submit_pod.py`**: Submit PoD for testing (legacy PoD system)
-- **`ui_pod_submission.py`**: UI for PoD submission (legacy PoD system)
-- **`Syntheverse.sh`**: Main Syntheverse startup script (Legacy Web UI)
+- **`manage_services.sh`**: Unified service manager
+  - Start/stop PoC services (API + Frontend)
+  - Start/stop all services (RAG API)
+  - Service status and restart functionality
 
 ### Deployment (`deployment/`)
 
@@ -29,7 +34,8 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 
 ### Utilities (`utilities/`)
 
-- **`clear_persistent_memory.py`**: Clear test data and reset system state
+- **`install_deps.py`**: Install system dependencies
+- **`clear_state.py`**: Clear system state files
 
 ## Integration Points
 
@@ -57,5 +63,5 @@ Scripts for development, deployment, startup, and maintenance of the Syntheverse
 - Service health checks
 - Cleanup and maintenance operations
 - Path resolution: Scripts use `PROJECT_ROOT` variable to navigate to project root
-- Port management: Frontend (3001), PoC API (5001), Legacy Web UI (5000), RAG API (8000)
+- Port management: Frontend (3001), PoC API (5001), RAG API (8000)
 

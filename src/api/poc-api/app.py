@@ -5,6 +5,7 @@ Flask API server that connects the Next.js frontend to the PoC backend.
 
 import os
 import sys
+import logging
 from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -25,6 +26,12 @@ base_dir = project_root
 from layer2.poc_server import PoCServer
 from layer2.poc_archive import ContributionStatus, MetalType
 from layer2.tokenomics_state import Epoch
+
+# Load GROQ_API_KEY using centralized utility
+from core.utils import load_groq_api_key
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 # Blockchain Integration Setup
 try:
@@ -61,22 +68,22 @@ try:
         # Test connection to blockchain
         if w3.is_connected():
             blockchain_enabled = True
-            print("✅ Blockchain integration enabled - Connected to Anvil")
-            print(f"   SYNTH Contract: {synth_address}")
-            print(f"   POCRegistry Contract: {poc_registry_address}")
+            logger.info("Blockchain integration enabled - Connected to Anvil")
+            logger.info(f"SYNTH Contract: {synth_address}")
+            logger.info(f"POCRegistry Contract: {poc_registry_address}")
         else:
             blockchain_enabled = False
-            print("⚠️  Blockchain not connected - using simulation mode")
-            print("   Start Anvil: cd contracts && anvil")
-            print("   Deploy contracts: python3 deploy_contracts.py")
+            logger.warning("Blockchain not connected - using simulation mode")
+            logger.info("Start Anvil: cd contracts && anvil")
+            logger.info("Deploy contracts: python3 deploy_contracts.py")
     else:
-        print("⚠️  Blockchain contracts not found - using simulation mode")
+        logger.warning("Blockchain contracts not found - using simulation mode")
         blockchain_enabled = False
         synth_contract = None
         poc_registry_contract = None
 
 except ImportError:
-    print("⚠️  web3 not installed - blockchain features disabled")
+    logger.warning("web3 not installed - blockchain features disabled")
     w3 = None
     blockchain_enabled = False
     synth_contract = None
@@ -181,7 +188,7 @@ try:
     from pdf_generator import PODPDFGenerator
     pdf_generator_available = True
 except ImportError:
-    print("⚠️  PDF generator not available (reportlab not installed)")
+    logger.warning("PDF generator not available (reportlab not installed)")
     PODPDFGenerator = None
     pdf_generator_available = False
 
@@ -192,40 +199,40 @@ CORS(app)  # Enable CORS for Next.js frontend
 app.config['FLASK_SKIP_DOTENV'] = True
 
 # Initialize PoC Server
-print("Starting PoC API server initialization...")
+logger.info("Starting PoC API server initialization...")
 try:
     # Use absolute paths for consistent file locations
     base_dir = Path(__file__).parent.parent.parent  # Project root
-    groq_key = os.getenv('GROQ_API_KEY')
+    groq_key = load_groq_api_key()
 
-    print(f"Environment check - GROQ_API_KEY: {'set' if groq_key else 'NOT SET'}")
+    logger.info(f"Environment check - GROQ_API_KEY: {'set' if groq_key else 'NOT SET'}")
     if groq_key:
-        print(f"GROQ key starts with: {groq_key[:15]}...")
+        logger.debug(f"GROQ key starts with: {groq_key[:15]}...")
     else:
-        print("No GROQ_API_KEY found in environment")
+        logger.warning("No GROQ_API_KEY found in environment")
 
-    print(f"Initializing PoC Server...")
+    logger.info("Initializing PoC Server...")
     poc_server = PoCServer(
         groq_api_key=groq_key,
         output_dir=str(base_dir / "test_outputs" / "poc_reports"),
         tokenomics_state_file=str(base_dir / "test_outputs" / "l2_tokenomics_state.json"),
         archive_file=str(base_dir / "test_outputs" / "poc_archive.json")
     )
-    print(f"📁 Archive file path: {base_dir / 'test_outputs' / 'poc_archive.json'}")
-    print(f"📁 Archive file exists: {(base_dir / 'test_outputs' / 'poc_archive.json').exists()}")
-    print("✓ PoC Server initialized successfully")
+    logger.info(f"Archive file path: {base_dir / 'test_outputs' / 'poc_archive.json'}")
+    logger.info(f"Archive file exists: {(base_dir / 'test_outputs' / 'poc_archive.json').exists()}")
+    logger.info("PoC Server initialized successfully")
 except Exception as e:
-    print(f"⚠️  Warning: Failed to initialize PoC Server: {e}")
-    print("   Some endpoints may not work until GROQ_API_KEY is set")
+    logger.warning(f"Failed to initialize PoC Server: {e}")
+    logger.warning("Some endpoints may not work until GROQ_API_KEY is set")
     poc_server = None
 
 # Initialize PDF Generator
 if pdf_generator_available:
     try:
         pdf_generator = PODPDFGenerator(output_dir=str(base_dir / "ui_web" / "test_outputs" / "pdf_reports"))
-        print("✓ PDF Generator initialized successfully")
+        logger.info("PDF Generator initialized successfully")
     except Exception as e:
-        print(f"⚠️  Warning: Failed to initialize PDF Generator: {e}")
+        logger.warning(f"Failed to initialize PDF Generator: {e}")
         pdf_generator = None
         pdf_generator_available = False
 else:
@@ -1254,9 +1261,9 @@ def health():
 
 
 if __name__ == '__main__':
-    print("Starting PoC API Server...")
-    print("API will be available at: http://localhost:5001")
-    print("Make sure GROQ_API_KEY is set in environment")
+    logger.info("Starting PoC API Server...")
+    logger.info("API will be available at: http://localhost:5001")
+    logger.info("Make sure GROQ_API_KEY is set in environment")
     # Debug/reloader should be off by default (test runners spawn processes and expect stable PIDs).
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
     app.run(host='0.0.0.0', port=5001, debug=debug)

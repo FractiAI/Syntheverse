@@ -1,15 +1,15 @@
 # Syntheverse Test Wallet Setup
 
 ## Overview
-This guide helps you set up a test wallet for the Syntheverse PoC system on Base Goerli testnet.
+This guide helps you set up a test wallet for the Syntheverse PoC system on Base Sepolia testnet.
 
 ## Prerequisites
 - MetaMask browser extension or Coinbase Wallet mobile app
 - Internet connection
 
-## Base Goerli Testnet Setup
+## Base Sepolia Testnet Setup
 
-### 1. Add Base Goerli Network to MetaMask
+### 1. Add Base Sepolia Network to MetaMask
 
 **Manual Configuration:**
 - Open MetaMask
@@ -19,23 +19,23 @@ This guide helps you set up a test wallet for the Syntheverse PoC system on Base
 
 **Network Details:**
 ```
-Network Name: Base Goerli
-RPC URL: https://goerli.base.org
-Chain ID: 84531
+Network Name: Base Sepolia
+RPC URL: https://sepolia.base.org
+Chain ID: 84532
 Currency Symbol: ETH
-Block Explorer: https://goerli.basescan.org/
+Block Explorer: https://sepolia.basescan.org/
 ```
 
 ### 2. Get Free Test ETH
 
-Visit the [Base Goerli Faucet](https://faucet.base.org/) and:
+Visit the [Base Faucet](https://faucet.base.org/) and:
 - Connect your wallet
 - Request test ETH (0.5 ETH max per day)
 - Wait 1-2 minutes for confirmation
 
 ### 3. Verify Network Setup
 
-- Check MetaMask shows "Base Goerli"
+- Check MetaMask shows "Base Sepolia"
 - Balance should show received test ETH
 - Test transaction: Send 0.001 ETH to yourself
 
@@ -61,10 +61,10 @@ Create a `.env.local` file in the project root:
 TEST_WALLET_ADDRESS=0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 TEST_WALLET_PRIVATE_KEY=your-private-key-here
 
-# Base Goerli Configuration
-BASE_GOERLI_RPC=https://goerli.base.org
-BASE_GOERLI_CHAIN_ID=84531
-BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
+# Base Sepolia Configuration
+BASE_SEPOLIA_RPC=https://sepolia.base.org
+BASE_SEPOLIA_CHAIN_ID=84532
+BASE_SEPOLIA_EXPLORER=https://sepolia.basescan.org/
 ```
 
 ## Wallet Integration Testing
@@ -96,7 +96,7 @@ BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
    - Enter submission hash and contributor ID
    - Click "Register Certificate"
    - Approve MetaMask transaction
-   - Verify on Base Goerli explorer
+   - Verify on Base Sepolia explorer
 
 ## Fee Structure Testing
 
@@ -115,7 +115,7 @@ BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
 ### Common Issues
 
 **"Network not found"**
-- Verify Base Goerli network is added correctly
+- Verify Base Sepolia network is added correctly
 - Check RPC URL: `https://goerli.base.org`
 
 **"Insufficient funds"**
@@ -125,7 +125,7 @@ BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
 **"Transaction failed"**
 - Check gas limit (Base is efficient, try 100,000 gas)
 - Verify contract addresses are correct
-- Check Base Goerli status: https://status.base.org/
+- Check Base Sepolia status: https://status.base.org/
 
 **"Wallet not connecting"**
 - Refresh browser page
@@ -134,7 +134,7 @@ BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
 
 ### Debug Tools
 
-**Base Goerli Explorer**: https://goerli.basescan.org/
+**Base Sepolia Explorer**: https://sepolia.basescan.org/
 - View transactions and contract interactions
 - Check contract deployments
 - Monitor network activity
@@ -148,7 +148,7 @@ BASE_GOERLI_EXPLORER=https://goerli.basescan.org/
 
 Once local testing is complete:
 
-1. **Deploy to Base Goerli**: Smart contracts and backend
+1. **Deploy to Base Sepolia**: Smart contracts and backend
 2. **Frontend Integration**: Connect to testnet contracts
 3. **User Testing**: Invite beta testers
 4. **Mainnet Migration**: Deploy to Base mainnet
@@ -156,7 +156,7 @@ Once local testing is complete:
 
 ## Security Notes
 
-- **Testnet Only**: All transactions on Base Goerli are for testing
+- **Testnet Only**: All transactions on Base Sepolia are for testing
 - **No Real Value**: Test ETH and tokens have no monetary value
 - **Private Keys**: Never expose private keys in code or logs
 - **Rate Limits**: Respect faucet limits and API rate limits
@@ -164,6 +164,6 @@ Once local testing is complete:
 
 ---
 
-**Ready to test?** Start with the [Base Goerli Faucet](https://faucet.base.org/) to get your test ETH! 🚀
+**Ready to test?** Start with the [Base Faucet](https://faucet.base.org/) to get your test ETH! 🚀
 
 
